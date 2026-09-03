@@ -1,0 +1,8 @@
+type: object
+description: The repository connections the caller can see.
+required: [items]
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Connection.yaml

@@ -1,0 +1,5 @@
+type: string
+description: >
+  The forge hosting the connected repository. GitHub is the only provider SpecForge integrates
+  with today; GitLab and Bitbucket are acknowledged in the product but not built.
+enum: [GITHUB]

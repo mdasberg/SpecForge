@@ -1,0 +1,17 @@
+get:
+  operationId: listForgeInstallations
+  tags: [ Repository ]
+  summary: The forge installations the caller can connect a repository through.
+  description: >
+    Only repositories the installation actually grants are selectable in the connection wizard —
+    an installation is scoped by GitHub to a subset of an account's repositories, and that scope
+    is the boundary SpecForge reads through.
+  responses:
+    '200':
+      description: The forge installations visible to the caller.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ForgeInstallationList.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml

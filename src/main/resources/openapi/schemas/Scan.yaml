@@ -1,0 +1,59 @@
+type: object
+description: >
+  The result of scanning a repository for importable specifications. The scan is asynchronous and
+  its result is stored rather than recomputed, so the connection wizard can re-read it instead of
+  scanning again on every step back and forth.
+required:
+  - id
+  - status
+  - repositoryFullName
+  - branch
+  - pathGlob
+  - specFormat
+  - importableCount
+  - changeProposalCount
+  - unparsableCount
+  - startedAt
+  - files
+properties:
+  id:
+    type: string
+    format: uuid
+  status:
+    type: string
+    enum: [PENDING, RUNNING, SUCCEEDED, FAILED]
+  repositoryFullName:
+    type: string
+    example: acme/billing-specs
+  branch:
+    type: string
+    example: main
+  pathGlob:
+    type: string
+    example: openspec/specs/**/spec.md
+  specFormat:
+    $ref: ./SpecFormat.yaml
+  importableCount:
+    type: integer
+    format: int32
+  changeProposalCount:
+    type: integer
+    format: int32
+  unparsableCount:
+    type: integer
+    format: int32
+  failureReason:
+    type: string
+    nullable: true
+    description: Why the scan failed, present only when status is FAILED.
+  startedAt:
+    type: string
+    format: date-time
+  finishedAt:
+    type: string
+    format: date-time
+    nullable: true
+  files:
+    type: array
+    items:
+      $ref: ./ScanFile.yaml

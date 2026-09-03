@@ -1,0 +1,13 @@
+type: object
+description: One file the scan looked at.
+required: [path, classification]
+properties:
+  path:
+    type: string
+    example: openspec/specs/billing/spec.md
+  classification:
+    $ref: ./ScanClassification.yaml
+  reason:
+    type: string
+    nullable: true
+    description: Why the file could not be parsed. Present only when classification is UNPARSABLE.

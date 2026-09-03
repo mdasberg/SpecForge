@@ -1,0 +1,53 @@
+type: object
+description: One execution of importing specifications from a connection's repository.
+required:
+  - id
+  - connectionId
+  - trigger
+  - status
+  - startedAt
+  - importedCount
+  - unchangedCount
+  - skippedCount
+  - failedCount
+  - files
+properties:
+  id:
+    type: string
+    format: uuid
+  connectionId:
+    type: string
+    format: uuid
+  trigger:
+    type: string
+    enum: [INITIAL, PUSH, PULL_REQUEST, MANUAL]
+  status:
+    type: string
+    enum: [RUNNING, SUCCEEDED, FAILED]
+  commitSha:
+    type: string
+    nullable: true
+    description: The commit the run imported from. Null until the run resolves the branch head.
+  startedAt:
+    type: string
+    format: date-time
+  finishedAt:
+    type: string
+    format: date-time
+    nullable: true
+  importedCount:
+    type: integer
+    format: int32
+  unchangedCount:
+    type: integer
+    format: int32
+  skippedCount:
+    type: integer
+    format: int32
+  failedCount:
+    type: integer
+    format: int32
+  files:
+    type: array
+    items:
+      $ref: ./ImportRunFile.yaml

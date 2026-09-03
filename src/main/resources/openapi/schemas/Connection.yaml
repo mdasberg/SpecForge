@@ -1,0 +1,48 @@
+type: object
+description: A connection between a project and the repository that holds its specifications.
+required:
+  - id
+  - projectName
+  - installationId
+  - repositoryFullName
+  - branch
+  - pathGlob
+  - specFormat
+  - syncMode
+  - state
+  - createdAt
+properties:
+  id:
+    type: string
+    format: uuid
+  projectName:
+    type: string
+    example: Billing
+  installationId:
+    type: string
+    format: uuid
+  repositoryFullName:
+    type: string
+    example: acme/billing-specs
+  branch:
+    type: string
+    example: main
+  pathGlob:
+    type: string
+    example: openspec/specs/**/spec.md
+  specFormat:
+    $ref: ./SpecFormat.yaml
+  syncMode:
+    $ref: ./SyncMode.yaml
+  state:
+    type: string
+    enum: [ACTIVE, DEGRADED]
+  degradedReason:
+    type: string
+    nullable: true
+    description: >
+      The notice shown on a connection whose installation was revoked or suspended. Null while the
+      connection is ACTIVE.
+  createdAt:
+    type: string
+    format: date-time

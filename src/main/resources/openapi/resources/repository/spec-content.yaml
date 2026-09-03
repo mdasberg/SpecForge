@@ -1,0 +1,28 @@
+put:
+  operationId: updateSpecContent
+  tags: [ Repository ]
+  summary: Refused edit of a specification's content.
+  description: >
+    The response is always 409: specification content lives in the connected git repository, and
+    SpecForge is a read-only mirror. The problem document names the source repository and path,
+    directing the author to change the file in git instead.
+  parameters:
+    - name: specId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/SpecContentUpdate.yaml
+  responses:
+    '409':
+      $ref: ../../responses/Conflict.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

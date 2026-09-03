@@ -1,0 +1,41 @@
+post:
+  operationId: createRepositoryConnection
+  tags: [ Repository ]
+  summary: Connect a repository as the source of a project's specifications.
+  description: >
+    Creates the connection and triggers the initial import. A repository, branch and path can be
+    connected once; connecting it again is a conflict rather than a silent duplicate.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/ConnectionRequest.yaml
+  responses:
+    '201':
+      description: The connection was created.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Connection.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '409':
+      $ref: ../../responses/Conflict.yaml
+    '422':
+      $ref: ../../responses/UnprocessableEntity.yaml
+get:
+  operationId: listRepositoryConnections
+  tags: [ Repository ]
+  summary: The repository connections the caller can see.
+  responses:
+    '200':
+      description: The connections.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ConnectionList.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml

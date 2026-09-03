@@ -1,0 +1,46 @@
+post:
+  operationId: receiveGitHubWebhook
+  tags: [ Repository ]
+  summary: Receive a GitHub webhook delivery.
+  description: >
+    Triggers a sync for the connections that watch the delivered repository and branch. Declared
+    with security: [] because it is authenticated by an HMAC signature over the raw body rather
+    than by a bearer token — GitHub cannot present a Keycloak token.
+  security: []
+  parameters:
+    - name: X-GitHub-Event
+      in: header
+      required: false
+      schema:
+        type: string
+    - name: X-GitHub-Delivery
+      in: header
+      required: false
+      schema:
+        type: string
+    - name: X-Hub-Signature-256
+      in: header
+      required: false
+      schema:
+        type: string
+  requestBody:
+    required: true
+    description: >
+      The raw delivery payload. It is declared as a string rather than a typed object on purpose:
+      the HMAC signature is computed over the exact bytes GitHub sent, so the endpoint has to see
+      the body before anything parses it.
+    content:
+      '*/*':
+        schema:
+          type: string
+  responses:
+    '202':
+      description: Accepted, or acknowledged as a replay of a delivery already processed.
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      description: The signature did not verify.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../schemas/Problem.yaml

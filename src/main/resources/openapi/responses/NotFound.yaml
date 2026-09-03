@@ -1,0 +1,5 @@
+description: No resource exists at this identifier.
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml

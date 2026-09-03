@@ -8,7 +8,6 @@ plugins {
 }
 
 group = 'com.specforge'
-version = '0.0.1-SNAPSHOT'
 description = 'SpecForge — collaborative review and approval for software specifications'
 
 java {
@@ -38,6 +37,13 @@ openApiGenerate {
     modelNameSuffix = ''
 }
 
+// The contract is split across resources/, schemas/, parameters/ and responses/, and the generator
+// declares only the root document as an input. Without this the task stays up-to-date after a
+// $ref'd file changes and the build silently compiles against stale interfaces.
+tasks.named('openApiGenerate') {
+    inputs.dir("$projectDir/src/main/resources/openapi").withPathSensitivity(PathSensitivity.RELATIVE)
+}
+
 // The same contract bundled to a single JSON file, which is what /api/openapi.json serves. Serving
 // the generated bundle rather than a hand-kept copy is what keeps the published document and the
 // interfaces provably the same artefact.
@@ -46,6 +52,7 @@ def bundleApiContract = tasks.register('bundleApiContract', org.openapitools.gen
     inputSpec = apiContract
     outputDir = layout.buildDirectory.dir('generated/openapi-doc').get().asFile.toString()
     logToStderr = true
+    inputs.dir("$projectDir/src/main/resources/openapi").withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 sourceSets {
@@ -90,10 +97,6 @@ idea {
         testSources.from(sourceSets.itest.java.srcDirs)
         testResources.from(sourceSets.itest.resources.srcDirs)
     }
-}
-
-ext {
-    springModulithVersion = '2.1.1'
 }
 
 dependencies {

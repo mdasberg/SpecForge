@@ -1,0 +1,22 @@
+get:
+  operationId: getRepositoryConnection
+  tags: [ Repository ]
+  summary: A single repository connection.
+  parameters:
+    - name: connectionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The connection.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Connection.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

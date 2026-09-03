@@ -1,0 +1,15 @@
+type: object
+description: >
+  One file an import run looked at. This is the row that answers "why is this file not a
+  specification" without re-running the import.
+required: [path, outcome]
+properties:
+  path:
+    type: string
+    example: openspec/specs/billing/spec.md
+  outcome:
+    $ref: ./ImportOutcome.yaml
+  reason:
+    type: string
+    nullable: true
+    description: Why the file was skipped or failed, present only for those outcomes.

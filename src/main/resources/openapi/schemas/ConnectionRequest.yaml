@@ -1,0 +1,28 @@
+type: object
+description: A request to connect a repository as the source of a project's specifications.
+required: [installationId, repositoryFullName, branch, pathGlob, specFormat, syncMode, project]
+properties:
+  installationId:
+    type: string
+    format: uuid
+    description: The forge installation to read the repository through.
+  repositoryFullName:
+    type: string
+    example: acme/billing-specs
+  branch:
+    type: string
+    example: main
+  pathGlob:
+    type: string
+    default: openspec/specs/**/spec.md
+    description: Which files in the repository count as specifications.
+  specFormat:
+    $ref: ./SpecFormat.yaml
+  syncMode:
+    $ref: ./SyncMode.yaml
+  project:
+    $ref: ./ProjectConfiguration.yaml
+  scanId:
+    type: string
+    format: uuid
+    description: The scan whose result the administrator confirmed before connecting.

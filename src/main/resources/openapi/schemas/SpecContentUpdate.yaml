@@ -1,0 +1,10 @@
+type: object
+description: >
+  A request to edit a specification's content directly. This request is always refused:
+  specification content lives in the connected git repository, and SpecForge is a read-only
+  mirror. The schema exists so the refusal is part of the contract rather than an accident of
+  routing.
+required: [content]
+properties:
+  content:
+    type: string

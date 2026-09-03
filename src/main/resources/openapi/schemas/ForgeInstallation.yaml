@@ -1,0 +1,41 @@
+type: object
+description: >
+  A GitHub App installation SpecForge can read repositories through. The installation is the
+  boundary of what is even selectable in the connection wizard: a repository the installation was
+  never granted never appears.
+required: [id, provider, accountLogin, status, grantedRepositoryCount, repositories]
+properties:
+  id:
+    type: string
+    format: uuid
+  provider:
+    $ref: ./ForgeProvider.yaml
+  accountLogin:
+    type: string
+    description: The GitHub organisation or user the installation belongs to.
+    example: acme
+  accountType:
+    type: string
+    example: Organization
+  status:
+    type: string
+    enum: [ACTIVE, SUSPENDED, REVOKED]
+    description: >
+      Whether the installation can still be read through. A suspended or revoked installation
+      degrades every connection that was made through it.
+  grantedRepositoryCount:
+    type: integer
+    format: int32
+    description: How many repositories this installation currently grants access to.
+  accountRepositoryCount:
+    type: integer
+    format: int32
+    nullable: true
+    description: >
+      The total number of repositories in the account, granted or not. Lets the wizard state
+      "4 of 23 granted" rather than just the granted count; null when GitHub does not report it.
+  repositories:
+    type: array
+    description: The repositories granted by this installation.
+    items:
+      $ref: ./GrantedRepository.yaml
