@@ -1,0 +1,45 @@
+schema: spec-driven
+
+context: |
+  SpecForge is a collaborative review and approval platform for software
+  specifications — the missing review layer for spec-driven development.
+  Lifecycle: Draft → In Review → Changes Requested → Approved → Implemented.
+
+  Design: the clickable prototype in `design/` is the reference for every
+  screen and for the design system (IBM Plex Sans/Mono, dark default with a
+  light theme, indigo accent, violet reserved for agent output). Rebuild with
+  `npm --prefix design run dev`.
+
+  Tech stack (see add-project-skeleton/design.md for the rationale):
+  Java 25 · Spring Boot 4 · Spring Modulith 2 (one module per capability) ·
+  MySQL + Liquibase · React 19 + TypeScript + Vite. Package base
+  `com.specforge`. REST under `/api`, errors as RFC 9457 problem+json.
+
+  Auth and user management: Keycloak (realm `specforge`, dev realm imported from
+  `keycloak/realm-export.json`). The backend is a resource server validating
+  Keycloak JWTs; the SPA logs in with authorization code + PKCE through the
+  public `specforge-web` client; check runners authenticate as agents through
+  service accounts on the confidential `specforge-api` client. Realm roles
+  `REVIEWER` / `ARCHITECT` / `ADMIN` are the only source of roles. SpecForge
+  builds no account, password or MFA screens — those live in Keycloak.
+
+  Hard product rules that cut across capabilities:
+  - SpecForge is READ-ONLY on a connected repository. Specs live in git;
+    reviews, comments, approvals and tickets live in SpecForge.
+  - Human and agent authorship is always distinguishable in the API, not just
+    in the UI. Agents comment, suggest and fail checks; agents never approve.
+  - Every state change lands in the append-only audit event log.
+  - No health, member, claim or other restricted data enters SpecForge fixtures
+    or sample data.
+
+  Implementation order (each change depends on the ones above it):
+  1. add-project-skeleton
+  2. add-spec-repository
+  3. add-spec-catalog
+  4. add-spec-review
+  5. add-review-discussions
+  6. add-review-approval
+  7. add-automated-review
+  8. add-ticket-links
+  9. add-audit-trail
+  10. add-review-dashboard
