@@ -1,0 +1,232 @@
+  <div class="body">
+    <div class="side" style="flex: 0 0 262px; gap: 16px">
+      <div>
+        <div class="side-t">Checks on v3</div>
+        <div class="side-group">
+          <div class="side-item on"><span style="color: var(--red)">@i(x,13)</span> API compatibility<div class="spacer"></div><span class="badge b-blocked" style="height: 16px; font-size: 10px">Blocking</span></div>
+          <div class="side-item"><span style="color: var(--amber)">@i(warn,13)</span> Acceptance criteria coverage<div class="spacer"></div><span>1</span></div>
+          <div class="side-item"><span style="color: var(--green)">@i(check,13)</span> OpenSpec validation</div>
+          <div class="side-item"><span style="color: var(--green)">@i(check,13)</span> Architecture rules</div>
+          <div class="side-item"><span style="color: var(--green)">@i(check,13)</span> Terminology consistency</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Agent findings</div>
+        <div class="side-group">
+          <div class="side-item">@i(bot,13) Missing edge cases<div class="spacer"></div><span>2</span></div>
+          <div class="side-item">@i(bot,13) Security concerns<div class="spacer"></div><span>0</span></div>
+          <div class="side-item">@i(bot,13) Inconsistent terminology<div class="spacer"></div><span>0</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Runs</div>
+        <div class="side-group">
+          <div class="side-item on">@i(circleDot,13) v3 · 1 Sep 09:20<div class="spacer"></div><span class="faint">14s</span></div>
+          <div class="side-item">@i(commit,13) v2 · 27 Aug 09:02<div class="spacer"></div><span class="faint">12s</span></div>
+          <div class="side-item">@i(commit,13) v1 · 24 Aug 15:06<div class="spacer"></div><span class="faint">9s</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main" style="padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 20px; align-items: start">
+
+      <div style="display: flex; flex-direction: column; gap: 14px">
+
+        <!-- legend -->
+        <div class="card card-pad" style="padding: 10px 14px; display: flex; align-items: center; gap: 18px">
+          <span class="rp-t" style="margin: 0">Feedback source</span>
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px">
+            <span class="av av-am">AO</span><span class="muted">Human — round avatar, name, no badge</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px">
+            <span class="av av-bot">@i(bot,12)</span><span class="muted">Agent — square dashed avatar, violet rail, always badged</span>
+          </div>
+          <div class="spacer"></div>
+          <span class="chip">@i(filter,12) Agent findings only</span>
+        </div>
+
+        <!-- failing check detail -->
+        <div class="card" style="border-left: 3px solid var(--red)">
+          <div class="card-h">
+            <span style="color: var(--red)">@i(x,14)</span>
+            <span class="card-t">API compatibility</span>
+            <span class="badge b-blocked">Blocking</span>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">contract check · openapi/claim-preauthorization.yaml</span>
+          </div>
+          <div class="card-pad">
+            <p class="cmt-t" style="margin: 0 0 10px">Removing <code>providerTier</code> from the request body is a breaking change for consumers that still send it. Two consumers are registered against version <span class="mono">3.2</span> of this contract.</p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px">
+              <thead><tr>
+                <th style="text-align: left; font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-3); padding: 6px 10px; border-bottom: 1px solid var(--line); background: var(--panel-2)">Consumer</th>
+                <th style="text-align: left; font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-3); padding: 6px 10px; border-bottom: 1px solid var(--line); background: var(--panel-2)">Uses</th>
+                <th style="text-align: left; font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-3); padding: 6px 10px; border-bottom: 1px solid var(--line); background: var(--panel-2)">Impact</th>
+              </tr></thead>
+              <tbody>
+                <tr>
+                  <td style="padding: 7px 10px; border-bottom: 1px solid var(--line-2)" class="mono">claim-intake 3.2</td>
+                  <td style="padding: 7px 10px; border-bottom: 1px solid var(--line-2); color: var(--fg-2)"><code>providerTier</code> on every request</td>
+                  <td style="padding: 7px 10px; border-bottom: 1px solid var(--line-2)"><span class="badge b-blocked">Rejected at 422</span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 7px 10px; border-bottom: 1px solid var(--line-2)" class="mono">provider-portal 2.9</td>
+                  <td style="padding: 7px 10px; border-bottom: 1px solid var(--line-2); color: var(--fg-2)">reads the co-payment hint</td>
+                  <td style="padding: 7px 10px; border-bottom: 1px solid var(--line-2)"><span class="badge b-changes">Degraded copy</span></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="gate" style="margin-top: 12px">
+              <span style="color: var(--indigo); padding-top: 1px">@i(shield,13)</span>
+              <div>Rule <b class="mono" style="font-weight: 500">api/no-breaking-removals</b> blocks approval unless the removal is marked deprecated for one release or every consumer is bumped in the same change.</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px">
+              <button class="btn btn-primary btn-sm" onClick="{{openTicket}}">@i(ticket,12) Create ticket for consumer bump</button>
+              <button class="btn btn-sm">@i(clock,12) Mark deprecated for one release</button>
+              <button class="btn btn-sm btn-ghost">@i(comment,12) Discuss</button>
+              <div class="spacer"></div>
+              <button class="btn btn-sm btn-ghost faint">Override with justification</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- agent finding with suggestion -->
+        <div class="thread agent">
+          <div class="th-h" style="background: var(--violet-dim); padding: 9px 12px">
+            <span class="av av-bot">@i(bot,12)</span>
+            <b style="font-weight: 600; font-size: 12.5px">spec-sentinel</b>
+            <span class="badge b-agent" style="height: 17px">Automated reviewer</span>
+            <span class="muted" style="font-size: 11.5px">acceptance criteria coverage</span>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">§7 · CM-C-107 · 2d ago</span>
+          </div>
+          <div class="cmt" style="padding: 12px">
+            <div class="cmt-b">
+              <div class="cmt-t">Requirement <code>CM-C-107</code> (“an approved pre-authorization expires 14 days after approval”) has no acceptance criterion. Nothing in §9 exercises the expiry path, so an implementation could satisfy the spec without ever emitting <code>claims.preauthorization.expired.v1</code>.</div>
+            </div>
+          </div>
+          <div class="suggest" style="margin: 0 12px 12px">
+            <div class="sh">suggested addition — §9 Acceptance criteria</div>
+            <div class="sl" style="background: var(--add-bg); color: var(--add-fg)">+ **AC-9.7** Given an APPROVED pre-authorization with no referencing claim,</div>
+            <div class="sl" style="background: var(--add-bg); color: var(--add-fg)">+ when 14 days have passed since the approval timestamp,</div>
+            <div class="sl" style="background: var(--add-bg); color: var(--add-fg)">+ then its state is EXPIRED and claims.preauthorization.expired.v1</div>
+            <div class="sl" style="background: var(--add-bg); color: var(--add-fg)">+ is emitted exactly once for the pre-authorization id.</div>
+          </div>
+          <div class="th-f" style="padding: 0 12px 12px">
+            <button class="btn btn-sm btn-primary">@i(check,12) Accept into v4 draft</button>
+            <button class="btn btn-sm">@i(x,12) Dismiss</button>
+            <button class="btn btn-sm btn-ghost">@i(comment,12) Discuss with the team</button>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">accepting edits the spec, not the review</span>
+          </div>
+        </div>
+
+        <div class="thread agent">
+          <div class="th-h" style="background: var(--violet-dim); padding: 9px 12px">
+            <span class="av av-bot">@i(bot,12)</span>
+            <b style="font-weight: 600; font-size: 12.5px">spec-sentinel</b>
+            <span class="badge b-agent" style="height: 17px">Automated reviewer</span>
+            <span class="muted" style="font-size: 11.5px">missing edge case</span>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">§4 · 2d ago</span>
+          </div>
+          <div class="cmt" style="padding: 12px">
+            <div class="cmt-b">
+              <div class="cmt-t">The state machine has no transition out of <code>PARTIALLY_APPROVED</code> when the member's policy lapses before the reservation is consumed. <code>APPROVED</code> has the same gap, but v2 covered it in §8 — that paragraph was removed in v3.</div>
+              <div style="display: flex; align-items: center; gap: 7px; margin-top: 8px">
+                <span class="badge b-changes" style="height: 18px">Confidence: medium</span>
+                <span class="faint" style="font-size: 11px">derived from the v2 → v3 diff and cm-011</span>
+              </div>
+            </div>
+          </div>
+          <div class="th-f" style="padding: 0 12px 12px">
+            <button class="btn btn-sm">@i(check,12) Accept</button>
+            <button class="btn btn-sm">@i(x,12) Dismiss</button>
+            <button class="btn btn-sm btn-ghost" onClick="{{openTicket}}">@i(ticket,12) Create ticket</button>
+          </div>
+        </div>
+
+        <!-- human comment, for contrast -->
+        <div class="thread">
+          <div class="th-h">
+            <span style="color: var(--amber)">@i(circleDot,13)</span>
+            <b style="font-weight: 600">Unresolved</b>
+            <span class="muted" style="font-size: 11.5px">picked up from an agent finding</span>
+            <div class="spacer"></div>
+            <span class="faint">§4 Lifecycle</span>
+          </div>
+          <div class="cmt">
+            <div class="av av-am">AO</div>
+            <div class="cmt-b">
+              <div class="cmt-h"><b>Amara Okoth</b><span class="when">3h ago</span><span class="badge b-draft" style="height: 16px; font-size: 10px">Architect</span></div>
+              <div class="cmt-t">Agreed with the agent on the lapsed-policy gap, but the fix belongs in §8, not the state machine. <span class="mention">@mischa</span> can you restore the v2 paragraph and reference CM-C-104?</div>
+            </div>
+          </div>
+          <div class="th-f">
+            <button class="btn btn-sm">@i(check,12) Resolve</button>
+            <button class="btn btn-sm btn-ghost">@i(comment,12) Reply</button>
+            <button class="btn btn-sm btn-ghost" onClick="{{openTicket}}">@i(ticket,12) Create ticket</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div class="card">
+          <div class="card-h">@i(zap,13)<span class="card-t">Run summary</span><div class="spacer"></div><span class="faint" style="font-size: 11px">14s · 1 Sep 09:20</span></div>
+          <div class="rp-block">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px">
+              <div class="tnum" style="font-size: 22px; font-weight: 600">3 / 5</div>
+              <div class="faint" style="font-size: 11.5px">checks passed<br>1 blocking, 1 warning</div>
+            </div>
+            <div class="progress" style="height: 6px">
+              <i style="width: 60%; background: var(--green)"></i>
+              <i style="width: 20%; background: var(--amber)"></i>
+              <i style="width: 20%; background: var(--red)"></i>
+            </div>
+          </div>
+          <div class="rp-block">
+            <div class="rp-t">Approval impact</div>
+            <div class="check"><span style="color: var(--red); padding-top: 2px">@i(x,13)</span><div><div class="nm">Approval blocked</div><div class="ds">1 blocking check must pass or be overridden with a justification</div></div></div>
+            <div class="check"><span style="color: var(--amber); padding-top: 2px">@i(warn,13)</span><div><div class="nm">Warnings do not block</div><div class="ds">they stay on the spec until resolved or dismissed</div></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h">@i(bot,13)<span class="card-t">Automated reviewers</span></div>
+          <div class="rp-block">
+            <div class="rv">
+              <div class="av av-bot">@i(bot,12)</div>
+              <div style="flex: 1 1 auto; min-width: 0">
+                <div class="rv-n">spec-sentinel</div>
+                <div class="rv-r">OpenSpec + architecture rules · reviews every version</div>
+              </div>
+            </div>
+            <div class="rv">
+              <div class="av av-bot">@i(shield,12)</div>
+              <div style="flex: 1 1 auto; min-width: 0">
+                <div class="rv-n">contract-guard</div>
+                <div class="rv-r">API compatibility against registered consumers</div>
+              </div>
+            </div>
+            <div class="gate" style="margin-top: 8px">
+              <span style="color: var(--violet); padding-top: 1px">@i(bot,13)</span>
+              <div>Agents can comment, suggest and fail checks. They never approve, and their findings never count toward the approval rule.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h">@i(sliders,13)<span class="card-t">Enabled for care-management</span></div>
+          <div class="rp-block" style="display: flex; flex-direction: column; gap: 7px; font-size: 12px">
+            <div style="display: flex; align-items: center; gap: 8px"><span style="color: var(--green)">@i(check,13)</span>OpenSpec validation<div class="spacer"></div><span class="tag">blocking</span></div>
+            <div style="display: flex; align-items: center; gap: 8px"><span style="color: var(--green)">@i(check,13)</span>API compatibility<div class="spacer"></div><span class="tag">blocking</span></div>
+            <div style="display: flex; align-items: center; gap: 8px"><span style="color: var(--green)">@i(check,13)</span>Architecture rules<div class="spacer"></div><span class="tag">blocking</span></div>
+            <div style="display: flex; align-items: center; gap: 8px"><span style="color: var(--green)">@i(check,13)</span>Acceptance criteria coverage<div class="spacer"></div><span class="tag">warn</span></div>
+            <div style="display: flex; align-items: center; gap: 8px"><span style="color: var(--green)">@i(check,13)</span>Terminology consistency<div class="spacer"></div><span class="tag">warn</span></div>
+            <div style="display: flex; align-items: center; gap: 8px" class="faint">@i(minus,13)Security concerns<div class="spacer"></div><span class="tag">off</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

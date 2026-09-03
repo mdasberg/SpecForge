@@ -1,0 +1,258 @@
+  <div class="body">
+    <div class="side" style="flex: 0 0 236px; gap: 16px">
+      <div>
+        <div class="side-t">Compare</div>
+        <div style="padding: 0 8px; display: flex; flex-direction: column; gap: 6px">
+          <div class="input select" style="min-height: 30px">
+            <span class="muted">v2 <span class="faint">· 27 Aug</span></span>@i(chevD,13)
+          </div>
+          <div class="faint" style="text-align: center; font-size: 11px">compared with</div>
+          <div class="input select" style="min-height: 30px; border-color: var(--indigo)">
+            <span>v3 <span class="faint">· 1 Sep · current</span></span>@i(chevD,13)
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Changed sections</div>
+        <div class="side-group">
+          <div class="side-item on">@i(chevD,13) §4 Lifecycle<div class="spacer"></div><span style="color: var(--green)">+7</span><span style="color: var(--red)">−2</span></div>
+          <div class="side-item">@i(chevD,13) §5 API contract<div class="spacer"></div><span style="color: var(--green)">+14</span><span style="color: var(--red)">−9</span></div>
+          <div class="side-item">@i(chevD,13) §6 Domain events<div class="spacer"></div><span style="color: var(--green)">+9</span><span style="color: var(--red)">−0</span></div>
+          <div class="side-item">@i(chevD,13) §7 Validation rules<div class="spacer"></div><span style="color: var(--green)">+6</span><span style="color: var(--red)">−4</span></div>
+          <div class="side-item">@i(chevD,13) §8 Error handling<div class="spacer"></div><span style="color: var(--green)">+3</span><span style="color: var(--red)">−8</span></div>
+          <div class="side-item">@i(chevD,13) §9 Acceptance criteria<div class="spacer"></div><span style="color: var(--green)">+2</span><span style="color: var(--red)">−0</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Unchanged</div>
+        <div class="side-group">
+          <div class="side-item faint">§1 Purpose</div>
+          <div class="side-item faint">§2 Context</div>
+          <div class="side-item faint">§3 Preconditions</div>
+          <div class="side-item faint">§10 Architecture decisions</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Submitted by</div>
+        <div style="padding: 0 8px">
+          <div style="display: flex; align-items: center; gap: 8px">
+            <div class="av av-md av-lg">MD</div>
+            <div>
+              <div style="font-size: 12px; font-weight: 500">Mischa</div>
+              <div class="faint" style="font-size: 11px">1 Sep 2026, 09:12</div>
+            </div>
+          </div>
+          <div class="tl-box" style="margin-top: 8px; font-size: 11.5px">“Split approval per line item, move the duplicate case to 409, drop <span class="mono">providerTier</span> now that co-payment comes from the contract.”</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main" style="padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
+
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div class="seg">
+          <span class="{{inlineTab}}" onClick="{{setInline}}">@i(rows,12) Inline</span>
+          <span class="{{sbsTab}}" onClick="{{setSbs}}">@i(split,12) Side by side</span>
+        </div>
+        <span class="chip">@i(filter,12) Only changed sections</span>
+        <span class="chip">Ignore whitespace</span>
+        <div class="spacer"></div>
+        <div class="filestat" style="font-size: 11.5px">
+          <span class="bar"><span class="a"></span><span class="a"></span><span class="a"></span><span class="d"></span><span class="d"></span></span>
+          <b>+41</b><i>−23</i><span class="faint">across 2 files</span>
+        </div>
+        <button class="btn btn-sm">@i(chevD,12) Next change</button>
+      </div>
+
+      <!-- ============ INLINE ============ -->
+      <div style="display: {{inlineDisplay}}; flex-direction: column; gap: 12px">
+
+        <div class="diff">
+          <div class="diff-h">
+            @i(file,13)<span class="mono" style="font-size: 11.5px">openspec/specs/claim-preauthorization/spec.md</span>
+            <span class="tag">modified</span>
+            <div class="spacer"></div>
+            <div class="filestat"><b>+29</b><i>−18</i></div>
+            <span class="chip" style="height: 24px; font-size: 11px">@i(check,11) Mark viewed</span>
+          </div>
+
+          <div class="hunk">@@ −58,7 +58,9 @@ ## 4. Pre-Authorization Lifecycle</div>
+          <div class="dl"><span class="dl-n">58</span><span class="dl-m"> </span><span class="dl-c">REQUESTED      -&gt; UNDER_REVIEW | DECLINED</span></div>
+          <div class="dl del"><span class="dl-n">59</span><span class="dl-m">−</span><span class="dl-c">UNDER_REVIEW   -&gt; APPROVED | DECLINED</span></div>
+          <div class="dl add"><span class="dl-n">59</span><span class="dl-m">+</span><span class="dl-c">UNDER_REVIEW   -&gt; APPROVED | <span class="ww">PARTIALLY_APPROVED</span> | DECLINED</span></div>
+          <div class="dl"><span class="dl-n">60</span><span class="dl-m"> </span><span class="dl-c">APPROVED       -&gt; EXPIRED | CONSUMED</span></div>
+          <div class="dl add"><span class="dl-n">61</span><span class="dl-m">+</span><span class="dl-c">PARTIALLY_APPROVED -&gt; EXPIRED | CONSUMED</span></div>
+          <div class="dl"><span class="dl-n">62</span><span class="dl-m"> </span><span class="dl-c">DECLINED       -&gt; (terminal)</span></div>
+
+          <div class="hunk">@@ −71,3 +73,6 @@</div>
+          <div class="dl add"><span class="dl-n">73</span><span class="dl-m">+</span><span class="dl-c">- **PARTIALLY_APPROVED** — at least one requested line item is approved and</span></div>
+          <div class="dl add"><span class="dl-n">74</span><span class="dl-m">+</span><span class="dl-c">  at least one is declined. The aggregate keeps a per-line-item decision.</span></div>
+          <div class="dl del"><span class="dl-n">71</span><span class="dl-m">−</span><span class="dl-c">- **EXPIRED** — reached automatically <span class="ww">30</span> days after approval if no</span></div>
+          <div class="dl add"><span class="dl-n">75</span><span class="dl-m">+</span><span class="dl-c">- **EXPIRED** — reached automatically <span class="ww">14</span> days after approval if no</span></div>
+          <div class="dl"><span class="dl-n">76</span><span class="dl-m"> </span><span class="dl-c">  claim references the pre-authorization.</span></div>
+
+          <div class="hunk">@@ −96,9 +101,11 @@ ## 5. API Contract</div>
+          <div class="dl"><span class="dl-n">101</span><span class="dl-m"> </span><span class="dl-c">  201 Created            PreAuthorizationResponse, Location header</span></div>
+          <div class="dl del"><span class="dl-n">97</span><span class="dl-m">−</span><span class="dl-c">  <span class="ww">400 Bad Request        a pre-authorization already exists</span></span></div>
+          <div class="dl add"><span class="dl-n">102</span><span class="dl-m">+</span><span class="dl-c">  <span class="ww">409 Conflict           an active pre-authorization exists for the</span></span></div>
+          <div class="dl add"><span class="dl-n">103</span><span class="dl-m">+</span><span class="dl-c">                         (member, benefit, provider) triple</span></div>
+          <div class="dl"><span class="dl-n">104</span><span class="dl-m"> </span><span class="dl-c">  422 Unprocessable      benefit not covered on the service date</span></div>
+
+          <!-- comment attached to a changed line -->
+          <div style="border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--panel-2); padding: 10px 12px 12px">
+            <div class="thread" style="max-width: 720px">
+              <div class="th-h">
+                <span style="color: var(--amber)">@i(circleDot,13)</span>
+                <b style="font-weight: 600">Unresolved</b>
+                <span class="faint">attached to line 102 of v3</span>
+                <div class="spacer"></div>
+                <span class="faint">@i(dots,13)</span>
+              </div>
+              <div class="cmt">
+                <div class="av av-am">AO</div>
+                <div class="cmt-b">
+                  <div class="cmt-h"><b>Amara Okoth</b><span class="when">2d ago</span><span class="badge b-draft" style="height: 16px; font-size: 10px">Architect</span></div>
+                  <div class="cmt-t">409 is right — a duplicate active pre-authorization is a state conflict, not a validation failure. But the error body must carry the id of the conflicting pre-authorization, otherwise clients cannot link the two.</div>
+                </div>
+              </div>
+              <div class="linked">
+                <span style="color: var(--green)">@i(ticket,14)</span>
+                <div><div><a href="#" class="mono">CM-412</a> <span class="muted">Include conflicting pre-authorization id in 409 body</span></div>
+                <div class="faint" style="font-size: 11px; margin-top: 1px">Jira · created from this discussion</div></div>
+                <div class="spacer"></div>
+                <span class="badge b-review">To do</span>
+              </div>
+              <div class="th-f">
+                <button class="btn btn-sm">@i(check,12) Resolve</button>
+                <button class="btn btn-sm btn-ghost">@i(comment,12) Reply</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="dl"><span class="dl-n">105</span><span class="dl-m"> </span><span class="dl-c"> </span></div>
+          <div class="dl"><span class="dl-n">106</span><span class="dl-m"> </span><span class="dl-c">request body:</span></div>
+          <div class="dl del"><span class="dl-n">101</span><span class="dl-m">−</span><span class="dl-c">  providerTier           enum, drives the co-payment table</span></div>
+          <div class="dl add"><span class="dl-n">107</span><span class="dl-m">+</span><span class="dl-c">  lineItems[]            one requested benefit code per entry</span></div>
+
+          <!-- inline agent finding on the removal -->
+          <div style="border-top: 1px solid var(--line); background: var(--violet-dim); padding: 9px 12px; display: flex; align-items: flex-start; gap: 9px">
+            <span style="color: var(--violet); padding-top: 1px">@i(bot,14)</span>
+            <div style="min-width: 0; flex: 1 1 auto">
+              <div style="display: flex; align-items: center; gap: 7px">
+                <b style="font-size: 12px">spec-sentinel</b>
+                <span class="badge b-agent" style="height: 16px; font-size: 10px">Automated reviewer</span>
+                <span class="badge b-blocked" style="height: 16px; font-size: 10px">Breaking change</span>
+              </div>
+              <div class="cmt-t" style="margin-top: 3px">Removing <code>providerTier</code> breaks <span class="mono">claim-intake 3.2</span>, which still sends it. Either keep it optional for one release or coordinate the consumer bump in the same change.</div>
+            </div>
+            <button class="btn btn-sm" style="flex: 0 0 auto" onClick="{{openTicket}}">@i(ticket,12) Create ticket</button>
+            <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto">Dismiss</button>
+          </div>
+
+          <div class="hunk">@@ −118,0 +126,4 @@ ## 6. Domain Events</div>
+          <div class="dl add"><span class="dl-n">126</span><span class="dl-m">+</span><span class="dl-c">| claims.preauthorization.expired.v1 | preAuthId | expiry job ran |</span></div>
+          <div class="dl add"><span class="dl-n">127</span><span class="dl-m">+</span><span class="dl-c">| claims.preauthorization.partially_approved.v1 | preAuthId | mixed decision |</span></div>
+        </div>
+
+        <div class="diff">
+          <div class="diff-h">
+            @i(file,13)<span class="mono" style="font-size: 11.5px">openapi/claim-preauthorization.yaml</span>
+            <span class="tag">modified</span>
+            <div class="spacer"></div>
+            <div class="filestat"><b>+12</b><i>−5</i></div>
+            <span class="chip" style="height: 24px; font-size: 11px">@i(chevR,11) 3 hunks collapsed</span>
+          </div>
+          <div class="hunk" style="border-bottom: none">@@ −44,5 +44,12 @@ responses</div>
+        </div>
+      </div>
+
+      <!-- ============ SIDE BY SIDE ============ -->
+      <div style="display: {{sbsDisplay}}; flex-direction: column; gap: 12px">
+        <div class="diff">
+          <div class="diff-h">
+            @i(file,13)<span class="mono" style="font-size: 11.5px">openspec/specs/claim-preauthorization/spec.md</span>
+            <div class="spacer"></div>
+            <div class="filestat"><b>+29</b><i>−18</i></div>
+          </div>
+          <div class="sbs">
+            <div>
+              <div class="sbs-h">@i(commit,12)<b style="font-weight: 500">v2</b><span class="faint">27 Aug 2026 · Mischa</span></div>
+            </div>
+            <div>
+              <div class="sbs-h">@i(circleDot,12)<b style="font-weight: 500; color: var(--fg)">v3</b><span class="faint">1 Sep 2026 · Mischa · current</span></div>
+            </div>
+          </div>
+
+          <div class="hunk">## 4. Pre-Authorization Lifecycle</div>
+          <div class="sbs">
+            <div>
+              <div class="dl"><span class="dl-n">58</span><span class="dl-c">REQUESTED      -&gt; UNDER_REVIEW | DECLINED</span></div>
+              <div class="dl del"><span class="dl-n">59</span><span class="dl-c">UNDER_REVIEW   -&gt; APPROVED | DECLINED</span></div>
+              <div class="dl"><span class="dl-n">60</span><span class="dl-c">APPROVED       -&gt; EXPIRED | CONSUMED</span></div>
+              <div class="dl nil"><span class="dl-n"> </span><span class="dl-c"> </span></div>
+              <div class="dl"><span class="dl-n">61</span><span class="dl-c">DECLINED       -&gt; (terminal)</span></div>
+            </div>
+            <div>
+              <div class="dl"><span class="dl-n">58</span><span class="dl-c">REQUESTED      -&gt; UNDER_REVIEW | DECLINED</span></div>
+              <div class="dl add"><span class="dl-n">59</span><span class="dl-c">UNDER_REVIEW   -&gt; APPROVED | <span class="ww">PARTIALLY_APPROVED</span> | DECLINED</span></div>
+              <div class="dl"><span class="dl-n">60</span><span class="dl-c">APPROVED       -&gt; EXPIRED | CONSUMED</span></div>
+              <div class="dl add"><span class="dl-n">61</span><span class="dl-c">PARTIALLY_APPROVED -&gt; EXPIRED | CONSUMED</span></div>
+              <div class="dl"><span class="dl-n">62</span><span class="dl-c">DECLINED       -&gt; (terminal)</span></div>
+            </div>
+          </div>
+
+          <div class="hunk">Lifecycle states</div>
+          <div class="sbs">
+            <div>
+              <div class="dl nil"><span class="dl-n"> </span><span class="dl-c"> </span></div>
+              <div class="dl nil"><span class="dl-n"> </span><span class="dl-c"> </span></div>
+              <div class="dl del"><span class="dl-n">71</span><span class="dl-c">- **EXPIRED** — reached automatically <span class="ww">30</span> days after</span></div>
+              <div class="dl"><span class="dl-n">72</span><span class="dl-c">  approval if no claim references the pre-authorization.</span></div>
+            </div>
+            <div>
+              <div class="dl add"><span class="dl-n">73</span><span class="dl-c">- **PARTIALLY_APPROVED** — at least one requested line item</span></div>
+              <div class="dl add"><span class="dl-n">74</span><span class="dl-c">  is approved and at least one is declined.</span></div>
+              <div class="dl add"><span class="dl-n">75</span><span class="dl-c">- **EXPIRED** — reached automatically <span class="ww">14</span> days after</span></div>
+              <div class="dl"><span class="dl-n">76</span><span class="dl-c">  approval if no claim references the pre-authorization.</span></div>
+            </div>
+          </div>
+
+          <div class="hunk">## 5. API Contract</div>
+          <div class="sbs">
+            <div>
+              <div class="dl"><span class="dl-n">96</span><span class="dl-c">  201 Created            PreAuthorizationResponse</span></div>
+              <div class="dl del"><span class="dl-n">97</span><span class="dl-c">  <span class="ww">400 Bad Request        a pre-authorization already</span></span></div>
+              <div class="dl del"><span class="dl-n">98</span><span class="dl-c">  <span class="ww">                       exists</span></span></div>
+              <div class="dl"><span class="dl-n">99</span><span class="dl-c">  422 Unprocessable      benefit not covered</span></div>
+              <div class="dl"><span class="dl-n">100</span><span class="dl-c"> </span></div>
+              <div class="dl"><span class="dl-n">101</span><span class="dl-c">request body:</span></div>
+              <div class="dl del"><span class="dl-n">102</span><span class="dl-c">  providerTier           enum, drives co-payment</span></div>
+            </div>
+            <div>
+              <div class="dl"><span class="dl-n">101</span><span class="dl-c">  201 Created            PreAuthorizationResponse</span></div>
+              <div class="dl add"><span class="dl-n">102</span><span class="dl-c">  <span class="ww">409 Conflict           an active pre-authorization</span></span></div>
+              <div class="dl add"><span class="dl-n">103</span><span class="dl-c">  <span class="ww">                       exists for the triple</span></span></div>
+              <div class="dl"><span class="dl-n">104</span><span class="dl-c">  422 Unprocessable      benefit not covered</span></div>
+              <div class="dl"><span class="dl-n">105</span><span class="dl-c"> </span></div>
+              <div class="dl"><span class="dl-n">106</span><span class="dl-c">request body:</span></div>
+              <div class="dl add"><span class="dl-n">107</span><span class="dl-c">  lineItems[]            one benefit code per entry</span></div>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--line); background: var(--panel-2); padding: 10px 12px">
+            <div style="display: flex; align-items: center; gap: 9px; font-size: 11.5px">
+              <div class="av av-am">AO</div>
+              <span><b style="font-weight: 600">Amara Okoth</b> <span class="muted">commented on the 409 line</span></span>
+              <span class="badge b-changes" style="height: 17px">Unresolved</span>
+              <span class="tag">CM-412</span>
+              <div class="spacer"></div>
+              <button class="btn btn-sm btn-ghost">@i(chevD,12) Show discussion</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

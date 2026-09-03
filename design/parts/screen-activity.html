@@ -1,0 +1,129 @@
+<div class="body">
+  <div class="side" style="flex: 0 0 236px">
+    <div>
+      <div class="side-t">Activity</div>
+      <div class="side-group">
+        <div class="side-item on">@i(layers,14) Everything</div>
+        <div class="side-item">@i(user,14) People you work with</div>
+        <div class="side-item">@i(eye,14) Specs you watch</div>
+        <div class="side-item">@i(bot,14) Automated reviewers</div>
+      </div>
+    </div>
+    <div>
+      <div class="side-t">Event type</div>
+      <div class="side-group">
+        <div class="side-item">@i(commit,13) New versions</div>
+        <div class="side-item">@i(check,13) Approvals</div>
+        <div class="side-item">@i(warn,13) Changes requested</div>
+        <div class="side-item">@i(comment,13) Discussions</div>
+        <div class="side-item">@i(ticket,13) Tickets</div>
+        <div class="side-item">@i(deploy,13) Deployments</div>
+      </div>
+    </div>
+    <div>
+      <div class="side-t">Projects</div>
+      <div class="side-group">
+        <div class="side-item">@i(folder,13) care-management</div>
+        <div class="side-item">@i(folder,13) isiro</div>
+        <div class="side-item">@i(folder,13) financial-management</div>
+        <div class="side-item">@i(folder,13) carepool-pii</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main" style="padding: 20px 24px 24px">
+    <div style="display: flex; align-items: flex-end; gap: 12px; margin-bottom: 16px">
+      <div>
+        <h1 class="h1">Activity</h1>
+        <p class="sub">Every specification event across the projects you can see.</p>
+      </div>
+      <div class="spacer"></div>
+      <span class="chip">@i(clock,12) Last 7 days</span>
+    </div>
+
+    <div style="max-width: 940px">
+      <div class="rp-t" style="margin-bottom: 10px">Today · 3 September 2026</div>
+      <div class="tl" style="margin-bottom: 22px">
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot warn">@i(clock,13)</div><div class="tl-stem"></div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><b>Claim Pre-Authorization</b><span class="muted">is waiting on Priya Raghunathan</span><span class="tl-when">09:40</span></div>
+            <div class="tl-d">Reminder sent · <span class="mono">care-management</span> · 4 discussions still unresolved</div>
+            <div style="margin-top: 7px"><button class="btn btn-sm" onClick="{{openReview}}">@i(eye,12) Open review</button></div>
+          </div>
+        </div>
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot idx">@i(commit,13)</div><div class="tl-stem"></div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><span class="av av-sb">SB</span><b>Sven Bakker</b><span class="muted">submitted</span><span class="tag">v4</span><span class="muted">of Settlement Reconciliation</span><span class="tl-when">09:05</span></div>
+            <div class="tl-d"><span class="mono">financial-management</span> · Finance · <span style="color: var(--green)">+58</span> <span style="color: var(--red)">−12</span></div>
+          </div>
+        </div>
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot ai">@i(bot,13)</div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><b>contract-guard</b><span class="badge b-agent" style="height: 17px">Agent</span><span class="muted">failed a check on Payment Instruction Batching</span><span class="tl-when">08:12</span></div>
+            <div class="tl-d"><span class="mono">isiro</span> · API compatibility · batch size field narrowed from int64 to int32</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rp-t" style="margin-bottom: 10px">Yesterday · 2 September 2026</div>
+      <div class="tl" style="margin-bottom: 22px">
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot">@i(ticket,13)</div><div class="tl-stem"></div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><span class="av av-md">MD</span><b>Mischa</b><span class="muted">created</span><a href="#" class="mono">CM-412</a><span class="muted">from a discussion on Claim Pre-Authorization</span><span class="tl-when">16:20</span></div>
+            <div class="tl-d">Jira · High · assigned to Mischa</div>
+          </div>
+        </div>
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot ok">@i(check,13)</div><div class="tl-stem"></div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><span class="av av-jv">JV</span><b>Joris Veenstra</b><span class="muted">approved Claim Pre-Authorization</span><span class="tag">v3</span><span class="tl-when">11:05</span></div>
+          </div>
+        </div>
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot ok">@i(deploy,13)</div><div class="tl-stem"></div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><b>care-management</b><span class="muted">deployed to staging</span><span class="tag mono">1.4.0-rc3</span><span class="tl-when">14:02</span></div>
+            <div class="tl-d">Implements CM-C-101, CM-C-104, CM-C-108 from Claim Pre-Authorization · <a href="#" class="mono">#231</a></div>
+          </div>
+        </div>
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot warn">@i(warn,13)</div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><span class="av av-am">AO</span><b>Amara Okoth</b><span class="muted">requested changes on Member Eligibility Snapshot</span><span class="tag">v3</span><span class="tl-when">10:30</span></div>
+            <div class="tl-d"><span class="mono">care-management</span> · 3 blocking discussions</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rp-t" style="margin-bottom: 10px">1 September 2026</div>
+      <div class="tl">
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot ok">@i(check,13)</div><div class="tl-stem"></div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><span class="av av-am">AO</span><b>Amara Okoth</b><span class="muted">approved Claim Pre-Authorization</span><span class="tag">v3</span><span class="badge b-draft" style="height: 17px">Architect</span><span class="tl-when">17:44</span></div>
+            <div class="tl-d">Approval rule <span class="mono">claims/architect-approval</span> satisfied</div>
+          </div>
+        </div>
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot ai">@i(bot,13)</div><div class="tl-stem"></div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><b>spec-sentinel</b><span class="badge b-agent" style="height: 17px">Agent</span><span class="muted">reviewed Claim Pre-Authorization</span><span class="tag">v3</span><span class="tl-when">09:20</span></div>
+            <div class="tl-d">5 checks, 3 passed · 2 findings, 1 blocking</div>
+          </div>
+        </div>
+        <div class="tl-i">
+          <div class="tl-rail"><div class="tl-dot idx">@i(commit,13)</div></div>
+          <div class="tl-c">
+            <div class="tl-hd"><span class="av av-md">MD</span><b>Mischa</b><span class="muted">submitted</span><span class="tag">v3</span><span class="muted">of Claim Pre-Authorization</span><span class="tl-when">09:12</span></div>
+            <div class="tl-d">6 sections changed · <span style="color: var(--green)">+41</span> <span style="color: var(--red)">−23</span></div>
+            <div style="margin-top: 7px"><button class="btn btn-sm" onClick="{{openChanges}}">@i(rows,12) Review the changes</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

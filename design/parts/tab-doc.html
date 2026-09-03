@@ -1,0 +1,368 @@
+  <div class="body">
+    <!-- outline -->
+    <div class="side" style="flex: 0 0 200px; gap: 14px">
+      <div>
+        <div class="side-t">On this page</div>
+        <div class="side-group">
+          <div class="side-item sub" style="padding-left: 8px">1. Purpose</div>
+          <div class="side-item sub" style="padding-left: 8px">2. Context</div>
+          <div class="side-item sub on" style="padding-left: 8px">3. Preconditions</div>
+          <div class="side-item sub" style="padding-left: 8px">4. Lifecycle<div class="spacer"></div><span class="badge b-changes" style="height: 16px; font-size: 10px">+1</span></div>
+          <div class="side-item sub" style="padding-left: 8px">5. API contract<div class="spacer"></div><span class="badge b-changes" style="height: 16px; font-size: 10px">2</span></div>
+          <div class="side-item sub" style="padding-left: 8px">6. Domain events<div class="spacer"></div><span class="badge b-changes" style="height: 16px; font-size: 10px">+1</span></div>
+          <div class="side-item sub" style="padding-left: 8px">7. Validation rules<div class="spacer"></div><span class="badge b-agent" style="height: 16px; font-size: 10px">@i(bot,10)</span></div>
+          <div class="side-item sub" style="padding-left: 8px">8. Error handling</div>
+          <div class="side-item sub" style="padding-left: 8px">9. Acceptance criteria</div>
+          <div class="side-item sub" style="padding-left: 8px">10. Architecture decisions</div>
+        </div>
+      </div>
+      <div>
+        <div class="side-t">Versions</div>
+        <div class="side-group">
+          <div class="side-item on">@i(circleDot,13) v3 <span class="faint" style="font-weight: 400">· current</span></div>
+          <div class="side-item">@i(commit,13) v2 <span class="faint">· 6d ago</span></div>
+          <div class="side-item">@i(commit,13) v1 <span class="faint">· 10d ago</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="side-t">Tags</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; padding: 0 8px">
+          <span class="tag">claims</span><span class="tag">api</span><span class="tag">kafka</span><span class="tag">modulith</span><span class="tag">cm-c</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- document + comment gutter -->
+    <div class="main" style="padding: 22px 20px; display: grid; grid-template-columns: minmax(0, 1fr) 302px; gap: 20px; align-items: start">
+
+      <div class="doc" style="max-width: none">
+        <h2><span class="num">1.</span> Purpose</h2>
+        <p>Pre-authorization lets a contracted provider confirm <strong>before treatment</strong> that a planned benefit is covered for a member, and reserves the estimated amount against that benefit's remaining limit. It is the entry point of the <code>claim</code> capability (<code>CM-C</code>) in <code>care-management</code>.</p>
+        <p>Out of scope: claim submission, adjudication and payment. Those stay in <code>claim-management</code> until the capability is migrated.</p>
+
+        <h2><span class="num">2.</span> Context</h2>
+        <ul>
+          <li>Owning module <code>com.carepay.care.claim.preauthorization</code>, exposed to other modules only through <code>PreAuthorizationApi</code> (Spring Modulith named interface).</li>
+          <li>Authorization is delegated to askari; every endpoint checks the SpiceDB permission <code>claim/preauthorization#request</code> for the calling principal.</li>
+          <li>Member and provider identifiers are pvault tokens. Raw identifiers never cross the module boundary or reach Kafka.</li>
+          <li>Replaces the manual phone-and-fax approval flow documented in <a href="#">cm-004</a>.</li>
+        </ul>
+
+        <h2><span class="num">3.</span> Preconditions</h2>
+        <table>
+          <thead><tr><th style="width: 84px">Id</th><th>Requirement</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">CM-C-101</td><td>The member holds an <code>ACTIVE</code> policy covering the requested service date.</td></tr>
+            <tr><td class="mono">CM-C-102</td><td><span class="hl-cmt">The provider is contracted for the scheme that funds the benefit</span>, and the contract is effective on the service date.</td></tr>
+            <tr><td class="mono">CM-C-103</td><td>The calling principal holds <code>request</code> permission on the benefit through askari.</td></tr>
+          </tbody>
+        </table>
+
+        <h2><span class="num">4.</span> Pre-Authorization Lifecycle</h2>
+        <p>A pre-authorization is an aggregate with an explicit state machine. Transitions are the only way the state changes; there is no direct write path.</p>
+        <div class="codehead">@i(layers,12) state machine</div>
+<pre><code><span class="tok-c"># v3 adds PARTIALLY_APPROVED for multi-line-item requests</span>
+REQUESTED      <span class="tok-k">-&gt;</span> UNDER_REVIEW | DECLINED
+UNDER_REVIEW   <span class="tok-k">-&gt;</span> APPROVED | <span class="ww" style="background: var(--add-bg); color: var(--add-fg); border-radius: 3px; padding: 0 3px">PARTIALLY_APPROVED</span> | DECLINED
+APPROVED       <span class="tok-k">-&gt;</span> EXPIRED | CONSUMED
+<span class="ww" style="background: var(--add-bg); color: var(--add-fg); border-radius: 3px; padding: 0 3px">PARTIALLY_APPROVED -&gt; EXPIRED | CONSUMED</span>
+DECLINED       <span class="tok-k">-&gt;</span> <span class="tok-c">(terminal)</span></code></pre>
+        <ul>
+          <li><strong><span class="hl-cmt">PARTIALLY_APPROVED</span></strong> — at least one requested line item is approved and at least one is declined. The aggregate keeps a per-line-item decision.</li>
+          <li><strong>EXPIRED</strong> — reached automatically <code>14</code> days after approval if no claim references the pre-authorization. <span class="faint">(v2: 30 days)</span></li>
+          <li><strong>CONSUMED</strong> — a submitted claim referenced the pre-authorization; the reservation is released against the actual claimed amount.</li>
+        </ul>
+
+        <h2><span class="num">5.</span> API Contract</h2>
+        <div class="codehead">@i(file,12) openapi/claim-preauthorization.yaml</div>
+<pre><code><span class="tok-k">POST</span> /v1/claims/pre-authorizations
+  <span class="tok-n">201</span> Created            <span class="tok-c">PreAuthorizationResponse, Location header</span>
+  <span class="tok-n">409</span> <span class="hl-cmt">Conflict</span>           <span class="tok-c">an active pre-authorization exists for the</span>
+                           <span class="tok-c">(member, benefit, provider) triple</span>
+  <span class="tok-n">422</span> Unprocessable      <span class="tok-c">benefit not covered on the service date</span>
+
+<span class="tok-k">GET</span>  /v1/claims/pre-authorizations/{id}
+<span class="tok-k">POST</span> /v1/claims/pre-authorizations/{id}/decision
+  <span class="tok-n">200</span> OK                 <span class="tok-c">decision recorded, emits a domain event</span>
+  <span class="tok-n">409</span> Conflict           <span class="tok-c">state is terminal</span></code></pre>
+        <div class="codehead">@i(file,12) request body</div>
+<pre><code>{
+  <span class="tok-s">"memberToken"</span>: <span class="tok-s">"pv_mbr_8f31…"</span>,
+  <span class="tok-s">"providerToken"</span>: <span class="tok-s">"pv_prv_2ac0…"</span>,
+  <span class="tok-s">"serviceDate"</span>: <span class="tok-s">"2026-09-14"</span>,
+  <span class="tok-s">"lineItems"</span>: [
+    { <span class="tok-s">"benefitCode"</span>: <span class="tok-s">"OUT-CONS"</span>, <span class="tok-s">"estimatedAmount"</span>: { <span class="tok-s">"currency"</span>: <span class="tok-s">"KES"</span>, <span class="tok-s">"value"</span>: <span class="tok-n">4500</span> } }
+  ]
+}</code></pre>
+
+        <h2><span class="num">6.</span> Domain Events</h2>
+        <p>Published through the Modulith outbox to Kafka. Payloads carry tokens only.</p>
+        <table>
+          <thead><tr><th>Topic</th><th style="width: 108px">Key</th><th>Emitted when</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">claims.preauthorization.requested.v1</td><td class="mono">preAuthId</td><td>request accepted</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- comment gutter -->
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div class="row-meta" style="justify-content: space-between">
+          <span style="display: flex; align-items: center; gap: 6px">@i(comment,13) Discussions on v3</span>
+          <span class="chip" style="height: 24px; font-size: 11px">@i(filter,11) Unresolved</span>
+        </div>
+
+        <!-- resolved thread, anchored to CM-C-102 -->
+        <div class="thread {{t4Class}}">
+          <div class="th-h">
+            <span style="color: var(--green)">@i(resolve,13)</span>
+            <b style="font-weight: 600">{{t4Label}}</b>
+            <div class="spacer"></div>
+            <span class="faint">CM-C-102</span>
+          </div>
+          <div class="cmt" style="padding: 8px 10px">
+            <div class="av av-pr">PR</div>
+            <div class="cmt-b">
+              <div class="cmt-h"><b>Priya Raghunathan</b><span class="when">6d ago · on v2</span></div>
+              <div class="cmt-t">Scheme funding is the thing that actually gates this — good that it moved out of the API section.</div>
+            </div>
+          </div>
+          <div class="th-f">
+            <button class="btn btn-sm btn-ghost" onClick="{{t4Toggle}}">{{t4Btn}}</button>
+            <span class="faint" style="font-size: 11px">resolved by Mischa</span>
+          </div>
+        </div>
+
+        <!-- thread on PARTIALLY_APPROVED -->
+        <div class="thread {{t2Class}}">
+          <div class="th-h">
+            <span style="color: var(--amber)">@i(circleDot,13)</span>
+            <b style="font-weight: 600">{{t2Label}}</b>
+            <div class="spacer"></div>
+            <span class="faint">§4 Lifecycle</span>
+            <span class="faint">@i(dots,13)</span>
+          </div>
+          <div class="th-anchor">PARTIALLY_APPROVED</div>
+          <div class="cmt">
+            <div class="av av-jv">JV</div>
+            <div class="cmt-b">
+              <div class="cmt-h"><b>Joris Veenstra</b><span class="when">1d ago</span></div>
+              <div class="cmt-t">What happens to the declined line items — does the provider re-request them on a new pre-authorization, or can this aggregate be amended? The state machine allows neither today.</div>
+            </div>
+          </div>
+          <div class="cmt">
+            <div class="av av-md">MD</div>
+            <div class="cmt-b">
+              <div class="cmt-h"><b>Mischa</b><span class="when">22h ago</span></div>
+              <div class="cmt-t">New pre-authorization, deliberately. Amending would make the reservation ledger non-append-only. <span class="mention">@amara.okoth</span> agree that's the right call for cm-011?</div>
+            </div>
+          </div>
+          <div class="th-f">
+            <button class="btn btn-sm" onClick="{{t2Toggle}}">@i(check,12) {{t2Btn}}</button>
+            <button class="btn btn-sm btn-ghost" onClick="{{openTicket}}">@i(ticket,12) Create ticket</button>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">2 replies</span>
+          </div>
+        </div>
+
+        <!-- thread on 409, with linked ticket -->
+        <div class="thread {{t1Class}}">
+          <div class="th-h">
+            <span style="color: var(--amber)">@i(circleDot,13)</span>
+            <b style="font-weight: 600">{{t1Label}}</b>
+            <div class="spacer"></div>
+            <span class="faint">§5 API contract</span>
+            <span class="faint">@i(dots,13)</span>
+          </div>
+          <div class="th-anchor">409 Conflict</div>
+          <div class="cmt">
+            <div class="av av-am">AO</div>
+            <div class="cmt-b">
+              <div class="cmt-h"><b>Amara Okoth</b><span class="when">2d ago</span><span class="badge b-draft" style="height: 16px; font-size: 10px">Architect</span></div>
+              <div class="cmt-t">409 is right — a duplicate active pre-authorization is a state conflict, not a validation failure. But the error body must carry the id of the conflicting pre-authorization, otherwise clients cannot link the two and we get the v2 support tickets all over again.</div>
+            </div>
+          </div>
+          <div class="linked">
+            <span style="color: var(--green)">@i(ticket,14)</span>
+            <div style="min-width: 0">
+              <div><a href="#" class="mono">CM-412</a> <span class="muted">Include conflicting pre-authorization id in 409 body</span></div>
+              <div class="faint" style="font-size: 11px; margin-top: 1px">Jira · Care Management · High · assigned to Mischa · created from this discussion</div>
+            </div>
+            <div class="spacer"></div>
+            <span class="badge b-review" style="flex: 0 0 auto">To do</span>
+          </div>
+          <div class="th-f">
+            <button class="btn btn-sm" onClick="{{t1Toggle}}">@i(check,12) {{t1Btn}}</button>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">1 reply · 1 ticket</span>
+          </div>
+        </div>
+
+        <!-- automated reviewer thread -->
+        <div class="thread agent {{t3Class}}">
+          <div class="th-h" style="background: var(--violet-dim)">
+            <span style="color: var(--violet)">@i(bot,13)</span>
+            <b style="font-weight: 600">spec-sentinel</b>
+            <span class="badge b-agent" style="height: 17px">Automated reviewer</span>
+            <div class="spacer"></div>
+            <span class="faint">§7 Validation rules</span>
+          </div>
+          <div class="cmt">
+            <div class="av av-bot">@i(bot,12)</div>
+            <div class="cmt-b">
+              <div class="cmt-h"><b>Acceptance criteria coverage</b><span class="when">on v3 · 2d ago</span></div>
+              <div class="cmt-t">Requirement <code>CM-C-107</code> (expiry after 14 days) has no matching acceptance criterion. Every requirement in <code>openspec/specs/**</code> needs at least one.</div>
+            </div>
+          </div>
+          <div class="suggest">
+            <div class="sh">suggested addition — §9 Acceptance criteria</div>
+            <div class="sl" style="background: var(--add-bg); color: var(--add-fg)">+ AC-9.7 Given an APPROVED pre-authorization with no referencing claim,</div>
+            <div class="sl" style="background: var(--add-bg); color: var(--add-fg)">+ when 14 days have passed since approval, then it becomes</div>
+            <div class="sl" style="background: var(--add-bg); color: var(--add-fg)">+ EXPIRED and claims.preauthorization.expired.v1 is emitted once.</div>
+          </div>
+          <div style="display: {{aiOpenDisplay}}" class="th-f">
+            <button class="btn btn-sm btn-primary" onClick="{{aiAccept}}">@i(check,12) Accept suggestion</button>
+            <button class="btn btn-sm" onClick="{{aiDismiss}}">@i(x,12) Dismiss</button>
+            <button class="btn btn-sm btn-ghost">@i(comment,12) Discuss</button>
+          </div>
+          <div style="display: {{aiDoneDisplay}}" class="th-f">
+            <span class="faint" style="font-size: 11.5px; display: flex; align-items: center; gap: 6px">{{aiDoneLabel}}</span>
+            <div class="spacer"></div>
+            <button class="btn btn-sm btn-ghost" onClick="{{aiReset}}">Undo</button>
+          </div>
+        </div>
+
+        <!-- short unresolved thread -->
+        <div class="thread {{t5Class}}">
+          <div class="th-h">
+            <span style="color: var(--amber)">@i(circleDot,13)</span>
+            <b style="font-weight: 600">{{t5Label}}</b>
+            <div class="spacer"></div>
+            <span class="faint">§8 Error handling</span>
+          </div>
+          <div class="cmt">
+            <div class="av av-pr">PR</div>
+            <div class="cmt-b">
+              <div class="cmt-h"><b>Priya Raghunathan</b><span class="when">1d ago</span><span class="badge b-review" style="height: 16px; font-size: 10px">Required reviewer</span></div>
+              <div class="cmt-t">What does the provider portal show when a request is declined for a non-covered benefit? The error code alone isn't enough for the UI copy.</div>
+            </div>
+          </div>
+          <div class="th-f">
+            <button class="btn btn-sm" onClick="{{t5Toggle}}">@i(check,12) {{t5Btn}}</button>
+            <button class="btn btn-sm btn-ghost" onClick="{{openTicket}}">@i(ticket,12) Create ticket</button>
+          </div>
+        </div>
+
+        <div class="reply">
+          <div class="av av-md">MD</div>
+          <span>Reply, or select text in the specification to start a discussion…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- review panel -->
+    <div style="flex: 0 0 320px; border-left: 1px solid var(--line); background: var(--panel); overflow: hidden">
+      <div class="rp-block">
+        <div class="rp-t">@i(shield,13) Review status</div>
+        <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 10px">
+          <span class="badge b-changes" style="height: 24px; padding: 0 9px">@i(clock,12) Not ready</span>
+          <span class="muted" style="font-size: 11.5px">2 of 3 required reviewers</span>
+        </div>
+        <div class="gate">
+          <span style="color: var(--green); padding-top: 1px">@i(check,13)</span>
+          <div>Rule <b class="mono" style="font-weight: 500">claims/architect-approval</b> — requires 2 approvals, at least one from an architect. <span style="color: var(--green)">Satisfied.</span></div>
+        </div>
+        <div class="gate" style="margin-top: 6px">
+          <span style="color: var(--amber); padding-top: 1px">@i(warn,13)</span>
+          <div>Blocked by <b style="font-weight: 500">{{unresolved}} unresolved discussions</b> and 1 pending required reviewer.</div>
+        </div>
+      </div>
+
+      <div class="rp-block">
+        <div class="rp-t">@i(user,13) Reviewers</div>
+        <div class="rv">
+          <div class="av av-am">AO</div>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div class="rv-n">Amara Okoth</div>
+            <div class="rv-r">Architect · required</div>
+          </div>
+          <span class="badge b-approved">@i(check,11) Approved v3</span>
+        </div>
+        <div class="rv">
+          <div class="av av-jv">JV</div>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div class="rv-n">Joris Veenstra</div>
+            <div class="rv-r">Backend chapter</div>
+          </div>
+          <span class="badge b-approved">@i(check,11) Approved v3</span>
+        </div>
+        <div class="rv">
+          <div class="av av-pr">PR</div>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div class="rv-n">Priya Raghunathan</div>
+            <div class="rv-r">Product · required</div>
+          </div>
+          <span class="badge b-draft">@i(clock,11) Pending</span>
+        </div>
+        <div class="hr" style="margin: 9px 0"></div>
+        <div class="rv">
+          <div class="av av-bot">@i(bot,12)</div>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div class="rv-n" style="display: flex; align-items: center; gap: 6px">spec-sentinel <span class="badge b-agent" style="height: 16px; font-size: 10px">Agent</span></div>
+            <div class="rv-r">2 findings · 1 blocking</div>
+          </div>
+          <span class="badge b-changes">@i(warn,11) Findings</span>
+        </div>
+      </div>
+
+      <div class="rp-block">
+        <div class="rp-t">@i(comment,13) Unresolved conversations <div class="spacer"></div><span class="tag">{{unresolved}}</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11.5px">
+          <div style="display: flex; gap: 7px"><span class="faint mono" style="flex: 0 0 46px">§4</span><span class="muted">Declined line items have no re-request path</span></div>
+          <div style="display: flex; gap: 7px"><span class="faint mono" style="flex: 0 0 46px">§5</span><span class="muted">409 body must carry the conflicting id</span></div>
+          <div style="display: flex; gap: 7px"><span class="faint mono" style="flex: 0 0 46px">§7</span><span class="muted">CM-C-107 has no acceptance criterion</span></div>
+          <div style="display: flex; gap: 7px"><span class="faint mono" style="flex: 0 0 46px">§8</span><span class="muted">Portal copy for non-covered benefit</span></div>
+        </div>
+      </div>
+
+      <div class="rp-block">
+        <div class="rp-t">@i(zap,13) Automated checks <div class="spacer"></div><span class="tag">3 / 5 passed</span></div>
+        <div class="check"><span style="color: var(--green); padding-top: 2px">@i(check,13)</span><div><div class="nm">OpenSpec validation</div><div class="ds">schema, ids and cross-references valid</div></div></div>
+        <div class="check"><span style="color: var(--red); padding-top: 2px">@i(x,13)</span><div><div class="nm">API compatibility</div><div class="ds"><code style="font-size: 10.5px">providerTier</code> removed — consumed by claim-intake 3.2</div></div></div>
+        <div class="check"><span style="color: var(--amber); padding-top: 2px">@i(warn,13)</span><div><div class="nm">Acceptance criteria coverage</div><div class="ds">1 requirement without criteria (CM-C-107)</div></div></div>
+        <div class="check"><span style="color: var(--green); padding-top: 2px">@i(check,13)</span><div><div class="nm">Architecture rules</div><div class="ds">module boundaries and pvault usage ok</div></div></div>
+        <div class="check"><span style="color: var(--green); padding-top: 2px">@i(check,13)</span><div><div class="nm">Terminology consistency</div><div class="ds">matches the claims glossary</div></div></div>
+      </div>
+
+      <div class="rp-block">
+        <div class="rp-t">@i(ticket,13) Linked work <div class="spacer"></div><span class="tag">2</span></div>
+        <div style="display: flex; flex-direction: column; gap: 7px">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px">
+            <span class="tag">Jira</span><a href="#" class="mono">CM-412</a><span class="muted" style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">409 body carries conflicting id</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px">
+            <span class="tag">GitHub</span><a href="#" class="mono">#219</a><span class="muted" style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Expiry job for pre-authorizations</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rp-block">
+        <div style="display: flex; gap: 6px">
+          <button class="btn btn-primary" style="flex: 1 1 auto" onClick="{{openApprove}}">@i(check,13) Approve</button>
+          <button class="btn btn-warn" onClick="{{openRequest}}">@i(warn,13) Request changes</button>
+        </div>
+        <button class="btn btn-ghost" style="width: 100%; margin-top: 6px" onClick="{{openComment}}">@i(comment,13) Comment without a verdict</button>
+
+        <div style="display: {{composerDisplay}}; flex-direction: column; gap: 8px; margin-top: 10px; padding: 10px; border: 1px solid var(--indigo); border-radius: 8px; background: var(--panel-2)">
+          <div class="row-meta" style="gap: 6px"><b style="color: var(--fg); font-weight: 600; font-size: 12px">{{composerTitle}}</b><div class="spacer"></div><span class="tag">v3</span></div>
+          <div class="input area" style="min-height: 62px">{{composerBody}}</div>
+          <div style="display: flex; align-items: center; gap: 6px">
+            <button class="btn btn-sm btn-primary">{{composerSubmit}}</button>
+            <button class="btn btn-sm btn-ghost" onClick="{{closeComposer}}">Cancel</button>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">recorded in history</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

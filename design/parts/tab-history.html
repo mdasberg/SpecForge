@@ -1,0 +1,234 @@
+  <div class="body">
+    <div class="side" style="flex: 0 0 250px; gap: 16px">
+      <div>
+        <div class="side-t">Versions</div>
+        <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 4px">
+          <div style="display: flex; align-items: center; gap: 9px; padding: 7px 8px; border: 1px solid var(--indigo); border-radius: 6px; background: var(--indigo-dim)">
+            <span style="color: var(--indigo)">@i(circleDot,14)</span>
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="font-size: 12px; font-weight: 500">v3 · current</div>
+              <div class="faint" style="font-size: 11px">1 Sep · Mischa · +41 −23</div>
+            </div>
+            <span class="tag">B</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px">
+            <span class="faint">@i(commit,14)</span>
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="font-size: 12px; font-weight: 500">v2</div>
+              <div class="faint" style="font-size: 11px">27 Aug · Mischa · +67 −18</div>
+            </div>
+            <span class="tag">A</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; padding: 7px 8px; border: 1px solid transparent; border-radius: 6px">
+            <span class="faint">@i(commit,14)</span>
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="font-size: 12px; font-weight: 500">v1</div>
+              <div class="faint" style="font-size: 11px">24 Aug · Mischa · initial</div>
+            </div>
+          </div>
+          <button class="btn btn-sm" style="margin-top: 4px; height: 28px">@i(split,12) Compare A → B</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Filter events</div>
+        <div class="side-group">
+          <div class="side-item on">@i(layers,13) All events<div class="spacer"></div><span>18</span></div>
+          <div class="side-item">@i(commit,13) Versions<div class="spacer"></div><span>3</span></div>
+          <div class="side-item">@i(check,13) Approvals<div class="spacer"></div><span>3</span></div>
+          <div class="side-item">@i(comment,13) Discussions<div class="spacer"></div><span>7</span></div>
+          <div class="side-item">@i(ticket,13) Tickets<div class="spacer"></div><span>2</span></div>
+          <div class="side-item">@i(bot,13) Automated<div class="spacer"></div><span>3</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Participants</div>
+        <div class="side-group">
+          <div class="side-item"><span class="av av-md">MD</span> Mischa<div class="spacer"></div><span>9</span></div>
+          <div class="side-item"><span class="av av-am">AO</span> Amara Okoth<div class="spacer"></div><span>4</span></div>
+          <div class="side-item"><span class="av av-jv">JV</span> Joris Veenstra<div class="spacer"></div><span>2</span></div>
+          <div class="side-item"><span class="av av-pr">PR</span> Priya Raghunathan<div class="spacer"></div><span>2</span></div>
+          <div class="side-item"><span class="av av-bot">@i(bot,11)</span> spec-sentinel<div class="spacer"></div><span>3</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main" style="padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 20px; align-items: start">
+
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px">
+          <h2 class="h2">Audit trail</h2>
+          <span class="faint" style="font-size: 11.5px">18 events since 24 Aug 2026 · newest first</span>
+          <div class="spacer"></div>
+          <span class="chip">@i(clock,12) All time</span>
+        </div>
+
+        <div class="tl">
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot warn">@i(clock,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><b>Awaiting review from Priya Raghunathan</b><span class="badge b-draft" style="height: 17px">Required</span><span class="tl-when">today 09:40</span></div>
+              <div class="tl-d">Reminder sent. Approval rule <span class="mono">claims/architect-approval</span> is already satisfied; 4 discussions are still unresolved.</div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot">@i(ticket,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-md">MD</span><b>Mischa</b><span class="muted">created a ticket from a discussion</span><span class="tl-when">2 Sep · 16:20</span></div>
+              <div class="tl-box" style="display: flex; align-items: center; gap: 9px">
+                <span style="color: var(--green)">@i(ticket,14)</span>
+                <div><a href="#" class="mono">CM-412</a> <span class="muted">Include conflicting pre-authorization id in 409 body</span>
+                  <div class="faint" style="font-size: 11px">Jira · High · from Amara Okoth's discussion on §5 API contract</div></div>
+                <div class="spacer"></div><span class="badge b-review">To do</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot ok">@i(check,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-jv">JV</span><b>Joris Veenstra</b><span class="muted">approved</span><span class="tag">v3</span><span class="tl-when">2 Sep · 11:05</span></div>
+              <div class="tl-d">“Per-line-item decisions are the right shape. The new pre-authorization for declined items still needs a note in §4.”</div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot ok">@i(check,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-am">AO</span><b>Amara Okoth</b><span class="muted">approved</span><span class="tag">v3</span><span class="badge b-draft" style="height: 17px">Architect</span><span class="tl-when">1 Sep · 17:44</span></div>
+              <div class="tl-d">“409 semantics agreed. Keeping the reservation ledger append-only is consistent with cm-011.”</div>
+              <div class="tl-box" style="border-left: 2px solid var(--green)">
+                <span style="color: var(--green)">@i(shield,12)</span> Approval rule <b class="mono" style="font-weight: 500">claims/architect-approval</b> satisfied — 2 approvals, 1 from an architect.
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot ai">@i(bot,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><b>spec-sentinel</b><span class="badge b-agent" style="height: 17px">Automated reviewer</span><span class="muted">reviewed</span><span class="tag">v3</span><span class="tl-when">1 Sep · 09:20</span></div>
+              <div class="tl-d">5 checks run, 3 passed. 2 findings left as comments: 1 blocking.</div>
+              <div class="tl-box">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px"><span style="color: var(--red)">@i(x,12)</span> API compatibility — <span class="mono">providerTier</span> removed, consumed by claim-intake 3.2</div>
+                <div style="display: flex; align-items: center; gap: 8px"><span style="color: var(--amber)">@i(warn,12)</span> Acceptance criteria coverage — CM-C-107 has no criterion</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot idx">@i(commit,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-md">MD</span><b>Mischa</b><span class="muted">submitted</span><span class="tag">v3</span><span class="tl-when">1 Sep · 09:12</span></div>
+              <div class="tl-d">6 sections changed · <span style="color: var(--green)">+41</span> <span style="color: var(--red)">−23</span> · from openspec change <span class="mono">cm-c-preauth-v3</span></div>
+              <div class="tl-box">
+                “Split approval per line item, move the duplicate case to 409, drop <span class="mono">providerTier</span> now that co-payment comes from the contract.”
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px">
+                  <button class="btn btn-sm">@i(split,12) Compare v2 → v3</button>
+                  <button class="btn btn-sm btn-ghost">@i(eye,12) View v3 as submitted</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot ok">@i(resolve,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-md">MD</span><b>Mischa</b><span class="muted">resolved a discussion on §3 Preconditions</span><span class="tl-when">28 Aug · 14:02</span></div>
+              <div class="tl-d">Priya Raghunathan's question about scheme funding — answered by moving CM-C-102 out of the API section.</div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot warn">@i(warn,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-am">AO</span><b>Amara Okoth</b><span class="muted">requested changes</span><span class="tag">v2</span><span class="tl-when">27 Aug · 16:30</span></div>
+              <div class="tl-d">3 blocking discussions opened.</div>
+              <div class="tl-box" style="border-left: 2px solid var(--amber)">“A single APPROVED state cannot express a mixed decision, and 400 for a duplicate hides a state conflict behind a validation error.”</div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot">@i(comment,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-pr">PR</span><b>Priya Raghunathan</b><span class="muted">commented on §8 Error handling</span><span class="tl-when">27 Aug · 10:12</span></div>
+              <div class="tl-d">“What does the provider portal show when a request is declined for a non-covered benefit?” — still unresolved.</div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot idx">@i(commit,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-md">MD</span><b>Mischa</b><span class="muted">submitted</span><span class="tag">v2</span><span class="tl-when">27 Aug · 09:00</span></div>
+              <div class="tl-d">4 sections changed · <span style="color: var(--green)">+67</span> <span style="color: var(--red)">−18</span> · added the API contract and domain events</div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot">@i(eye,13)</div><div class="tl-stem"></div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-md">MD</span><b>Mischa</b><span class="muted">requested review</span><span class="tl-when">25 Aug · 11:20</span></div>
+              <div class="tl-d" style="display: flex; align-items: center; gap: 6px">
+                from <span class="avstack"><span class="av av-am">AO</span><span class="av av-jv">JV</span><span class="av av-pr">PR</span><span class="av av-bot">@i(bot,11)</span></span>
+                <span>Amara Okoth, Joris Veenstra, Priya Raghunathan and spec-sentinel</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-i">
+            <div class="tl-rail"><div class="tl-dot">@i(plus,13)</div></div>
+            <div class="tl-c">
+              <div class="tl-hd"><span class="av av-md">MD</span><b>Mischa</b><span class="muted">created the specification</span><span class="tag">v1</span><span class="tl-when">24 Aug · 15:05</span></div>
+              <div class="tl-d">Imported from <span class="mono">openspec/changes/cm-c-preauth/proposal.md</span> on <span class="mono">care-management</span>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div class="card">
+          <div class="card-h">@i(book,13)<span class="card-t">Decision record</span><div class="spacer"></div><span class="tag">auto-generated</span></div>
+          <div class="rp-block">
+            <div class="rp-t">What changed</div>
+            <ul style="margin: 0; padding-left: 17px; font-size: 12px; color: var(--fg-2); display: flex; flex-direction: column; gap: 4px">
+              <li>Lifecycle gained <span class="mono">PARTIALLY_APPROVED</span> with per-line-item decisions.</li>
+              <li>Duplicate active request returns <span class="mono">409</span> instead of <span class="mono">400</span>.</li>
+              <li>Approval expiry shortened from 30 to 14 days.</li>
+              <li><span class="mono">providerTier</span> removed from the request body.</li>
+            </ul>
+          </div>
+          <div class="rp-block">
+            <div class="rp-t">Why</div>
+            <div style="font-size: 12px; color: var(--fg-2)">Mixed decisions were being modelled as two unrelated requests in production. Architecture review on v2 (Amara Okoth) required a state that expresses this without amending an approved reservation — see <a href="#">cm-011</a>.</div>
+          </div>
+          <div class="rp-block">
+            <div class="rp-t">Who reviewed</div>
+            <div style="display: flex; flex-direction: column; gap: 7px; font-size: 12px">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="av av-am">AO</span>Amara Okoth<div class="spacer"></div><span class="badge b-approved">Approved</span></div>
+              <div style="display: flex; align-items: center; gap: 8px"><span class="av av-jv">JV</span>Joris Veenstra<div class="spacer"></div><span class="badge b-approved">Approved</span></div>
+              <div style="display: flex; align-items: center; gap: 8px"><span class="av av-pr">PR</span>Priya Raghunathan<div class="spacer"></div><span class="badge b-draft">Pending</span></div>
+              <div style="display: flex; align-items: center; gap: 8px"><span class="av av-bot">@i(bot,12)</span>spec-sentinel<div class="spacer"></div><span class="badge b-changes">2 findings</span></div>
+            </div>
+          </div>
+          <div class="rp-block">
+            <div class="rp-t">Open when approved</div>
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11.5px">
+              <div style="display: flex; align-items: center; gap: 7px"><span class="tag">Jira</span><a href="#" class="mono">CM-412</a><span class="muted">409 body</span></div>
+              <div style="display: flex; align-items: center; gap: 7px"><span class="tag">GitHub</span><a href="#" class="mono">#219</a><span class="muted">expiry job</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-pad">
+          <div class="rp-t" style="margin-bottom: 8px">@i(split,13) Compare any two versions</div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <div class="input select" style="flex: 1 1 auto; min-height: 30px"><span>v1</span>@i(chevD,12)</div>
+            @i(arrowR,13)
+            <div class="input select" style="flex: 1 1 auto; min-height: 30px"><span>v3</span>@i(chevD,12)</div>
+          </div>
+          <button class="btn btn-sm" style="width: 100%; margin-top: 8px">Show combined diff · +108 −41</button>
+        </div>
+      </div>
+    </div>
+  </div>

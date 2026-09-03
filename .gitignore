@@ -1,0 +1,8 @@
+# IDE
+.idea/
+
+# hot.md rotation backup — working state, not history
+hot.prev.md
+
+# Node
+node_modules/

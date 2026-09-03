@@ -1,0 +1,25 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "is_interactive": true
+    }
+  ],
+  "annotations": [
+    {
+      "id": "flow-note",
+      "x": 0,
+      "y": -250,
+      "w": 760,
+      "text": "SpecForge — clickable prototype\nThe whole flow works: Home, Specs, Reviews, Projects and Activity in the top nav; inside a review, the Document / Changes / Discussions / Checks / History / Traceability tabs.\n\nStart here: Projects, then Connect a repository — pick a GitHub repo, confirm where the specs live, set how new versions enter review, and connect.\n\nThen the review walkthrough: Home, click the Claim Pre-Authorization row, read the document, switch to Changes for the v2 to v3 diff (inline or side by side), resolve or reopen a discussion, accept or dismiss the agent suggestion, create a ticket from a comment, then Approve or Request changes — and read it all back under History.\n\nDiscussion state is shared, so resolving a thread in the document updates the tab badge and the Discussions list. The theme tweak above the artboard switches between dark and light."
+    }
+  ],
+  "launch": {
+    "view": "focused",
+    "file": "Main.dc.html"
+  }
+}

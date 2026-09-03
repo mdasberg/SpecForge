@@ -1,0 +1,153 @@
+<div class="body">
+  <div class="side" style="flex: 0 0 236px">
+    <div>
+      <div class="side-t">Filter</div>
+      <div class="side-group">
+        <div class="side-item on">@i(circleDot,14) Unresolved<div class="spacer"></div><span>{{unresolved}}</span></div>
+        <div class="side-item">@i(resolve,14) Resolved<div class="spacer"></div><span>{{resolvedCount}}</span></div>
+        <div class="side-item">@i(user,14) Waiting on you<div class="spacer"></div><span>2</span></div>
+        <div class="side-item">@i(bot,14) From agents<div class="spacer"></div><span>1</span></div>
+        <div class="side-item">@i(ticket,14) Turned into work<div class="spacer"></div><span>1</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="side-t">By section</div>
+      <div class="side-group">
+        <div class="side-item">§3 Preconditions<div class="spacer"></div><span>1</span></div>
+        <div class="side-item">§4 Lifecycle<div class="spacer"></div><span>2</span></div>
+        <div class="side-item">§5 API contract<div class="spacer"></div><span>2</span></div>
+        <div class="side-item">§7 Validation rules<div class="spacer"></div><span>1</span></div>
+        <div class="side-item">§8 Error handling<div class="spacer"></div><span>1</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="side-t">Version</div>
+      <div class="side-group">
+        <div class="side-item on">@i(circleDot,13) v3<div class="spacer"></div><span>5</span></div>
+        <div class="side-item">@i(commit,13) v2<div class="spacer"></div><span>2</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <h2 class="h2">Discussions</h2>
+      <span class="faint" style="font-size: 11.5px">7 in total · {{unresolved}} unresolved · comments stay attached to the version they were made on</span>
+      <div class="spacer"></div>
+      <span class="chip">Sort: unresolved first @i(chevD,11)</span>
+    </div>
+
+    <div class="card">
+      <div class="rows">
+        <div class="row {{t2Class}}" style="align-items: flex-start; padding: 10px 14px">
+          <span class="av av-jv" style="margin-top: 1px">JV</span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span class="row-t">Declined line items have no re-request path</span>
+              <span class="tag">§4 Lifecycle</span>
+              <span class="tag mono">PARTIALLY_APPROVED</span>
+            </div>
+            <div class="cmt-t" style="margin-top: 3px; font-size: 11.5px">Joris Veenstra · 1d ago · 2 replies · last reply from Mischa mentions <span class="mention">@amara.okoth</span></div>
+          </div>
+          <span class="badge b-changes" style="flex: 0 0 auto">{{t2Label}}</span>
+          <button class="btn btn-sm" style="flex: 0 0 auto" onClick="{{t2Toggle}}">{{t2Btn}}</button>
+          <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto" onClick="{{tabDoc}}">Open in document</button>
+        </div>
+
+        <div class="row {{t1Class}}" style="align-items: flex-start; padding: 10px 14px">
+          <span class="av av-am" style="margin-top: 1px">AO</span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span class="row-t">409 body must carry the conflicting pre-authorization id</span>
+              <span class="tag">§5 API contract</span>
+              <span class="badge b-approved" style="height: 17px; font-size: 10px">@i(ticket,10) CM-412</span>
+            </div>
+            <div class="cmt-t" style="margin-top: 3px; font-size: 11.5px">Amara Okoth · Architect · 2d ago · 1 reply · ticket created 2 Sep</div>
+          </div>
+          <span class="badge b-changes" style="flex: 0 0 auto">{{t1Label}}</span>
+          <button class="btn btn-sm" style="flex: 0 0 auto" onClick="{{t1Toggle}}">{{t1Btn}}</button>
+          <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto" onClick="{{tabDoc}}">Open in document</button>
+        </div>
+
+        <div class="row {{t3Class}}" style="align-items: flex-start; padding: 10px 14px; border-left: 3px solid var(--violet)">
+          <span class="av av-bot" style="margin-top: 1px">@i(bot,12)</span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span class="row-t">CM-C-107 has no acceptance criterion</span>
+              <span class="badge b-agent" style="height: 17px; font-size: 10px">spec-sentinel</span>
+              <span class="tag">§7 Validation rules</span>
+            </div>
+            <div class="cmt-t" style="margin-top: 3px; font-size: 11.5px">Automated reviewer · 2d ago · suggests AC-9.7 as a patch</div>
+          </div>
+          <span class="badge b-agent" style="flex: 0 0 auto">{{aiStatusLabel}}</span>
+          <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto" onClick="{{tabChecks}}">Review suggestion</button>
+        </div>
+
+        <div class="row {{t5Class}}" style="align-items: flex-start; padding: 10px 14px">
+          <span class="av av-pr" style="margin-top: 1px">PR</span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span class="row-t">Portal copy for a declined non-covered benefit</span>
+              <span class="tag">§8 Error handling</span>
+              <span class="badge b-review" style="height: 17px; font-size: 10px">Required reviewer</span>
+            </div>
+            <div class="cmt-t" style="margin-top: 3px; font-size: 11.5px">Priya Raghunathan · 1d ago · no replies yet · blocks her approval</div>
+          </div>
+          <span class="badge b-changes" style="flex: 0 0 auto">{{t5Label}}</span>
+          <button class="btn btn-sm" style="flex: 0 0 auto" onClick="{{t5Toggle}}">{{t5Btn}}</button>
+          <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto" onClick="{{openTicket}}">@i(ticket,12) Create ticket</button>
+        </div>
+
+        <div class="row {{t4Class}}" style="align-items: flex-start; padding: 10px 14px">
+          <span class="av av-pr" style="margin-top: 1px">PR</span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span class="row-t">Scheme funding gates the request, not the API</span>
+              <span class="tag">§3 Preconditions</span>
+              <span class="tag mono">CM-C-102</span>
+            </div>
+            <div class="cmt-t" style="margin-top: 3px; font-size: 11.5px">Priya Raghunathan · 6d ago · on v2 · resolved by Mischa on 28 Aug</div>
+          </div>
+          <span class="badge b-approved" style="flex: 0 0 auto">{{t4Label}}</span>
+          <button class="btn btn-sm" style="flex: 0 0 auto" onClick="{{t4Toggle}}">{{t4Btn}}</button>
+          <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto" onClick="{{tabDoc}}">Open in document</button>
+        </div>
+
+        <div class="row resolved" style="align-items: flex-start; padding: 10px 14px">
+          <span class="av av-am" style="margin-top: 1px">AO</span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span class="row-t">A single APPROVED state cannot express a mixed decision</span>
+              <span class="tag">§4 Lifecycle</span>
+              <span class="tag">v2</span>
+            </div>
+            <div class="cmt-t" style="margin-top: 3px; font-size: 11.5px">Amara Okoth · 27 Aug · answered by v3 · resolved automatically when the section was rewritten</div>
+          </div>
+          <span class="badge b-approved" style="flex: 0 0 auto">Resolved</span>
+          <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto">Reopen</button>
+        </div>
+
+        <div class="row resolved" style="align-items: flex-start; padding: 10px 14px">
+          <span class="av av-sb" style="margin-top: 1px">SB</span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span class="row-t">Reservation ledger must stay append-only</span>
+              <span class="tag">§5 API contract</span>
+              <span class="tag">v2</span>
+            </div>
+            <div class="cmt-t" style="margin-top: 3px; font-size: 11.5px">Sven Bakker · 27 Aug · resolved with a reference to <a href="#">cm-011</a></div>
+          </div>
+          <span class="badge b-approved" style="flex: 0 0 auto">Resolved</span>
+          <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto">Reopen</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-pad" style="display: flex; align-items: center; gap: 10px">
+      <span class="av av-md">MD</span>
+      <span class="faint">Select any text in the document to start a new discussion, or comment on a whole section.</span>
+      <div class="spacer"></div>
+      <button class="btn btn-sm" onClick="{{tabDoc}}">@i(book,12) Go to the document</button>
+    </div>
+  </div>
+</div>

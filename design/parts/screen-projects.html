@@ -1,0 +1,189 @@
+<div class="body">
+  <div class="main" style="padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px">
+
+    <div style="display: flex; align-items: flex-end; gap: 12px">
+      <div>
+        <h1 class="h1">Projects</h1>
+        <p class="sub">Each project maps to one Git repository. Specs are read from the repository; approval rules, reviewers and trackers are configured here.</p>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" onClick="{{openRepo}}">@i(plus,13) Connect a repository</button>
+    </div>
+
+    <div class="card" style="display: {{connectedDisplay}}; border-color: var(--green)">
+      <div class="card-h">
+        <span style="color: var(--green)">@i(check,14)</span>
+        <span class="card-t">{{repoProject}}</span>
+        <span class="mono faint" style="font-size: 11px">{{repoName}}</span>
+        <div class="spacer"></div>
+        <span class="badge b-approved">Just connected</span>
+      </div>
+      <div class="card-pad" style="display: flex; align-items: center; gap: 16px">
+        <div style="display: flex; align-items: center; gap: 14px; font-size: 11.5px">
+          <span class="stat">@i(spec,12){{repoImported}} specifications imported</span>
+          <span class="stat">@i(layers,12){{repoReqs}} requirements indexed</span>
+          <span class="stat"><span style="color: var(--amber)">@i(warn,12)</span>{{repoInvalid}} imported as draft</span>
+          <span class="stat">@i(bot,12)automated review running</span>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn btn-sm" onClick="{{openSpecs}}">Browse specs @i(chevR,12)</button>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+
+      <div class="card" style="border-color: var(--indigo)">
+        <div class="card-h">
+          @i(folder,14)<span class="card-t">care-management</span>
+          <span class="tag">Care platform</span>
+          <div class="spacer"></div>
+          <span class="badge b-review">14 specs</span>
+        </div>
+        <div class="card-pad">
+          <div class="progress" style="height: 6px; margin-bottom: 10px">
+            <i style="width: 36%; background: var(--green)"></i>
+            <i style="width: 29%; background: var(--indigo)"></i>
+            <i style="width: 14%; background: var(--amber)"></i>
+            <i style="width: 21%; background: var(--line)"></i>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; font-size: 11.5px; margin-bottom: 12px">
+            <span class="stat"><span style="color: var(--green)">@i(check,12)</span>5 approved</span>
+            <span class="stat"><span style="color: var(--indigo)">@i(circleDot,12)</span>4 in review</span>
+            <span class="stat"><span style="color: var(--amber)">@i(warn,12)</span>2 changes requested</span>
+            <span class="stat">@i(file,12)3 draft</span>
+          </div>
+          <div class="kv" style="grid-template-columns: 104px 1fr; font-size: 11.5px">
+            <dt>Domains</dt>
+            <dd style="display: flex; flex-wrap: wrap; gap: 4px"><span class="tag">Claims</span><span class="tag">Benefits</span><span class="tag">Members</span><span class="tag">Providers</span><span class="tag">Platform</span></dd>
+            <dt>Approval rule</dt>
+            <dd>2 approvals, 1 from an architect</dd>
+            <dt>Trackers</dt>
+            <dd style="display: flex; gap: 5px"><span class="tag">Jira · CM</span><span class="tag">GitHub Issues</span></dd>
+            <dt>Reviewers</dt>
+            <dd><div class="avstack"><span class="av av-md">MD</span><span class="av av-am">AO</span><span class="av av-jv">JV</span><span class="av av-pr">PR</span><span class="av av-bot">@i(bot,11)</span></div></dd>
+          </div>
+          <div class="hr" style="margin: 12px 0"></div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="faint" style="font-size: 11px">Claim Pre-Authorization updated 2 days ago</span>
+            <div class="spacer"></div>
+            <button class="btn btn-sm" onClick="{{openSpecs}}">Browse specs @i(chevR,12)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          @i(folder,14)<span class="card-t">isiro</span>
+          <span class="tag">Payments</span>
+          <div class="spacer"></div>
+          <span class="badge b-draft">9 specs</span>
+        </div>
+        <div class="card-pad">
+          <div class="progress" style="height: 6px; margin-bottom: 10px">
+            <i style="width: 44%; background: var(--green)"></i>
+            <i style="width: 23%; background: var(--indigo)"></i>
+            <i style="width: 11%; background: var(--amber)"></i>
+            <i style="width: 22%; background: var(--line)"></i>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; font-size: 11.5px; margin-bottom: 12px">
+            <span class="stat"><span style="color: var(--green)">@i(check,12)</span>4 approved</span>
+            <span class="stat"><span style="color: var(--indigo)">@i(circleDot,12)</span>2 in review</span>
+            <span class="stat"><span style="color: var(--amber)">@i(warn,12)</span>1 changes requested</span>
+            <span class="stat">@i(file,12)2 draft</span>
+          </div>
+          <div class="kv" style="grid-template-columns: 104px 1fr; font-size: 11.5px">
+            <dt>Domains</dt>
+            <dd style="display: flex; flex-wrap: wrap; gap: 4px"><span class="tag">Payments</span><span class="tag">Ledger</span><span class="tag">Settlement</span></dd>
+            <dt>Approval rule</dt>
+            <dd>2 approvals</dd>
+            <dt>Trackers</dt>
+            <dd style="display: flex; gap: 5px"><span class="tag">Linear · ISI</span></dd>
+            <dt>Reviewers</dt>
+            <dd><div class="avstack"><span class="av av-jv">JV</span><span class="av av-sb">SB</span><span class="av av-md">MD</span><span class="av av-bot">@i(bot,11)</span></div></dd>
+          </div>
+          <div class="hr" style="margin: 12px 0"></div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="faint" style="font-size: 11px">Payment Instruction Batching updated 6h ago</span>
+            <div class="spacer"></div>
+            <button class="btn btn-sm">Browse specs @i(chevR,12)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          @i(folder,14)<span class="card-t">financial-management</span>
+          <span class="tag">Payments</span>
+          <div class="spacer"></div>
+          <span class="badge b-draft">21 specs</span>
+        </div>
+        <div class="card-pad">
+          <div class="progress" style="height: 6px; margin-bottom: 10px">
+            <i style="width: 62%; background: var(--green)"></i>
+            <i style="width: 14%; background: var(--indigo)"></i>
+            <i style="width: 5%; background: var(--amber)"></i>
+            <i style="width: 19%; background: var(--line)"></i>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; font-size: 11.5px; margin-bottom: 12px">
+            <span class="stat"><span style="color: var(--green)">@i(check,12)</span>13 approved</span>
+            <span class="stat"><span style="color: var(--indigo)">@i(circleDot,12)</span>3 in review</span>
+            <span class="stat">@i(deploy,12)9 implemented</span>
+          </div>
+          <div class="kv" style="grid-template-columns: 104px 1fr; font-size: 11.5px">
+            <dt>Domains</dt>
+            <dd style="display: flex; flex-wrap: wrap; gap: 4px"><span class="tag">Finance</span><span class="tag">Accounts</span><span class="tag">Platform</span></dd>
+            <dt>Approval rule</dt>
+            <dd>2 approvals, 1 from an architect</dd>
+            <dt>Trackers</dt>
+            <dd style="display: flex; gap: 5px"><span class="tag">Jira · FIN</span></dd>
+            <dt>Reviewers</dt>
+            <dd><div class="avstack"><span class="av av-sb">SB</span><span class="av av-md">MD</span><span class="av av-am">AO</span><span class="av av-bot">@i(bot,11)</span></div></dd>
+          </div>
+          <div class="hr" style="margin: 12px 0"></div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="faint" style="font-size: 11px">Settlement Reconciliation updated 40m ago</span>
+            <div class="spacer"></div>
+            <button class="btn btn-sm">Browse specs @i(chevR,12)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">
+          @i(folder,14)<span class="card-t">carepool-pii</span>
+          <span class="tag">Architecture board</span>
+          <div class="spacer"></div>
+          <span class="badge b-draft">4 specs</span>
+        </div>
+        <div class="card-pad">
+          <div class="progress" style="height: 6px; margin-bottom: 10px">
+            <i style="width: 50%; background: var(--green)"></i>
+            <i style="width: 25%; background: var(--indigo)"></i>
+            <i style="width: 25%; background: var(--line)"></i>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; font-size: 11.5px; margin-bottom: 12px">
+            <span class="stat"><span style="color: var(--green)">@i(check,12)</span>2 approved</span>
+            <span class="stat"><span style="color: var(--indigo)">@i(circleDot,12)</span>1 in review</span>
+            <span class="stat">@i(file,12)1 draft</span>
+          </div>
+          <div class="kv" style="grid-template-columns: 104px 1fr; font-size: 11.5px">
+            <dt>Domains</dt>
+            <dd style="display: flex; flex-wrap: wrap; gap: 4px"><span class="tag">Platform</span></dd>
+            <dt>Approval rule</dt>
+            <dd>1 approval from an architect</dd>
+            <dt>Trackers</dt>
+            <dd style="display: flex; gap: 5px"><span class="tag">GitHub Issues</span></dd>
+            <dt>Reviewers</dt>
+            <dd><div class="avstack"><span class="av av-am">AO</span><span class="av av-md">MD</span><span class="av av-bot">@i(bot,11)</span></div></dd>
+          </div>
+          <div class="hr" style="margin: 12px 0"></div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="faint" style="font-size: 11px">PII Substring Search Index updated yesterday</span>
+            <div class="spacer"></div>
+            <button class="btn btn-sm">Browse specs @i(chevR,12)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

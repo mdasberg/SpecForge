@@ -1,0 +1,292 @@
+  <div class="body">
+    <div class="side" style="flex: 0 0 250px; gap: 16px">
+      <div>
+        <div class="side-t">Browse</div>
+        <div class="side-group">
+          <div class="side-item on">@i(layers,14) All specifications<div class="spacer"></div><span>54</span></div>
+          <div class="side-item">@i(user,14) Owned by you<div class="spacer"></div><span>7</span></div>
+          <div class="side-item">@i(eye,14) Watching<div class="spacer"></div><span>11</span></div>
+          <div class="side-item">@i(book,14) Glossary<div class="spacer"></div><span></span></div>
+          <div class="side-item" onClick="{{openRepo}}">@i(branch,14) Connect a repository</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Projects &amp; domains</div>
+        <div class="side-group">
+          <div class="side-item on">@i(chevD,13) care-management<div class="spacer"></div><span>14</span></div>
+          <div class="side-item sub">Claims<div class="spacer"></div><span>6</span></div>
+          <div class="side-item sub">Benefits<div class="spacer"></div><span>3</span></div>
+          <div class="side-item sub">Members<div class="spacer"></div><span>2</span></div>
+          <div class="side-item sub">Providers<div class="spacer"></div><span>2</span></div>
+          <div class="side-item sub">Platform<div class="spacer"></div><span>1</span></div>
+          <div class="side-item">@i(chevR,13) isiro<div class="spacer"></div><span>9</span></div>
+          <div class="side-item">@i(chevR,13) financial-management<div class="spacer"></div><span>21</span></div>
+          <div class="side-item">@i(chevR,13) carepool-pii<div class="spacer"></div><span>4</span></div>
+          <div class="side-item">@i(chevR,13) askari<div class="spacer"></div><span>6</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Teams</div>
+        <div class="side-group">
+          <div class="side-item">@i(user,13) Care platform<div class="spacer"></div><span>23</span></div>
+          <div class="side-item">@i(user,13) Payments<div class="spacer"></div><span>18</span></div>
+          <div class="side-item">@i(user,13) Architecture board<div class="spacer"></div><span>13</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="side-t">Tags</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; padding: 0 8px">
+          <span class="tag">claims</span><span class="tag">api</span><span class="tag">kafka</span><span class="tag">modulith</span>
+          <span class="tag">pii</span><span class="tag">authz</span><span class="tag">ledger</span><span class="tag">breaking</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main" style="padding: 18px 24px 24px; display: flex; flex-direction: column; gap: 14px">
+
+      <div style="display: flex; align-items: flex-end; gap: 12px">
+        <div>
+          <h1 class="h1">Specifications</h1>
+          <p class="sub">54 specifications across 5 repositories · 14 in review · 3 with changes requested</p>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn">@i(sliders,13) Group by domain</button>
+        <button class="btn">@i(file,13) Export list</button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+        <div class="searchbox" style="width: 300px; height: 30px; background: var(--panel)">
+          @i(search,13)<span>claims lifecycle</span><span class="faint" style="margin-left: auto">@i(x,12)</span>
+        </div>
+        <span class="chip on">@i(folder,12) care-management @i(x,11)</span>
+        <span class="chip on">@i(circleDot,12) In review @i(x,11)</span>
+        <span class="chip">Domain @i(chevD,11)</span>
+        <span class="chip">Team @i(chevD,11)</span>
+        <span class="chip">Owner @i(chevD,11)</span>
+        <span class="chip">Tags @i(chevD,11)</span>
+        <span class="chip">Approval state @i(chevD,11)</span>
+        <div class="spacer"></div>
+        <span class="faint" style="font-size: 11.5px">14 results</span>
+        <span class="chip">Sort: recently updated @i(chevD,11)</span>
+      </div>
+
+      <div class="card" style="flex: 0 0 auto">
+        <div class="card-h" style="padding: 7px 14px">
+          <span class="faint" style="font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; flex: 1 1 auto">Specification</span>
+          <span class="faint" style="font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; width: 96px">Domain</span>
+          <span class="faint" style="font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; width: 132px">Owner</span>
+          <span class="faint" style="font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; width: 148px">Status</span>
+          <span class="faint" style="font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; width: 88px">Reviewers</span>
+          <span class="faint" style="font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; width: 46px; text-align: right">Open</span>
+          <span class="faint" style="font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; width: 46px; text-align: right">Work</span>
+          <span class="faint" style="font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; width: 80px; text-align: right">Updated</span>
+        </div>
+
+        <div class="rows">
+          <div class="row" style="background: var(--panel-2); padding: 6px 14px">
+            @i(chevD,13)@i(folder,13)
+            <b style="font-weight: 600; font-size: 12px">care-management</b>
+            <span class="faint mono" style="font-size: 11px">openspec/specs</span>
+            <span class="tag">Care platform</span>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">7 of 14 shown</span>
+          </div>
+
+          <div class="row click" onClick="{{openReview}}" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px">
+                <span class="row-t">Implement Claim Pre-Authorization</span><span class="tag">v3</span>
+                <span class="badge b-blocked" style="height: 17px; font-size: 10px">breaking</span>
+              </div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">claim-preauthorization/spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Claims</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-md">MD</span><span style="font-size: 12px">Mischa</span></div>
+            <div style="width: 148px"><span class="badge b-review"><span class="dot"></span>In review · 2/3</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-am">AO</span><span class="av av-jv">JV</span><span class="av av-pr">PR</span><span class="av av-bot">@i(bot,11)</span></div></div>
+            <span class="tnum" style="width: 46px; text-align: right; color: var(--amber)">4</span>
+            <span class="tnum muted" style="width: 46px; text-align: right">2</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">2d</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">Claim Intake Deduplication</span><span class="tag">v2</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">claim-intake/dedup.spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Claims</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-md">MD</span><span style="font-size: 12px">Mischa</span></div>
+            <div style="width: 148px"><span class="badge b-review"><span class="dot"></span>In review · 1/2</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-am">AO</span><span class="av av-bot">@i(bot,11)</span></div></div>
+            <span class="tnum muted" style="width: 46px; text-align: right">1</span>
+            <span class="tnum faint" style="width: 46px; text-align: right">—</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">4h</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">Member Eligibility Snapshot</span><span class="tag">v3</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">member-eligibility/spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Members</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-am">AO</span><span style="font-size: 12px">Amara Okoth</span></div>
+            <div style="width: 148px"><span class="badge b-changes"><span class="dot"></span>Changes requested</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-md">MD</span><span class="av av-jv">JV</span></div></div>
+            <span class="tnum" style="width: 46px; text-align: right; color: var(--amber)">3</span>
+            <span class="tnum faint" style="width: 46px; text-align: right">—</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">3d</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">Benefit Limit Evaluation</span><span class="tag">v2</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">benefit-limits/spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Benefits</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-pr">PR</span><span style="font-size: 12px">Priya R.</span></div>
+            <div style="width: 148px"><span class="badge b-approved">@i(check,11) Approved · 3/3</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-md">MD</span><span class="av av-am">AO</span><span class="av av-jv">JV</span></div></div>
+            <span class="tnum faint" style="width: 46px; text-align: right">0</span>
+            <span class="tnum muted" style="width: 46px; text-align: right">1</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">1d</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">Provider Contract Versioning</span><span class="tag">v1</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">provider-contracts/versioning.spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Providers</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-pr">PR</span><span style="font-size: 12px">Priya R.</span></div>
+            <div style="width: 148px"><span class="badge b-review"><span class="dot"></span>In review · 2/3</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-am">AO</span><span class="av av-sb">SB</span><span class="av av-bot">@i(bot,11)</span></div></div>
+            <span class="tnum muted" style="width: 46px; text-align: right">2</span>
+            <span class="tnum faint" style="width: 46px; text-align: right">—</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">5d</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">Kafka Outbox Retry Policy</span><span class="tag">v1</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">service-outbox/spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Platform</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-jv">JV</span><span style="font-size: 12px">Joris V.</span></div>
+            <div style="width: 148px"><span class="badge b-draft"><span class="dot"></span>Draft</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-md">MD</span><span class="av av-am">AO</span></div></div>
+            <span class="tnum muted" style="width: 46px; text-align: right">2</span>
+            <span class="tnum faint" style="width: 46px; text-align: right">—</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">3d</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">Claim Intake Idempotency</span><span class="tag">v4</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">claim-intake/idempotency.spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Claims</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-jv">JV</span><span style="font-size: 12px">Joris V.</span></div>
+            <div style="width: 148px"><span class="badge b-impl">@i(deploy,11) Implemented · prod</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-md">MD</span><span class="av av-am">AO</span></div></div>
+            <span class="tnum faint" style="width: 46px; text-align: right">0</span>
+            <span class="tnum muted" style="width: 46px; text-align: right">3</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">2w</span>
+          </div>
+
+          <div class="row" style="background: var(--panel-2); padding: 6px 14px">
+            @i(chevD,13)@i(folder,13)
+            <b style="font-weight: 600; font-size: 12px">isiro</b>
+            <span class="faint mono" style="font-size: 11px">openspec/specs</span>
+            <span class="tag">Payments</span>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">3 of 9 shown</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">Payment Instruction Batching</span><span class="tag">v2</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">payment-batching/spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Payments</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-jv">JV</span><span style="font-size: 12px">Joris V.</span></div>
+            <div style="width: 148px"><span class="badge b-changes"><span class="dot"></span>Changes requested</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-md">MD</span><span class="av av-sb">SB</span><span class="av av-bot">@i(bot,11)</span></div></div>
+            <span class="tnum" style="width: 46px; text-align: right; color: var(--amber)">6</span>
+            <span class="tnum muted" style="width: 46px; text-align: right">1</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">6h</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">Settlement Windows</span><span class="tag">v1</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">settlement/windows.spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Payments</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-sb">SB</span><span style="font-size: 12px">Sven Bakker</span></div>
+            <div style="width: 148px"><span class="badge b-review"><span class="dot"></span>In review · 0/2</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-jv">JV</span><span class="av av-bot">@i(bot,11)</span></div></div>
+            <span class="tnum muted" style="width: 46px; text-align: right">1</span>
+            <span class="tnum faint" style="width: 46px; text-align: right">—</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">2d</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">Ledger Account Hierarchy</span><span class="tag">v5</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">ledger/accounts.spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Ledger</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-sb">SB</span><span style="font-size: 12px">Sven Bakker</span></div>
+            <div style="width: 148px"><span class="badge b-approved">@i(check,11) Approved · 2/2</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-am">AO</span><span class="av av-md">MD</span></div></div>
+            <span class="tnum faint" style="width: 46px; text-align: right">0</span>
+            <span class="tnum muted" style="width: 46px; text-align: right">2</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">1w</span>
+          </div>
+
+          <div class="row" style="background: var(--panel-2); padding: 6px 14px">
+            @i(chevD,13)@i(folder,13)
+            <b style="font-weight: 600; font-size: 12px">carepool-pii</b>
+            <span class="faint mono" style="font-size: 11px">openspec/specs</span>
+            <span class="tag">Architecture board</span>
+            <div class="spacer"></div>
+            <span class="faint" style="font-size: 11px">2 of 4 shown</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px">
+                <span class="row-t">PII Substring Search Index</span><span class="tag">v1</span>
+                <span class="badge b-agent" style="height: 17px; font-size: 10px">@i(bot,10) 3 findings</span>
+              </div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">substring-search/spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Platform</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-am">AO</span><span style="font-size: 12px">Amara Okoth</span></div>
+            <div style="width: 148px"><span class="badge b-review"><span class="dot"></span>In review · 1/2</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-md">MD</span><span class="av av-jv">JV</span><span class="av av-bot">@i(bot,11)</span></div></div>
+            <span class="tnum muted" style="width: 46px; text-align: right">1</span>
+            <span class="tnum faint" style="width: 46px; text-align: right">—</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">1d</span>
+          </div>
+
+          <div class="row" style="padding: 8px 14px">
+            <div style="flex: 1 1 auto; min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px"><span class="row-t">CPRN Tokenization</span><span class="tag">v3</span></div>
+              <div class="faint mono" style="font-size: 11px; margin-top: 1px">cprn/tokenization.spec.md</div>
+            </div>
+            <span class="muted" style="width: 96px; font-size: 12px">Platform</span>
+            <div style="width: 132px; display: flex; align-items: center; gap: 7px"><span class="av av-am">AO</span><span style="font-size: 12px">Amara Okoth</span></div>
+            <div style="width: 148px"><span class="badge b-impl">@i(deploy,11) Implemented · prod</span></div>
+            <div style="width: 88px"><div class="avstack"><span class="av av-md">MD</span><span class="av av-sb">SB</span></div></div>
+            <span class="tnum faint" style="width: 46px; text-align: right">0</span>
+            <span class="tnum muted" style="width: 46px; text-align: right">2</span>
+            <span class="faint tnum" style="width: 80px; text-align: right; font-size: 11.5px">3w</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

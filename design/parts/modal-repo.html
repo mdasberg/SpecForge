@@ -1,0 +1,252 @@
+<div class="scrim" onClick="{{closeRepo}}"></div>
+
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center">
+  <div class="modal" style="width: 720px">
+
+    <div class="card-h" style="padding: 12px 16px">
+      <span style="color: var(--indigo)">@i(branch,15)</span>
+      <span class="card-t" style="font-size: 13.5px">Connect a repository</span>
+      <div class="spacer"></div>
+      <div class="steps">
+        <span class="step {{repoS1}}"><span class="n">1</span>Repository</span>
+        @i(chevR,11)
+        <span class="step {{repoS2}}"><span class="n">2</span>Specifications</span>
+        @i(chevR,11)
+        <span class="step {{repoS3}}"><span class="n">3</span>Project</span>
+      </div>
+      <span class="faint" style="cursor: pointer; margin-left: 6px" onClick="{{closeRepo}}">@i(x,14)</span>
+    </div>
+
+    <!-- ===== step 1: pick the repository ===== -->
+    <div style="display: {{repoStep1Display}}; flex-direction: column; padding: 14px 16px 0">
+      <p class="cmt-t" style="margin: 0 0 12px">Specifications live in Git. SpecForge reads them from a repository and turns every change into a review — the repository stays the source of truth.</p>
+
+      <div class="gate" style="align-items: center; margin-bottom: 12px">
+        <span style="color: var(--green)">@i(check,13)</span>
+        <div style="flex: 1 1 auto"><b style="font-weight: 500">team-carepay</b> is connected through the SpecForge GitHub App · 4 of 23 repositories granted</div>
+        <button class="btn btn-sm" style="flex: 0 0 auto">Manage access</button>
+        <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto">@i(plus,12) Add organisation</button>
+      </div>
+
+      <div class="searchbox" style="width: 100%; margin-bottom: 10px">
+        @i(search,13)<span class="faint">Search repositories in team-carepay</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 7px; margin-bottom: 4px">
+        <div class="pick dim">
+          <span class="radio"></span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 7px">
+              <span class="mono" style="font-size: 12px">team-carepay/care-management</span>
+              <span class="tag">private</span>
+            </div>
+            <div class="faint" style="font-size: 11px; margin-top: 1px">14 specifications · syncing on pull request</div>
+          </div>
+          <span class="badge b-approved">@i(check,11) Already connected</span>
+        </div>
+
+        <div class="pick {{repo0Class}}" onClick="{{pickRepo0}}">
+          <span class="radio"></span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 7px">
+              <span class="mono" style="font-size: 12px">team-carepay/claim-management</span>
+              <span class="tag">private</span>
+              <span class="tag">Java</span>
+            </div>
+            <div class="faint" style="font-size: 11px; margin-top: 1px">pushed 3 days ago · <span class="mono">openspec/</span> directory found</div>
+          </div>
+          <span class="badge b-review">@i(spec,11) 5 spec files</span>
+        </div>
+
+        <div class="pick {{repo1Class}}" onClick="{{pickRepo1}}">
+          <span class="radio"></span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 7px">
+              <span class="mono" style="font-size: 12px">team-carepay/askari</span>
+              <span class="tag">private</span>
+              <span class="tag">Java</span>
+            </div>
+            <div class="faint" style="font-size: 11px; margin-top: 1px">pushed yesterday · <span class="mono">openspec/</span> directory found</div>
+          </div>
+          <span class="badge b-review">@i(spec,11) 4 spec files</span>
+        </div>
+
+        <div class="pick {{repo2Class}}" onClick="{{pickRepo2}}">
+          <span class="radio"></span>
+          <div style="flex: 1 1 auto; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 7px">
+              <span class="mono" style="font-size: 12px">team-carepay/carepool-paging</span>
+              <span class="tag">private</span>
+            </div>
+            <div class="faint" style="font-size: 11px; margin-top: 1px">pushed 2 weeks ago · <span class="mono">openspec/</span> directory found</div>
+          </div>
+          <span class="badge b-review">@i(spec,11) 3 spec files</span>
+        </div>
+      </div>
+
+      <div class="reply" style="border: none; padding: 8px 0 0">
+        @i(link,13)<span>Not on GitHub? SpecForge also reads GitLab and Bitbucket repositories.</span>
+      </div>
+    </div>
+
+    <!-- ===== step 2: where the specs live ===== -->
+    <div style="display: {{repoStep2Display}}; flex-direction: column; padding: 14px 16px 0">
+      <div class="gate" style="align-items: center; margin-bottom: 14px">
+        @i(branch,13)
+        <div style="flex: 1 1 auto"><span class="mono">{{repoName}}</span></div>
+        <button class="btn btn-sm btn-ghost" style="flex: 0 0 auto" onClick="{{repoBack}}">Change</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+        <div class="field">
+          <label>Branch</label>
+          <div class="input select"><span class="mono">{{repoBranch}}</span>@i(chevD,13)</div>
+        </div>
+        <div class="field" style="grid-column: span 2">
+          <label>Path to the specifications</label>
+          <div class="input mono" style="font-size: 11.5px">{{repoPath}}</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px">
+        <span class="badge b-approved">@i(check,11) OpenSpec format detected</span>
+        <span class="faint" style="font-size: 11px">requirement ids, acceptance criteria and change proposals are read automatically</span>
+      </div>
+
+      <div class="rp-t" style="margin-bottom: 7px">Scan of {{repoBranch}} <span class="faint" style="font-weight: 400; letter-spacing: 0; text-transform: none">— {{repoCount}} specifications, {{repoReqs}} requirements</span></div>
+      <div class="scan" style="margin-bottom: 12px">
+        <sc-for list="{{repoFiles}}" as="f" hint-placeholder-count="5">
+          <div class="scan-r">
+            <span style="color: {{f.color}}">@i(file,12)</span>
+            <span style="flex: 1 1 auto; min-width: 0; color: var(--fg-2)">{{f.path}}</span>
+            <span class="faint">{{f.note}}</span>
+            <span class="badge {{f.badgeClass}}" style="flex: 0 0 auto">{{f.badge}}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="gate" style="display: {{repoWarnDisplay}}; border-left: 2px solid var(--amber); margin-bottom: 12px">
+        <span style="color: var(--amber); padding-top: 1px">@i(warn,13)</span>
+        <div>{{repoInvalid}} file will import as <b style="font-weight: 500">Draft</b> instead of entering review — it has no requirement ids yet. Change proposals under <span class="mono">openspec/changes/</span> are tracked, not imported as specifications.</div>
+      </div>
+
+      <div class="gate" style="display: {{repoCleanDisplay}}; border-left: 2px solid var(--green); margin-bottom: 12px">
+        <span style="color: var(--green); padding-top: 1px">@i(check,13)</span>
+        <div>Every specification validates against OpenSpec and will enter review at its current version. Change proposals under <span class="mono">openspec/changes/</span> are tracked, not imported as specifications.</div>
+      </div>
+
+      <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--fg-2); margin-bottom: 14px">
+        <span style="width: 14px; height: 14px; border: 1px solid var(--indigo); border-radius: 3px; background: var(--indigo); color: #0b0d11; display: flex; align-items: center; justify-content: center">@i(check,10)</span>
+        Rebuild version history from git — each commit that touched a spec becomes a version
+      </label>
+    </div>
+
+    <!-- ===== step 3: project settings ===== -->
+    <div style="display: {{repoStep3Display}}; flex-direction: column; padding: 14px 16px 0">
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <div class="field">
+          <label>Project name</label>
+          <div class="input">{{repoProject}}</div>
+        </div>
+        <div class="field">
+          <label>Team</label>
+          <div class="input select"><span>{{repoTeam}}</span>@i(chevD,13)</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <div class="field">
+          <label>Domains</label>
+          <div class="input select"><span>From the folder name <span class="faint">· {{repoDomains}}</span></span>@i(chevD,13)</div>
+        </div>
+        <div class="field">
+          <label>Approval rule</label>
+          <div class="input select"><span>2 approvals, 1 from an architect</span>@i(chevD,13)</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>How new versions enter review</label>
+        <div style="display: flex; flex-direction: column; gap: 7px">
+          <div class="pick {{syncPrClass}}" onClick="{{setSyncPr}}">
+            <span class="radio"></span>
+            <div style="flex: 1 1 auto">
+              <div style="font-size: 12px; font-weight: 500">On pull request <span class="tag" style="margin-left: 5px">recommended</span></div>
+              <div class="faint" style="font-size: 11px; margin-top: 1px">A pull request touching a spec opens a review here, and SpecForge reports approvals back as a status check on the pull request.</div>
+            </div>
+          </div>
+          <div class="pick {{syncPushClass}}" onClick="{{setSyncPush}}">
+            <span class="radio"></span>
+            <div style="flex: 1 1 auto">
+              <div style="font-size: 12px; font-weight: 500">On push to {{repoBranch}}</div>
+              <div class="faint" style="font-size: 11px; margin-top: 1px">Every commit that changes a spec submits a new version for review after the fact.</div>
+            </div>
+          </div>
+          <div class="pick {{syncManualClass}}" onClick="{{setSyncManual}}">
+            <span class="radio"></span>
+            <div style="flex: 1 1 auto">
+              <div style="font-size: 12px; font-weight: 500">Manual import only</div>
+              <div class="faint" style="font-size: 11px; margin-top: 1px">No webhook. You choose when to pull in changes.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <div class="field">
+          <label>Automated reviewers</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 5px">
+            <span class="chip on" style="height: 24px; font-size: 11px">@i(bot,11) spec-sentinel</span>
+            <span class="chip on" style="height: 24px; font-size: 11px">@i(shield,11) contract-guard</span>
+            <span class="chip" style="height: 24px; font-size: 11px">@i(plus,11) add</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Tracker for tickets</label>
+          <div class="input select"><span style="display: flex; align-items: center; gap: 7px"><span class="tag">Jira</span>Care Management · CM</span>@i(chevD,13)</div>
+        </div>
+      </div>
+
+      <div class="gate" style="margin-bottom: 14px">
+        <span style="color: var(--indigo); padding-top: 1px">@i(user,13)</span>
+        <div>Reviewers are matched from <span class="mono">CODEOWNERS</span> where it exists, and from the team otherwise. You can change required reviewers per domain afterwards.</div>
+      </div>
+    </div>
+
+    <!-- ===== step 4: connected ===== -->
+    <div style="display: {{repoStep4Display}}; flex-direction: column; padding: 20px 16px 0">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px">
+        <span style="width: 34px; height: 34px; border-radius: 50%; background: var(--green-dim); color: var(--green); display: flex; align-items: center; justify-content: center; flex: 0 0 auto">@i(check,18)</span>
+        <div>
+          <div style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em"><span class="mono">{{repoName}}</span> is connected</div>
+          <div class="muted" style="font-size: 12px; margin-top: 2px">First sync finished in 6s · webhook installed on {{repoBranch}}</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 14px">
+        <div class="rows">
+          <div class="row" style="padding: 8px 12px"><span style="color: var(--green)">@i(check,13)</span><span style="flex: 1 1 auto">Specifications imported</span><b class="tnum">{{repoImported}}</b></div>
+          <div class="row" style="padding: 8px 12px"><span style="color: var(--green)">@i(check,13)</span><span style="flex: 1 1 auto">Requirements indexed</span><b class="tnum">{{repoReqs}}</b></div>
+          <div class="row" style="padding: 8px 12px"><span style="color: var(--green)">@i(check,13)</span><span style="flex: 1 1 auto">Versions rebuilt from git history</span><b class="tnum">{{repoVersions}}</b></div>
+          <div class="row" style="display: {{repoWarnDisplay}}; padding: 8px 12px"><span style="color: var(--amber)">@i(warn,13)</span><span style="flex: 1 1 auto">Imported as Draft — no requirement ids</span><b class="tnum">{{repoInvalid}}</b></div>
+          <div class="row" style="display: {{repoProposalsDisplay}}; padding: 8px 12px"><span class="faint">@i(minus,13)</span><span style="flex: 1 1 auto" class="muted">Change proposals tracked, not imported</span><b class="tnum muted">{{repoProposals}}</b></div>
+        </div>
+      </div>
+
+      <div class="rp-t" style="margin-bottom: 7px">What happens next</div>
+      <ul style="margin: 0 0 16px; padding-left: 18px; font-size: 12px; color: var(--fg-2); display: flex; flex-direction: column; gap: 4px">
+        <li>The automated reviewers are running their first pass — findings appear on each specification.</li>
+        <li>The next pull request that touches a spec will open a review and post a status check back to GitHub.</li>
+        <li>Nothing is written to the repository. SpecForge only reads, and comments live here.</li>
+      </ul>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--line); background: var(--panel-2)">
+      <span class="faint" style="font-size: 11px">{{repoHint}}</span>
+      <div class="spacer"></div>
+      <button class="btn" onClick="{{repoBack}}" style="display: {{repoBackDisplay}}">Back</button>
+      <button class="btn" onClick="{{closeRepo}}" style="display: {{repoCancelDisplay}}">Cancel</button>
+      <button class="btn btn-primary {{repoNextClass}}" onClick="{{repoNext}}">{{repoNextLabel}}</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+<div class="app {{theme}}" style="width: 1440px; height: 900px; position: relative; overflow: hidden">
+
+  <div class="topbar">
+    <div class="brand" style="cursor: pointer" onClick="{{openHome}}"><span style="color: var(--indigo)">@i(logo,20)</span>SpecForge</div>
+    <div class="nav">
+      <span class="{{navHome}}" onClick="{{openHome}}">Home</span>
+      <span class="{{navSpecs}}" onClick="{{openSpecs}}">Specs</span>
+      <span class="{{navReviews}}" onClick="{{openReview}}">Reviews</span>
+      <span class="{{navProjects}}" onClick="{{openProjects}}">Projects</span>
+      <span class="{{navActivity}}" onClick="{{openActivity}}">Activity</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="searchbox">@i(search,14)<span>Search specs, requirements, discussions</span><span class="kbd">⌘K</span></div>
+    <button class="btn btn-sm" style="height: 30px">@i(plus,13) New spec</button>
+    <div class="iconbtn" style="cursor: pointer">@i(bell,14)</div>
+    <div class="av av-md av-lg">MD</div>
+  </div>
+
+  <!-- spec header, review screen only -->
+  <div style="display: {{specHeaderDisplay}}; flex: 0 0 auto; border-bottom: 1px solid var(--line); background: var(--panel); padding: 14px 20px 0">
+    <div class="row-meta" style="gap: 6px; margin-bottom: 6px">
+      <span style="cursor: pointer" onClick="{{openProjects}}">Care Management</span>@i(chevR,11)
+      <span style="cursor: pointer" onClick="{{openSpecs}}">Claims</span>@i(chevR,11)
+      <span class="mono">care-management</span>@i(chevR,11)
+      <span class="mono faint">openspec/specs/claim-preauthorization/spec.md</span>
+      <a href="#" style="margin-left: 6px; display: inline-flex; align-items: center; gap: 4px">@i(branch,11) change/cm-c-preauth-v3</a>
+    </div>
+    <div style="display: flex; align-items: flex-start; gap: 12px">
+      <div style="flex: 1 1 auto; min-width: 0">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <h1 class="h1">Implement Claim Pre-Authorization</h1>
+          <span class="badge b-review"><span class="dot"></span>In review</span>
+          <span class="tag">v3</span>
+          <span class="badge b-blocked">@i(warn,11) Breaking API change</span>
+        </div>
+        <div class="row-meta" style="margin-top: 5px">
+          <span>Owner</span><div class="av av-md" style="width: 17px; height: 17px; font-size: 9px">MD</div><span style="color: var(--fg-2)">Mischa</span>
+          <span class="sep">·</span><span>v3 submitted 2 days ago by Mischa</span>
+          <span class="sep">·</span><span>capability <span class="mono">CM-C</span></span>
+          <span class="sep">·</span><span>12 requirements</span>
+          <span class="sep">·</span><span>2 of 3 required approvals</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <button class="btn">@i(eye,13) Watching</button>
+        <button class="btn" onClick="{{tabChanges}}">@i(split,13) Compare versions</button>
+        <button class="btn btn-primary" onClick="{{reviewNow}}">@i(check,13) Review changes</button>
+      </div>
+    </div>
+    <div class="tabs" style="margin-top: 14px">
+      <span class="tab {{tabDocOn}}" onClick="{{tabDoc}}">@i(book,13) Document</span>
+      <span class="tab {{tabChangesOn}}" onClick="{{tabChanges}}">@i(rows,13) Changes <span class="tag">v2 → v3</span></span>
+      <span class="tab {{tabDiscussionsOn}}" onClick="{{tabDiscussions}}">@i(comment,13) Discussions <span class="tag">{{unresolved}}</span></span>
+      <span class="tab {{tabChecksOn}}" onClick="{{tabChecks}}">@i(shield,13) Checks <span class="tag">3 / 5</span></span>
+      <span class="tab {{tabHistoryOn}}" onClick="{{tabHistory}}">@i(history,13) History</span>
+      <span class="tab {{tabTraceOn}}" onClick="{{tabTrace}}">@i(link,13) Traceability</span>
+    </div>
+  </div>
+
+  <div style="display: {{homeDisplay}}">
+@include(screen-home.html)
+  </div>
+
+  <div style="display: {{specsDisplay}}">
+@include(screen-specs.html)
+  </div>
+
+  <div style="display: {{projectsDisplay}}">
+@include(screen-projects.html)
+  </div>
+
+  <div style="display: {{activityDisplay}}">
+@include(screen-activity.html)
+  </div>
+
+  <div style="display: {{docDisplay}}">
+@include(tab-doc.html)
+  </div>
+
+  <div style="display: {{changesDisplay}}">
+@include(tab-changes.html)
+  </div>
+
+  <div style="display: {{discussionsDisplay}}">
+@include(tab-discussions.html)
+  </div>
+
+  <div style="display: {{checksDisplay}}">
+@include(tab-checks.html)
+  </div>
+
+  <div style="display: {{historyDisplay}}">
+@include(tab-history.html)
+  </div>
+
+  <div style="display: {{traceDisplay}}">
+@include(tab-trace.html)
+  </div>
+
+  <div style="display: {{ticketDisplay}}">
+@include(modal-ticket.html)
+  </div>
+
+  <div style="display: {{repoDisplay}}">
+@include(modal-repo.html)
+  </div>
+</div>

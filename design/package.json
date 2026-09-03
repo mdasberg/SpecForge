@@ -1,0 +1,18 @@
+{
+  "name": "specforge-design",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SpecForge design canvas: build the artboard from parts/, seed the canvas, serve it locally",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node check.mjs",
+    "seed": "node seed.mjs",
+    "start": "node serve.mjs",
+    "dev": "npm run build && npm run check && npm run seed && npm start",
+    "test": "npm run build && npm run check && node serve.mjs --selftest"
+  }
+}

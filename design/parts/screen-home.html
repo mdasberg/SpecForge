@@ -1,0 +1,327 @@
+  <div class="body">
+    <div class="side">
+      <div>
+        <div class="side-t">Your work</div>
+        <div class="side-group">
+          <div class="side-item on">@i(eye,14) Needs your review<div class="spacer"></div><span>4</span></div>
+          <div class="side-item">@i(spec,14) Specs you own<div class="spacer"></div><span>7</span></div>
+          <div class="side-item">@i(comment,14) Your discussions<div class="spacer"></div><span>9</span></div>
+          <div class="side-item">@i(user,14) Mentions<div class="spacer"></div><span>2</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="side-t">Projects</div>
+        <div class="side-group">
+          <div class="side-item">@i(folder,14) care-management<div class="spacer"></div><span>14</span></div>
+          <div class="side-item">@i(folder,14) isiro<div class="spacer"></div><span>9</span></div>
+          <div class="side-item">@i(folder,14) financial-management<div class="spacer"></div><span>21</span></div>
+          <div class="side-item">@i(folder,14) carepool-pii<div class="spacer"></div><span>4</span></div>
+          <div class="side-item">@i(folder,14) askari<div class="spacer"></div><span>6</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="side-t">Saved views</div>
+        <div class="side-group">
+          <div class="side-item">@i(filter,14) Claims domain</div>
+          <div class="side-item">@i(filter,14) Breaking API changes</div>
+          <div class="side-item">@i(filter,14) Awaiting architect</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main" style="padding: 18px 24px 24px; display: flex; flex-direction: column; gap: 16px">
+
+      <div style="display: flex; align-items: flex-end; gap: 14px">
+        <div>
+          <h1 class="h1">Good morning, Mischa</h1>
+          <p class="sub">4 specifications are waiting on you. 2 have unresolved discussions from the architecture review.</p>
+        </div>
+        <div class="spacer"></div>
+        <div class="chip">@i(clock,13) Last 14 days</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+        <div class="card card-pad" style="padding: 12px 14px">
+          <div class="row-meta" style="gap: 6px"><span style="color: var(--indigo)">@i(eye,13)</span>Awaiting your review</div>
+          <div class="tnum" style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-top: 4px">4</div>
+        </div>
+        <div class="card card-pad" style="padding: 12px 14px">
+          <div class="row-meta" style="gap: 6px">@i(circleDot,13)In review across your projects</div>
+          <div class="tnum" style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-top: 4px">12</div>
+        </div>
+        <div class="card card-pad" style="padding: 12px 14px">
+          <div class="row-meta" style="gap: 6px"><span style="color: var(--amber)">@i(warn,13)</span>Changes requested</div>
+          <div class="tnum" style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-top: 4px">3</div>
+        </div>
+        <div class="card card-pad" style="padding: 12px 14px">
+          <div class="row-meta" style="gap: 6px"><span style="color: var(--green)">@i(check,13)</span>Approved, not yet implemented</div>
+          <div class="tnum" style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-top: 4px">6</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 396px; gap: 16px; align-items: start">
+
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div class="card">
+            <div class="card-h">
+              <span style="color: var(--indigo)">@i(eye,14)</span>
+              <span class="card-t">Needs your review</span>
+              <span class="tag">4</span>
+              <div class="spacer"></div>
+              <span class="faint" style="font-size: 11.5px">Sorted by review age</span>
+            </div>
+            <div class="rows">
+              <div class="row click" onClick="{{openReview}}" style="align-items: flex-start; padding: 10px 14px">
+                <span class="faint" style="padding-top: 2px">@i(spec,15)</span>
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div style="display: flex; align-items: center; gap: 8px">
+                    <span class="row-t">Implement Claim Pre-Authorization</span>
+                    <span class="badge b-review"><span class="dot"></span>In review</span>
+                    <span class="tag">v3</span>
+                    <span class="badge b-blocked">@i(warn,11) Breaking API change</span>
+                  </div>
+                  <div class="row-meta" style="margin-top: 4px">
+                    <span class="mono">care-management</span><span class="sep">/</span>
+                    <span class="mono faint">openspec/specs/claim-preauthorization</span>
+                    <span class="sep">·</span><span>Claims</span>
+                    <span class="sep">·</span><span>Mischa</span>
+                    <span class="sep">·</span><span>v3 submitted 2 days ago</span>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px">
+                  <div class="stat" style="color: var(--amber)">@i(comment,13) 4</div>
+                  <div class="stat">@i(ticket,13) 2</div>
+                  <div style="width: 68px">
+                    <div class="row-meta tnum" style="justify-content: flex-end; gap: 4px; margin-bottom: 3px">2/3</div>
+                    <div class="progress"><i style="width: 66%; background: var(--green)"></i></div>
+                  </div>
+                  <div class="avstack">
+                    <div class="av av-am" title="Amara Okoth">AO</div>
+                    <div class="av av-jv" title="Joris Veenstra">JV</div>
+                    <div class="av av-pr" title="Priya Raghunathan">PR</div>
+                    <div class="av av-bot" title="spec-sentinel">@i(bot,12)</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row" style="align-items: flex-start; padding: 10px 14px">
+                <span class="faint" style="padding-top: 2px">@i(spec,15)</span>
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div style="display: flex; align-items: center; gap: 8px">
+                    <span class="row-t">Payment Instruction Batching</span>
+                    <span class="badge b-changes"><span class="dot"></span>Changes requested</span>
+                    <span class="tag">v2</span>
+                  </div>
+                  <div class="row-meta" style="margin-top: 4px">
+                    <span class="mono">isiro</span><span class="sep">/</span>
+                    <span class="mono faint">openspec/specs/payment-batching</span>
+                    <span class="sep">·</span><span>Payments</span>
+                    <span class="sep">·</span><span>Joris Veenstra</span>
+                    <span class="sep">·</span><span>updated 6h ago</span>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px">
+                  <div class="stat" style="color: var(--amber)">@i(comment,13) 6</div>
+                  <div class="stat">@i(ticket,13) 1</div>
+                  <div style="width: 68px">
+                    <div class="row-meta tnum" style="justify-content: flex-end; gap: 4px; margin-bottom: 3px">0/2</div>
+                    <div class="progress"><i style="width: 0%; background: var(--green)"></i></div>
+                  </div>
+                  <div class="avstack">
+                    <div class="av av-md">MD</div>
+                    <div class="av av-sb">SB</div>
+                    <div class="av av-bot">@i(bot,12)</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row" style="align-items: flex-start; padding: 10px 14px">
+                <span class="faint" style="padding-top: 2px">@i(spec,15)</span>
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div style="display: flex; align-items: center; gap: 8px">
+                    <span class="row-t">PII Substring Search Index</span>
+                    <span class="badge b-review"><span class="dot"></span>In review</span>
+                    <span class="tag">v1</span>
+                    <span class="badge b-agent">@i(bot,11) 3 agent findings</span>
+                  </div>
+                  <div class="row-meta" style="margin-top: 4px">
+                    <span class="mono">carepool-pii</span><span class="sep">/</span>
+                    <span class="mono faint">openspec/specs/substring-search</span>
+                    <span class="sep">·</span><span>Platform</span>
+                    <span class="sep">·</span><span>Amara Okoth</span>
+                    <span class="sep">·</span><span>updated yesterday</span>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px">
+                  <div class="stat">@i(comment,13) 1</div>
+                  <div class="stat faint">@i(ticket,13) 0</div>
+                  <div style="width: 68px">
+                    <div class="row-meta tnum" style="justify-content: flex-end; gap: 4px; margin-bottom: 3px">1/2</div>
+                    <div class="progress"><i style="width: 50%; background: var(--green)"></i></div>
+                  </div>
+                  <div class="avstack">
+                    <div class="av av-md">MD</div>
+                    <div class="av av-jv">JV</div>
+                    <div class="av av-bot">@i(bot,12)</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row" style="align-items: flex-start; padding: 10px 14px">
+                <span class="faint" style="padding-top: 2px">@i(spec,15)</span>
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div style="display: flex; align-items: center; gap: 8px">
+                    <span class="row-t">Kafka Outbox Retry Policy</span>
+                    <span class="badge b-draft"><span class="dot"></span>Draft</span>
+                    <span class="tag">v1</span>
+                    <span class="faint" style="font-size: 11px">review requested for tomorrow</span>
+                  </div>
+                  <div class="row-meta" style="margin-top: 4px">
+                    <span class="mono">care-management</span><span class="sep">/</span>
+                    <span class="mono faint">openspec/specs/service-outbox</span>
+                    <span class="sep">·</span><span>Platform</span>
+                    <span class="sep">·</span><span>Joris Veenstra</span>
+                    <span class="sep">·</span><span>updated 3d ago</span>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px">
+                  <div class="stat">@i(comment,13) 2</div>
+                  <div class="stat faint">@i(ticket,13) 0</div>
+                  <div style="width: 68px">
+                    <div class="row-meta tnum" style="justify-content: flex-end; gap: 4px; margin-bottom: 3px">0/2</div>
+                    <div class="progress"><i style="width: 0%; background: var(--green)"></i></div>
+                  </div>
+                  <div class="avstack">
+                    <div class="av av-md">MD</div>
+                    <div class="av av-am">AO</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h">
+              @i(history,14)<span class="card-t">Recently changed</span>
+              <div class="spacer"></div>
+              <span class="faint" style="font-size: 11.5px">New versions submitted</span>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <span class="faint">@i(commit,14)</span>
+                <span class="row-t" style="flex: 1 1 auto; min-width: 0">Settlement Reconciliation</span>
+                <div class="row-meta"><span class="mono">financial-management</span><span class="sep">·</span><span>Finance</span></div>
+                <span class="tag">v3 → v4</span>
+                <div class="filestat"><span class="bar"><span class="a"></span><span class="a"></span><span class="a"></span><span class="d"></span><span></span></span><b>+58</b><i>−12</i></div>
+                <div class="av av-sb">SB</div>
+                <span class="faint tnum" style="width: 74px; text-align: right; font-size: 11.5px">40m ago</span>
+              </div>
+              <div class="row click" onClick="{{openReview}}">
+                <span class="faint">@i(commit,14)</span>
+                <span class="row-t" style="flex: 1 1 auto; min-width: 0">Implement Claim Pre-Authorization</span>
+                <div class="row-meta"><span class="mono">care-management</span><span class="sep">·</span><span>Claims</span></div>
+                <span class="tag">v2 → v3</span>
+                <div class="filestat"><span class="bar"><span class="a"></span><span class="a"></span><span class="d"></span><span class="d"></span><span></span></span><b>+41</b><i>−23</i></div>
+                <div class="av av-md">MD</div>
+                <span class="faint tnum" style="width: 74px; text-align: right; font-size: 11.5px">2d ago</span>
+              </div>
+              <div class="row">
+                <span class="faint">@i(commit,14)</span>
+                <span class="row-t" style="flex: 1 1 auto; min-width: 0">Askari Relationship Model</span>
+                <div class="row-meta"><span class="mono">askari</span><span class="sep">·</span><span>Authorization</span></div>
+                <span class="tag">v1 → v2</span>
+                <div class="filestat"><span class="bar"><span class="a"></span><span class="a"></span><span class="a"></span><span class="a"></span><span></span></span><b>+96</b><i>−4</i></div>
+                <div class="av av-am">AO</div>
+                <span class="faint tnum" style="width: 74px; text-align: right; font-size: 11.5px">3d ago</span>
+              </div>
+              <div class="row">
+                <span class="faint">@i(commit,14)</span>
+                <span class="row-t" style="flex: 1 1 auto; min-width: 0">Paging Metadata Headers</span>
+                <div class="row-meta"><span class="mono">carepool-paging</span><span class="sep">·</span><span>Platform</span></div>
+                <span class="tag">v2 → v3</span>
+                <div class="filestat"><span class="bar"><span class="a"></span><span class="d"></span><span></span><span></span><span></span></span><b>+9</b><i>−7</i></div>
+                <div class="av av-md">MD</div>
+                <span class="faint tnum" style="width: 74px; text-align: right; font-size: 11.5px">4d ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div class="card">
+            <div class="card-h">@i(clock,13)<span class="card-t">Awaiting approval from others</span><div class="spacer"></div><span class="tag">2</span></div>
+            <div class="rows">
+              <div class="row" style="padding: 9px 12px">
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div class="row-t">Claim Intake Deduplication</div>
+                  <div class="row-meta" style="margin-top: 2px"><span class="mono">care-management</span><span class="sep">·</span><span>waiting on Amara Okoth</span></div>
+                </div>
+                <span class="badge b-review tnum">1/2</span>
+              </div>
+              <div class="row" style="padding: 9px 12px">
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div class="row-t">Provider Contract Versioning</div>
+                  <div class="row-meta" style="margin-top: 2px"><span class="mono">care-management</span><span class="sep">·</span><span>waiting on architect</span></div>
+                </div>
+                <span class="badge b-review tnum">2/3</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><span style="color: var(--amber)">@i(warn,13)</span><span class="card-t">Changes requested on your specs</span><div class="spacer"></div><span class="tag">1</span></div>
+            <div class="rows">
+              <div class="row" style="padding: 9px 12px; align-items: flex-start">
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div class="row-t">Member Eligibility Snapshot</div>
+                  <div class="row-meta" style="margin-top: 2px"><span>Amara Okoth</span><span class="sep">·</span><span>3 blocking discussions</span></div>
+                  <div class="cmt-t" style="margin-top: 6px; font-size: 11.5px; border-left: 2px solid var(--amber); padding-left: 8px">“Snapshot invalidation is undefined when a member changes scheme mid-period.”</div>
+                </div>
+                <span class="badge b-changes" style="flex: 0 0 auto">Blocked</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><span style="color: var(--green)">@i(check,13)</span><span class="card-t">Recently approved</span></div>
+            <div class="rows">
+              <div class="row" style="padding: 9px 12px">
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div class="row-t">Benefit Limit Evaluation</div>
+                  <div class="row-meta" style="margin-top: 2px"><span class="mono">care-management</span><span class="sep">·</span><span>3/3 approvals</span></div>
+                </div>
+                <span class="faint" style="font-size: 11.5px">yesterday</span>
+              </div>
+              <div class="row" style="padding: 9px 12px">
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div class="row-t">Envers Audit Retention</div>
+                  <div class="row-meta" style="margin-top: 2px"><span class="mono">financial-management</span><span class="sep">·</span><span>2/2 approvals</span></div>
+                </div>
+                <span class="faint" style="font-size: 11.5px">2d ago</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h">@i(deploy,13)<span class="card-t">Recently implemented</span></div>
+            <div class="rows">
+              <div class="row" style="padding: 9px 12px">
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div class="row-t">Claim Intake Idempotency</div>
+                  <div class="row-meta" style="margin-top: 2px">@i(pr,12)<span class="mono">care-management#218</span><span class="sep">·</span><span>prod</span></div>
+                </div>
+                <span class="badge b-impl">@i(check,11) Shipped</span>
+              </div>
+              <div class="row" style="padding: 9px 12px">
+                <div style="flex: 1 1 auto; min-width: 0">
+                  <div class="row-t">SpiceDB Schema Bootstrap</div>
+                  <div class="row-meta" style="margin-top: 2px">@i(pr,12)<span class="mono">askari#77</span><span class="sep">·</span><span>staging</span></div>
+                </div>
+                <span class="badge b-impl">@i(clock,11) Rolling out</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
