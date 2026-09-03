@@ -1,4 +1,4 @@
-package com.specforge.repository.api;
+package com.specforge.repository.service;
 
 import com.specforge.platform.api.dto.Connection;
 import com.specforge.platform.api.dto.ForgeInstallation;
@@ -18,6 +18,8 @@ import com.specforge.repository.entity.ImportRunFileEntity;
 import com.specforge.repository.entity.RepositoryConnectionEntity;
 import com.specforge.repository.entity.RepositoryScanEntity;
 import com.specforge.repository.entity.ScanFileEntity;
+import com.specforge.repository.entity.SpecFileFormat;
+import com.specforge.repository.entity.SyncPolicy;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -29,9 +31,17 @@ import java.util.List;
  * the contract is allowed to be renamed without a migration, and the database is allowed to hold a
  * value the contract has not published yet — so they are mapped by name here rather than shared.
  */
-public final class RepositoryMapper {
+final class RepositoryMapper {
 
     private RepositoryMapper() {}
+
+    static SpecFileFormat format(SpecFormat format) {
+        return SpecFileFormat.valueOf(format.name());
+    }
+
+    static SyncPolicy syncPolicy(SyncMode syncMode) {
+        return SyncPolicy.valueOf(syncMode.name());
+    }
 
     static Connection connection(RepositoryConnectionEntity entity, String projectName) {
         Connection connection = new Connection(

@@ -2,6 +2,7 @@ package com.specforge.repository.service;
 
 import com.specforge.repository.entity.ConnectionState;
 import com.specforge.repository.entity.ForgeInstallationEntity.GrantedRepositoryRow;
+import com.specforge.platform.api.dto.ForgeInstallationList;
 import com.specforge.repository.entity.ForgeInstallationEntity;
 import com.specforge.repository.entity.InstallationStatus;
 import com.specforge.repository.entity.RepositoryConnectionEntity;
@@ -51,8 +52,10 @@ public class InstallationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ForgeInstallationEntity> list() {
-        return installations.findAllByOrderByAccountLoginAsc();
+    public ForgeInstallationList list() {
+        return new ForgeInstallationList(installations.findAllByOrderByAccountLoginAsc().stream()
+                .map(RepositoryMapper::installation)
+                .toList());
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.specforge.repository.service;
 
+import com.specforge.platform.api.dto.Scan;
+import com.specforge.platform.api.dto.ScanRequest;
 import com.specforge.repository.entity.RepositoryScanEntity;
 import com.specforge.repository.entity.ScanFileEntity;
 import com.specforge.repository.entity.SpecFileFormat;
@@ -45,24 +47,28 @@ public class ScanService {
      * Not transactional on purpose: the row has to be committed before the asynchronous run can
      * load it, and a scan carries no state that a rollback would need to undo.
      */
-    public RepositoryScanEntity start(
-            UUID installationId, String repositoryFullName, String branch, String pathGlob, SpecFileFormat format) {
+    public Scan start(ScanRequest request) {
         installations
-                .findById(installationId)
-                .orElseThrow(() -> Problems.notFound("No forge installation %s.".formatted(installationId)));
+                .findById(request.getInstallationId())
+                .orElseThrow(() -> Problems.notFound("No forge installation %s.".formatted(request.getInstallationId())));
         RepositoryScanEntity scan = scans.save(new RepositoryScanEntity(
-                UUID.randomUUID(), installationId, repositoryFullName, branch, pathGlob, format, clock.instant()));
+                UUID.randomUUID(),
+                request.getInstallationId(),
+                request.getRepositoryFullName(),
+                request.getBranch(),
+                request.getPathGlob(),
+                RepositoryMapper.format(request.getSpecFormat()),
+                clock.instant()));
         runner.run(scan.id());
-        return scan;
+        // Its files are not read back here: the scan has only just been queued, and the wizard
+        // polls for the result.
+        return RepositoryMapper.scan(scan, List.of());
     }
 
     @Transactional(readOnly = true)
-    public RepositoryScanEntity get(UUID scanId) {
-        return scans.findById(scanId).orElseThrow(() -> Problems.notFound("No scan %s.".formatted(scanId)));
-    }
-
-    @Transactional(readOnly = true)
-    public List<ScanFileEntity> files(UUID scanId) {
-        return scanFiles.findByScanIdOrderByPathAsc(scanId);
+    public Scan get(UUID scanId) {
+        RepositoryScanEntity scan =
+                scans.findById(scanId).orElseThrow(() -> Problems.notFound("No scan %s.".formatted(scanId)));
+        return RepositoryMapper.scan(scan, scanFiles.findByScanIdOrderByPathAsc(scanId));
     }
 }

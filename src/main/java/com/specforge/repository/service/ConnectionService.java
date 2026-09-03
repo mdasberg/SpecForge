@@ -1,5 +1,9 @@
 package com.specforge.repository.service;
 
+import com.specforge.platform.api.dto.Connection;
+import com.specforge.platform.api.dto.ConnectionList;
+import com.specforge.platform.api.dto.ConnectionRequest;
+import com.specforge.platform.api.dto.ProjectConfiguration;
 import com.specforge.repository.entity.ForgeInstallationEntity;
 import com.specforge.repository.entity.ImportTrigger;
 import com.specforge.repository.entity.ProjectEntity;
@@ -61,44 +65,52 @@ public class ConnectionService {
      * Not transactional as a whole: the connection has to be committed before the initial import
      * can be started against it.
      */
-    public RepositoryConnectionEntity create(ConnectionCommand command) {
+    public Connection create(ConnectionRequest request) {
         ForgeInstallationEntity installation = installations
-                .findById(command.installationId())
-                .orElseThrow(() -> Problems.notFound("No forge installation %s.".formatted(command.installationId())));
-        requireGranted(installation, command.repositoryFullName());
-        requireNotAlreadyConnected(command);
-        requireSomethingToImport(installation, command);
+                .findById(request.getInstallationId())
+                .orElseThrow(() -> Problems.notFound("No forge installation %s.".formatted(request.getInstallationId())));
+        requireGranted(installation, request.getRepositoryFullName());
+        requireNotAlreadyConnected(request);
+        requireSomethingToImport(installation, request);
 
         Instant now = clock.instant();
-        ProjectEntity project = upsertProject(command.project(), now);
+        ProjectEntity project = upsertProject(request.getProject(), now);
         RepositoryConnectionEntity connection = connections.save(new RepositoryConnectionEntity(
                 UUID.randomUUID(),
                 project.id(),
                 installation.id(),
-                command.repositoryFullName(),
-                command.branch(),
-                command.pathGlob(),
-                command.specFormat(),
-                command.syncMode(),
+                request.getRepositoryFullName(),
+                request.getBranch(),
+                request.getPathGlob(),
+                RepositoryMapper.format(request.getSpecFormat()),
+                RepositoryMapper.syncPolicy(request.getSyncMode()),
                 now));
         imports.start(connection, ImportTrigger.INITIAL, null);
-        return connection;
+        return RepositoryMapper.connection(connection, project.name());
     }
 
     @Transactional(readOnly = true)
-    public List<RepositoryConnectionEntity> list() {
-        return connections.findAllByOrderByCreatedAtAsc();
+    public ConnectionList list() {
+        return new ConnectionList(connections.findAllByOrderByCreatedAtAsc().stream()
+                .map(connection -> RepositoryMapper.connection(connection, project(connection).name()))
+                .toList());
     }
 
     @Transactional(readOnly = true)
-    public RepositoryConnectionEntity get(UUID connectionId) {
+    public Connection get(UUID connectionId) {
+        RepositoryConnectionEntity connection = require(connectionId);
+        return RepositoryMapper.connection(connection, project(connection).name());
+    }
+
+    /** The row itself, for the services in this package that work on it rather than render it. */
+    @Transactional(readOnly = true)
+    RepositoryConnectionEntity require(UUID connectionId) {
         return connections
                 .findById(connectionId)
                 .orElseThrow(() -> Problems.notFound("No repository connection %s.".formatted(connectionId)));
     }
 
-    @Transactional(readOnly = true)
-    public ProjectEntity project(RepositoryConnectionEntity connection) {
+    ProjectEntity project(RepositoryConnectionEntity connection) {
         return projects
                 .findById(connection.projectId())
                 .orElseThrow(() -> Problems.notFound("No project behind connection %s.".formatted(connection.id())));
@@ -114,10 +126,10 @@ public class ConnectionService {
         }
     }
 
-    private void requireNotAlreadyConnected(ConnectionCommand command) {
+    private void requireNotAlreadyConnected(ConnectionRequest request) {
         connections
                 .findByRepositoryFullNameAndBranchAndPathGlob(
-                        command.repositoryFullName(), command.branch(), command.pathGlob())
+                        request.getRepositoryFullName(), request.getBranch(), request.getPathGlob())
                 .ifPresent(existing -> {
                     throw Problems.conflict(
                             "%s (%s, %s) is already connected as connection %s."
@@ -133,44 +145,49 @@ public class ConnectionService {
      * The scan the administrator confirmed is the evidence when it is given; without one the glob
      * is checked live, so the wizard cannot be bypassed by posting straight at the API.
      */
-    private void requireSomethingToImport(ForgeInstallationEntity installation, ConnectionCommand command) {
-        if (command.scanId() != null) {
+    private void requireSomethingToImport(ForgeInstallationEntity installation, ConnectionRequest request) {
+        if (request.getScanId() != null) {
             RepositoryScanEntity scan = scans
-                    .findById(command.scanId())
-                    .orElseThrow(() -> Problems.notFound("No scan %s.".formatted(command.scanId())));
+                    .findById(request.getScanId())
+                    .orElseThrow(() -> Problems.notFound("No scan %s.".formatted(request.getScanId())));
             if (scan.status() != ScanStatus.SUCCEEDED) {
                 throw Problems.unprocessable("Scan %s has not succeeded, so it cannot confirm this connection."
                         .formatted(scan.id()));
             }
             if (scan.importableCount() == 0) {
-                throw noSpecifications(command);
+                throw noSpecifications(request);
             }
             return;
         }
         List<String> matched = SpecPaths.matching(
-                forge.listFiles(installation.externalId(), new ForgeRef(command.repositoryFullName(), command.branch())),
-                command.pathGlob());
+                forge.listFiles(
+                        installation.externalId(),
+                        new ForgeRef(request.getRepositoryFullName(), request.getBranch())),
+                request.getPathGlob());
         if (matched.isEmpty()) {
-            throw noSpecifications(command);
+            throw noSpecifications(request);
         }
     }
 
-    private static org.springframework.web.ErrorResponseException noSpecifications(ConnectionCommand command) {
+    private static org.springframework.web.ErrorResponseException noSpecifications(ConnectionRequest request) {
         return Problems.unprocessable("No specification was found at %s on %s (%s)."
-                .formatted(command.pathGlob(), command.repositoryFullName(), command.branch()));
+                .formatted(request.getPathGlob(), request.getRepositoryFullName(), request.getBranch()));
     }
 
-    private ProjectEntity upsertProject(ProjectCommand command, Instant now) {
-        Set<String> domains = new LinkedHashSet<>(command.domains() == null ? List.of() : command.domains());
-        Set<String> requiredRoles = new LinkedHashSet<>(command.requiredRoles() == null ? List.of() : command.requiredRoles());
+    private ProjectEntity upsertProject(ProjectConfiguration configuration, Instant now) {
+        Set<String> domains = new LinkedHashSet<>(
+                configuration.getDomains() == null ? List.of() : configuration.getDomains());
+        Set<String> requiredRoles = new LinkedHashSet<>(configuration.getApprovalRule().getRequiredRoles());
+        String tracker = configuration.getTracker() == null ? null : configuration.getTracker().name();
+        int minApprovals = configuration.getApprovalRule().getMinApprovals();
         return projects
-                .findByName(command.name())
+                .findByName(configuration.getName())
                 .map(project -> {
                     project.update(
-                            command.team(),
-                            command.tracker(),
-                            command.trackerProjectKey(),
-                            command.minApprovals(),
+                            configuration.getTeam(),
+                            tracker,
+                            configuration.getTrackerProjectKey(),
+                            minApprovals,
                             domains,
                             requiredRoles,
                             now);
@@ -178,11 +195,11 @@ public class ConnectionService {
                 })
                 .orElseGet(() -> projects.save(new ProjectEntity(
                         UUID.randomUUID(),
-                        command.name(),
-                        command.team(),
-                        command.tracker(),
-                        command.trackerProjectKey(),
-                        command.minApprovals(),
+                        configuration.getName(),
+                        configuration.getTeam(),
+                        tracker,
+                        configuration.getTrackerProjectKey(),
+                        minApprovals,
                         domains,
                         requiredRoles,
                         now)));

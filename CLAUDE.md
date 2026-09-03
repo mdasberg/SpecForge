@@ -81,6 +81,12 @@ by Keycloak subject id, so a rename in Keycloak never orphans a verdict. Dev rea
   path, `schemas/`, `parameters/`, `responses/`. A resource `$ref`s a shared response directly;
   shared responses are never also listed in the root `components`, or the bundle ships a dangling
   `$ref`.
+- **DTOs come from the contract, and the service layer speaks them.** Controllers are pass-throughs
+  with no mapping, entity-to-DTO mapping lives in `service/`, and there are no hand-written request
+  or response types — same shape as `financial-management`. Three kinds of hand-written value type
+  are deliberate and stay: persisted enums in `entity/` (a contract rename must never turn into a
+  data migration), a module's published API records in its base package (they are inter-module
+  contracts, not wire types), and the forge port's records (they mirror GitHub, not SpecForge).
 - Packages inside a module are **n-tier**, the same layout as the CarePay services
   (`financial-management`): `entity/`, `repository/`, `service/`, `api/`, `configuration/`,
   `exception/`, plus a port package where a module talks to something outside (`forge/`). There is

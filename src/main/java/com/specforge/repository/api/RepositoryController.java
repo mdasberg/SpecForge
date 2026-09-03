@@ -6,40 +6,32 @@ import com.specforge.platform.api.dto.ConnectionRequest;
 import com.specforge.platform.api.dto.ForgeInstallationList;
 import com.specforge.platform.api.dto.ImportRun;
 import com.specforge.platform.api.dto.ImportRunList;
-import com.specforge.platform.api.dto.ProjectConfiguration;
 import com.specforge.platform.api.dto.Scan;
 import com.specforge.platform.api.dto.ScanRequest;
 import com.specforge.platform.api.dto.SpecContentUpdate;
 import com.specforge.platform.api.generated.RepositoryApi;
-import com.specforge.repository.entity.ImportRunEntity;
-import com.specforge.repository.entity.ImportTrigger;
-import com.specforge.repository.entity.RepositoryConnectionEntity;
-import com.specforge.repository.entity.RepositoryScanEntity;
-import com.specforge.repository.entity.SpecFileFormat;
-import com.specforge.repository.entity.SyncPolicy;
 import com.specforge.repository.exception.Problems;
-import com.specforge.repository.service.ConnectionCommand;
 import com.specforge.repository.service.ConnectionService;
 import com.specforge.repository.service.ImportService;
 import com.specforge.repository.service.InstallationService;
-import com.specforge.repository.service.ProjectCommand;
 import com.specforge.repository.service.ScanService;
 import com.specforge.repository.service.SpecContentService;
 import com.specforge.repository.service.WebhookService;
 import com.specforge.repository.service.WebhookVerifier;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /**
  * The repository capability's HTTP surface. It implements the interface generated from
  * {@code specforge-api.yaml}, so a change to the contract that this does not follow fails to
  * compile rather than reaching a client.
+ *
+ * <p>There is no mapping here on purpose: the services speak the contract's own types, and this
+ * class only routes and authorises.
  */
 @RestController
-public class RepositoryController implements RepositoryApi {
+class RepositoryController implements RepositoryApi {
 
     private final ConnectionService connections;
     private final ScanService scans;
@@ -68,83 +60,50 @@ public class RepositoryController implements RepositoryApi {
 
     @Override
     public ForgeInstallationList listForgeInstallations() {
-        return new ForgeInstallationList(
-                installations.list().stream().map(RepositoryMapper::installation).toList());
+        return installations.list();
     }
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public Scan startRepositoryScan(ScanRequest request) {
-        RepositoryScanEntity scan = scans.start(
-                request.getInstallationId(),
-                request.getRepositoryFullName(),
-                request.getBranch(),
-                request.getPathGlob(),
-                SpecFileFormat.valueOf(request.getSpecFormat().name()));
-        return RepositoryMapper.scan(scan, List.of());
+        return scans.start(request);
     }
 
     @Override
     public Scan getRepositoryScan(UUID scanId) {
-        RepositoryScanEntity scan = scans.get(scanId);
-        return RepositoryMapper.scan(scan, scans.files(scanId));
+        return scans.get(scanId);
     }
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public Connection createRepositoryConnection(ConnectionRequest request) {
-        ProjectConfiguration project = request.getProject();
-        RepositoryConnectionEntity connection = connections.create(new ConnectionCommand(
-                request.getInstallationId(),
-                request.getRepositoryFullName(),
-                request.getBranch(),
-                request.getPathGlob(),
-                SpecFileFormat.valueOf(request.getSpecFormat().name()),
-                SyncPolicy.valueOf(request.getSyncMode().name()),
-                request.getScanId(),
-                new ProjectCommand(
-                        project.getName(),
-                        project.getTeam(),
-                        project.getDomains(),
-                        project.getTracker() == null ? null : project.getTracker().name(),
-                        project.getTrackerProjectKey(),
-                        project.getApprovalRule().getMinApprovals(),
-                        project.getApprovalRule().getRequiredRoles())));
-        return RepositoryMapper.connection(connection, project.getName());
+        return connections.create(request);
     }
 
     @Override
     public ConnectionList listRepositoryConnections() {
-        return new ConnectionList(connections.list().stream()
-                .map(connection -> RepositoryMapper.connection(connection, connections.project(connection).name()))
-                .toList());
+        return connections.list();
     }
 
     @Override
     public Connection getRepositoryConnection(UUID connectionId) {
-        RepositoryConnectionEntity connection = connections.get(connectionId);
-        return RepositoryMapper.connection(connection, connections.project(connection).name());
+        return connections.get(connectionId);
     }
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public ImportRun startImport(UUID connectionId) {
-        ImportRunEntity run = imports.start(connections.get(connectionId), ImportTrigger.MANUAL, null);
-        return RepositoryMapper.importRun(run, List.of());
+        return imports.startManual(connectionId);
     }
 
     @Override
     public ImportRunList listImportRuns(UUID connectionId) {
-        connections.get(connectionId);
-        return new ImportRunList(imports.list(connectionId).stream()
-                .map(run -> RepositoryMapper.importRun(run, imports.files(run.id())))
-                .toList());
+        return imports.list(connectionId);
     }
 
     @Override
     public ImportRun getImportRun(UUID connectionId, UUID runId) {
-        ImportRunEntity run = imports.get(connectionId, runId);
-        return RepositoryMapper.importRun(run, imports.files(run.id()));
+        return imports.get(connectionId, runId);
     }
 
     /**
