@@ -1,0 +1,34 @@
+schema: spec-driven
+
+context: |
+  SpecForge is a collaborative review and approval platform for software specifications — the
+  review layer that spec-driven development lacks. Spec lifecycle: Draft → In Review →
+  Changes Requested → Approved → Implemented, with anchored discussions, version diffs,
+  approval rules, automated/AI reviewers, ticket creation from a discussion, and a
+  spec→approval→ticket→PR→deployment traceability chain.
+
+  Stack: Java 25 · Spring Boot 4 · Spring Modulith 2 · PostgreSQL + Liquibase · Keycloak ·
+  React 19 + TypeScript + Vite. Package base `com.specforge`.
+
+  Change order is a hard dependency chain; do not start step N before N-1 is applied:
+  1. add-project-skeleton — app skeleton, Keycloak auth, API conventions, themed shell
+  2. add-spec-repository — connect a GitHub repo, import specs, versions, sync
+  3. add-spec-catalog — browse, filter, search, render
+  4. add-spec-review — reviews, version diff, inline and side-by-side
+  5. add-review-discussions — anchored threads, mentions, resolve
+  6. add-review-approval — reviewers, verdicts, approval rules, the gate
+  7. add-automated-review — check runs, agent findings, accept/dismiss
+  8. add-ticket-links — create a ticket from a comment, tracker adapters
+  9. add-audit-trail — append-only event log, timeline, traceability
+  10. add-review-dashboard — personal review queues, activity feed
+
+  Each change is mirrored as a GitHub issue on mdasberg/SpecForge (label `openspec`),
+  issue N == step N. The files here stay the source of truth.
+
+  Cross-capability rules, inherited by every capability:
+  - The connected spec repository is read-only. SpecForge imports and renders; comments and
+    verdicts live in SpecForge, never written back as file edits.
+  - Human-vs-agent provenance is an API field (`actor_kind`), not a UI convention. Agent
+    identities live in the same identity table as humans.
+  - Agents never approve. They may comment, suggest and fail checks.
+  - Every state change lands in the append-only audit log.

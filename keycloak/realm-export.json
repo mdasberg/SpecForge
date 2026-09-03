@@ -1,0 +1,153 @@
+{
+  "realm": "specforge",
+  "enabled": true,
+  "displayName": "SpecForge",
+  "accessTokenLifespan": 3600,
+  "attributes": {
+    "description": "DEVELOPMENT REALM ONLY. Contains development credentials (client secrets, seeded user passwords). This is not the deployment configuration and must never be used outside local development."
+  },
+  "roles": {
+    "realm": [
+      {
+        "name": "REVIEWER",
+        "description": "Can comment on and approve/reject spec reviews.",
+        "composite": false
+      },
+      {
+        "name": "ARCHITECT",
+        "description": "Reviewer with authority over approval rules and spec repositories.",
+        "composite": false
+      },
+      {
+        "name": "ADMIN",
+        "description": "Full administrative access to SpecForge.",
+        "composite": false
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "specforge-web",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*##http://localhost:8080/*"
+      },
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:8080"
+      ],
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "access.token.claim": "true",
+            "id.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "specforge-api",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "specforge-api-dev-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "access.token.claim": "true",
+            "id.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "reviewer",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Reviewer",
+      "lastName": "User",
+      "email": "reviewer@specforge.local",
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "reviewer",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "REVIEWER"
+      ]
+    },
+    {
+      "username": "architect",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Architect",
+      "lastName": "User",
+      "email": "architect@specforge.local",
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "architect",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "REVIEWER",
+        "ARCHITECT"
+      ]
+    },
+    {
+      "username": "admin-user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin-user@specforge.local",
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin-user",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "REVIEWER",
+        "ADMIN"
+      ]
+    }
+  ]
+}

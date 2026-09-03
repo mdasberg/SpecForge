@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: specforge
+  datasource:
+    url: jdbc:postgresql://localhost:30301/specforge
+    username: specforge
+    password: specforge
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Liquibase owns the schema; Hibernate only checks that it matches the mapping.
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
