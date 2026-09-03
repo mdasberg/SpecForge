@@ -165,6 +165,13 @@ dockerCompose {
     upAdditionalArgs = ['--quiet-pull']
     // Fail fast if a container never turns healthy; the plugin default is 15 minutes.
     waitForHealthyStateTimeout = java.time.Duration.ofMinutes(5)
+    // Readiness comes from the compose healthchecks, which run inside the container, and not from
+    // the plugin's own TCP probe. The probe resolves a host itself: with DOCKER_HOST unset and the
+    // ports published to 127.0.0.1 rather than 0.0.0.0, it falls back to the container network's
+    // gateway address, which nothing listens on. That is reachable on a developer's Docker Desktop
+    // and refused on a Linux CI runner, where it hung composeUp for fifteen minutes. Keeping the
+    // ports on loopback is deliberate, so the redundant probe goes instead.
+    waitForTcpPorts = false
     // No project name, so the stack is byte-for-byte the one `docker compose up` in this directory
     // creates. A generated name would collide with the developer's stack over container_name.
     projectName = null

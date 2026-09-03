@@ -20,7 +20,10 @@ final class Keycloak {
     static final String ISSUER = "http://localhost:8081/realms/specforge";
     private static final String ADMIN = "http://localhost:8081/admin/realms/specforge";
 
-    private static final HttpClient HTTP = HttpClient.newHttpClient();
+    // Bounded like every other request the suite makes: see BaseIntegrationTest.TIMEOUT.
+    private static final HttpClient HTTP = HttpClient.newBuilder()
+            .connectTimeout(BaseIntegrationTest.TIMEOUT)
+            .build();
     private static final JsonMapper JSON = JsonMapper.builder().build();
 
     private Keycloak() {
@@ -73,7 +76,7 @@ final class Keycloak {
     }
 
     private static String send(String method, URI uri, String contentType, String body, String bearerToken, int expected) {
-        HttpRequest.Builder request = HttpRequest.newBuilder(uri);
+        HttpRequest.Builder request = HttpRequest.newBuilder(uri).timeout(BaseIntegrationTest.TIMEOUT);
         if (contentType != null) {
             request.header("Content-Type", contentType);
         }
@@ -103,6 +106,7 @@ final class Keycloak {
         try {
             HttpResponse<String> response = HTTP.send(
                     HttpRequest.newBuilder(URI.create(ISSUER + "/protocol/openid-connect/token"))
+                            .timeout(BaseIntegrationTest.TIMEOUT)
                             .header("Content-Type", "application/x-www-form-urlencoded")
                             .POST(HttpRequest.BodyPublishers.ofString(urlEncoded(form)))
                             .build(),

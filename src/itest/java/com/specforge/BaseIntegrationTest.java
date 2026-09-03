@@ -2,6 +2,7 @@ package com.specforge;
 
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +20,16 @@ public abstract class BaseIntegrationTest {
      * The JDK client rather than a Spring one: these tests assert on 401 and 403 responses, and a
      * client that throws on a 4xx would turn the thing under test into an exception.
      */
-    protected static final HttpClient HTTP = HttpClient.newHttpClient();
+    /**
+     * Every request is bounded. Without this a service that accepts a connection and then never
+     * answers hangs the suite forever rather than failing it, which is the harder failure to
+     * diagnose — CI shows no output until something eventually times out.
+     */
+    static final Duration TIMEOUT = Duration.ofSeconds(20);
+
+    protected static final HttpClient HTTP = HttpClient.newBuilder()
+            .connectTimeout(TIMEOUT)
+            .build();
 
     @LocalServerPort
     private int port;
@@ -29,6 +39,6 @@ public abstract class BaseIntegrationTest {
         if (bearerToken != null) {
             request.header("Authorization", "Bearer " + bearerToken);
         }
-        return HTTP.send(request.GET().build(), HttpResponse.BodyHandlers.ofString());
+        return HTTP.send(request.timeout(TIMEOUT).GET().build(), HttpResponse.BodyHandlers.ofString());
     }
 }

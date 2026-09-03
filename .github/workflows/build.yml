@@ -8,6 +8,9 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    # A stuck container wait once ran for sixteen minutes before failing; without this a genuine
+    # hang would hold a runner for six hours.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
 
@@ -35,6 +38,7 @@ jobs:
 
   frontend:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: frontend
