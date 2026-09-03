@@ -1,0 +1,31 @@
+post:
+  operationId: startImport
+  tags: [ Repository ]
+  summary: Manually re-import a connection's repository.
+  description: >
+    Idempotent against unchanged content — a run that finds nothing changed creates no version and
+    reports UNCHANGED for every file, so triggering this repeatedly is safe.
+  parameters:
+    - name: connectionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '202':
+      description: The import run was accepted and is running.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ImportRun.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+    '409':
+      description: The connection is degraded, so synchronisation is stopped.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../schemas/Problem.yaml

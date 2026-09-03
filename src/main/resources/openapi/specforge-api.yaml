@@ -28,10 +28,34 @@ security:
 tags:
   - name: Identity
     description: Who the caller is, mirrored from the Keycloak token.
+  - name: Repository
+    description: >
+      Connecting a repository that holds specifications, scanning it, importing specs and keeping
+      them in sync. SpecForge is read-only on the repository.
 
 paths:
   /api/me:
     $ref: ./resources/identity/me.yaml
+  /api/forge/installations:
+    $ref: ./resources/repository/installations.yaml
+  /api/forge/scans:
+    $ref: ./resources/repository/scans.yaml
+  /api/forge/scans/{scanId}:
+    $ref: ./resources/repository/scan.yaml
+  /api/repository-connections:
+    $ref: ./resources/repository/connections.yaml
+  /api/repository-connections/{connectionId}:
+    $ref: ./resources/repository/connection.yaml
+  /api/repository-connections/{connectionId}/imports:
+    $ref: ./resources/repository/connection-imports.yaml
+  /api/repository-connections/{connectionId}/import-runs:
+    $ref: ./resources/repository/import-runs.yaml
+  /api/repository-connections/{connectionId}/import-runs/{runId}:
+    $ref: ./resources/repository/import-run.yaml
+  /api/specs/{specId}/content:
+    $ref: ./resources/repository/spec-content.yaml
+  /api/webhooks/github:
+    $ref: ./resources/repository/github-webhook.yaml
 
 components:
   securitySchemes:

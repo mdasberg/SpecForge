@@ -1,0 +1,14 @@
+type: object
+description: A repository the forge installation grants SpecForge access to.
+required: [fullName]
+properties:
+  fullName:
+    type: string
+    description: The owner-qualified repository name, e.g. `acme/billing-specs`.
+    example: acme/billing-specs
+  defaultBranch:
+    type: string
+    example: main
+  externalId:
+    type: string
+    description: The provider's own identifier for the repository, stored to survive a rename.

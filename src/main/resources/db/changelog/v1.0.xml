@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  One changelog per released version, named after the project's major.minor, the same way the
+  CarePay services do it. Everything that ships in 1.0.x lives here; the first changeset written
+  after the version bumps goes into the next file.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="platform-0001-identity" author="specforge">
+        <comment>
+            The mirror of a Keycloak identity. Named app_user because "user" is a reserved word in
+            PostgreSQL. There is no credential column here by design: Keycloak is the user store.
+        </comment>
+
+        <createTable tableName="app_user">
+            <column name="subject_id" type="VARCHAR(64)">
+                <constraints primaryKey="true" primaryKeyName="pk_app_user" nullable="false"/>
+            </column>
+            <column name="display_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="avatar_url" type="VARCHAR(1024)"/>
+            <column name="actor_kind" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="app_user_role">
+            <column name="user_subject_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="app_user_role"
+                       columnNames="user_subject_id, role"
+                       constraintName="pk_app_user_role"/>
+
+        <addForeignKeyConstraint baseTableName="app_user_role"
+                                 baseColumnNames="user_subject_id"
+                                 constraintName="fk_app_user_role_user"
+                                 referencedTableName="app_user"
+                                 referencedColumnNames="subject_id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+<changeSet id="repository-0001-connections" author="specforge">
+        <comment>
+            This module owns the connection to an external forge and everything about ingesting
+            from it: the installation grant, the project configuration captured in the connect
+            wizard, the connection itself, the recorded scan and import runs, proposed changes
+            arriving from pull requests, and the webhook replay guard.
+        </comment>
+
+        <createTable tableName="forge_installation">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_forge_installation" nullable="false"/>
+            </column>
+            <column name="provider" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id" type="VARCHAR(64)">
+                <!-- The forge's own installation id. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_login" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_type" type="VARCHAR(32)"/>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_repository_count" type="INT">
+                <!-- How many repositories the account has in total, so the wizard can say
+                     "4 of 23 granted". -->
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="forge_installation"
+                             columnNames="provider, external_id"
+                             constraintName="uq_forge_installation_provider_external"/>
+
+        <createTable tableName="forge_installation_repository">
+            <column name="installation_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="full_name" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id" type="VARCHAR(64)"/>
+            <column name="default_branch" type="VARCHAR(255)"/>
+        </createTable>
+
+        <addPrimaryKey tableName="forge_installation_repository"
+                       columnNames="installation_id, full_name"
+                       constraintName="pk_forge_installation_repository"/>
+
+        <addForeignKeyConstraint baseTableName="forge_installation_repository"
+                                 baseColumnNames="installation_id"
+                                 constraintName="fk_forge_installation_repository_installation"
+                                 referencedTableName="forge_installation"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createTable tableName="project">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_project" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="team" type="VARCHAR(255)"/>
+            <column name="tracker" type="VARCHAR(32)"/>
+            <column name="tracker_project_key" type="VARCHAR(128)"/>
+            <column name="min_approvals" type="INT">
+                <!-- Part of the approval rule captured here and evaluated later by the approval
+                     capability; this module stores it and never interprets it. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="project"
+                             columnNames="name"
+                             constraintName="uq_project_name"/>
+
+        <createTable tableName="project_domain">
+            <column name="project_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="domain" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="project_domain"
+                       columnNames="project_id, domain"
+                       constraintName="pk_project_domain"/>
+
+        <addForeignKeyConstraint baseTableName="project_domain"
+                                 baseColumnNames="project_id"
+                                 constraintName="fk_project_domain_project"
+                                 referencedTableName="project"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createTable tableName="project_required_role">
+            <column name="project_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="project_required_role"
+                       columnNames="project_id, role"
+                       constraintName="pk_project_required_role"/>
+
+        <addForeignKeyConstraint baseTableName="project_required_role"
+                                 baseColumnNames="project_id"
+                                 constraintName="fk_project_required_role_project"
+                                 referencedTableName="project"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createTable tableName="repository_connection">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_repository_connection" nullable="false"/>
+            </column>
+            <column name="project_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="installation_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="repository_full_name" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="branch" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path_glob" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="spec_format" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sync_mode" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="degraded_reason" type="VARCHAR(512)"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="repository_connection"
+                                 baseColumnNames="project_id"
+                                 constraintName="fk_repository_connection_project"
+                                 referencedTableName="project"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="repository_connection"
+                                 baseColumnNames="installation_id"
+                                 constraintName="fk_repository_connection_installation"
+                                 referencedTableName="forge_installation"
+                                 referencedColumnNames="id"/>
+
+        <addUniqueConstraint tableName="repository_connection"
+                             columnNames="repository_full_name, branch, path_glob"
+                             constraintName="uq_repository_connection_repo_branch_path"/>
+        <!-- The combination a second connection may not duplicate. -->
+
+        <createTable tableName="repository_scan">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_repository_scan" nullable="false"/>
+            </column>
+            <column name="installation_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="repository_full_name" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="branch" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path_glob" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="spec_format" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="importable_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="change_proposal_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unparsable_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="failure_reason" type="VARCHAR(1024)"/>
+            <column name="started_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="finished_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+        <!-- The scan runs before any connection exists, which is why it hangs off the
+             installation and not off a connection, and why its result is stored rather than
+             recomputed — the wizard re-reads it. -->
+
+        <addForeignKeyConstraint baseTableName="repository_scan"
+                                 baseColumnNames="installation_id"
+                                 constraintName="fk_repository_scan_installation"
+                                 referencedTableName="forge_installation"
+                                 referencedColumnNames="id"/>
+
+        <createTable tableName="repository_scan_file">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_repository_scan_file" nullable="false"/>
+            </column>
+            <column name="scan_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="classification" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reason" type="VARCHAR(1024)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="repository_scan_file"
+                                 baseColumnNames="scan_id"
+                                 constraintName="fk_repository_scan_file_scan"
+                                 referencedTableName="repository_scan"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="repository_scan_file"
+                             columnNames="scan_id, path"
+                             constraintName="uq_repository_scan_file_scan_path"/>
+
+        <createTable tableName="import_run">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_import_run" nullable="false"/>
+            </column>
+            <column name="connection_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_kind" type="VARCHAR(32)">
+                <!-- Named trigger_kind because TRIGGER is a reserved word in PostgreSQL. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="commit_sha" type="VARCHAR(64)"/>
+            <column name="started_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="finished_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="imported_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unchanged_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="skipped_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="failed_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="import_run"
+                                 baseColumnNames="connection_id"
+                                 constraintName="fk_import_run_connection"
+                                 referencedTableName="repository_connection"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createTable tableName="import_run_file">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_import_run_file" nullable="false"/>
+            </column>
+            <column name="run_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="outcome" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reason" type="VARCHAR(1024)"/>
+        </createTable>
+        <!-- This is the row that answers "why is this file not a specification" without
+             re-running the import. -->
+
+        <addForeignKeyConstraint baseTableName="import_run_file"
+                                 baseColumnNames="run_id"
+                                 constraintName="fk_import_run_file_run"
+                                 referencedTableName="import_run"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="import_run_file"
+                             columnNames="run_id, path"
+                             constraintName="uq_import_run_file_run_path"/>
+
+        <createTable tableName="spec_change_proposal">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_spec_change_proposal" nullable="false"/>
+            </column>
+            <column name="connection_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pull_request_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="head_sha" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(512)"/>
+            <column name="author" type="VARCHAR(255)"/>
+            <column name="state" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="spec_change_proposal"
+                                 baseColumnNames="connection_id"
+                                 constraintName="fk_spec_change_proposal_connection"
+                                 referencedTableName="repository_connection"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="spec_change_proposal"
+                             columnNames="connection_id, pull_request_number"
+                             constraintName="uq_spec_change_proposal_connection_pr"/>
+        <!-- A further commit on the same pull request updates this row's head rather than adding
+             a second proposal. -->
+
+        <createTable tableName="spec_change_proposal_file">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_spec_change_proposal_file" nullable="false"/>
+            </column>
+            <column name="proposal_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content_sha" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="spec_change_proposal_file"
+                                 baseColumnNames="proposal_id"
+                                 constraintName="fk_spec_change_proposal_file_proposal"
+                                 referencedTableName="spec_change_proposal"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="spec_change_proposal_file"
+                             columnNames="proposal_id, path"
+                             constraintName="uq_spec_change_proposal_file_proposal_path"/>
+
+        <createTable tableName="webhook_delivery">
+            <column name="delivery_id" type="VARCHAR(128)">
+                <constraints primaryKey="true" primaryKeyName="pk_webhook_delivery" nullable="false"/>
+            </column>
+            <column name="event" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="received_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <!-- The replay guard. A forge retries a delivery, so the delivery id is remembered and a
+             repeat is acknowledged without being processed twice. -->
+    </changeSet>
+
+<changeSet id="catalog-0001-spec-document" author="specforge">
+        <comment>
+            A specification document is a read-only mirror of a file in someone else's git
+            repository: SpecForge imports and renders it, never writes content back. Versions are
+            immutable and content-addressed, and section anchors are heading slugs rather than
+            line numbers, so a discussion survives an edit elsewhere in the file.
+        </comment>
+
+        <createTable tableName="spec_document">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_spec_document" nullable="false"/>
+            </column>
+            <column name="connection_id" type="UUID">
+                <!-- The repository connection that imported it; deliberately no FK, it belongs to another module. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="domain" type="VARCHAR(255)"/>
+            <column name="owning_team" type="VARCHAR(255)"/>
+            <column name="owner" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="spec_document"
+                             columnNames="connection_id, path"
+                             constraintName="uq_spec_document_connection_path"/>
+        <!-- The path is the stable identity, so re-importing the same path updates rather than duplicates. -->
+
+        <createTable tableName="spec_document_tag">
+            <column name="document_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="spec_document_tag"
+                       columnNames="document_id, tag"
+                       constraintName="pk_spec_document_tag"/>
+
+        <addForeignKeyConstraint baseTableName="spec_document_tag"
+                                 baseColumnNames="document_id"
+                                 constraintName="fk_spec_document_tag_document"
+                                 referencedTableName="spec_document"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createTable tableName="spec_version">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_spec_version" nullable="false"/>
+            </column>
+            <column name="document_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ordinal" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <!-- The normalised file content, never modified after insert. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="content_sha" type="VARCHAR(64)">
+                <!-- sha256 hex of the normalised content; this is the version's real identity, so
+                     re-importing an unchanged file creates nothing. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="commit_sha" type="VARCHAR(64)"/>
+            <column name="author" type="VARCHAR(255)"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="spec_version"
+                                 baseColumnNames="document_id"
+                                 constraintName="fk_spec_version_document"
+                                 referencedTableName="spec_document"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="spec_version"
+                             columnNames="document_id, ordinal"
+                             constraintName="uq_spec_version_document_ordinal"/>
+
+        <createIndex tableName="spec_version" indexName="idx_spec_version_document_sha">
+            <!-- Not unique on purpose: content may legitimately revert to an earlier state, and
+                 only the current version's hash is compared on import. -->
+            <column name="document_id"/>
+            <column name="content_sha"/>
+        </createIndex>
+
+        <createTable tableName="spec_section">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_spec_section" nullable="false"/>
+            </column>
+            <column name="version_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="UUID"/>
+            <column name="anchor_key" type="VARCHAR(512)">
+                <!-- Heading slug plus ordinal, the target discussions address. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="heading" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ordinal" type="INT">
+                <!-- Position in document order. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_line" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_line" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <!-- Line numbers are stored rather than a copy of the body because the version is
+             immutable, so the offsets can never drift; the anchor key, not the line, is what a
+             discussion points at. -->
+
+        <addForeignKeyConstraint baseTableName="spec_section"
+                                 baseColumnNames="version_id"
+                                 constraintName="fk_spec_section_version"
+                                 referencedTableName="spec_version"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="spec_section"
+                                 baseColumnNames="parent_id"
+                                 constraintName="fk_spec_section_parent"
+                                 referencedTableName="spec_section"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="spec_section"
+                             columnNames="version_id, anchor_key"
+                             constraintName="uq_spec_section_version_anchor"/>
+    </changeSet>
+
+</databaseChangeLog>

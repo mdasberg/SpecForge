@@ -1,0 +1,25 @@
+get:
+  operationId: getRepositoryScan
+  tags: [ Repository ]
+  summary: The result of a repository scan.
+  description: >
+    The scan is asynchronous and its result is stored rather than recomputed, so the connection
+    wizard can re-read it instead of scanning again on every step back and forth.
+  parameters:
+    - name: scanId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The scan.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Scan.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

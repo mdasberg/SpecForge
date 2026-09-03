@@ -81,6 +81,27 @@ by Keycloak subject id, so a rename in Keycloak never orphans a verdict. Dev rea
   path, `schemas/`, `parameters/`, `responses/`. A resource `$ref`s a shared response directly;
   shared responses are never also listed in the root `components`, or the bundle ships a dangling
   `$ref`.
+- **Lombok is on the classpath** and `@RequiredArgsConstructor` replaces every hand-written
+  injection constructor, as in the CarePay services. Method parameters and locals are `final`
+  unless they are genuinely reassigned. Lombok works on Java 25; `lombok.config` stops it reading
+  configuration from parent directories.
+- Services carry class-level `@Transactional` (`readOnly = true` on the read methods), and
+  asynchronous work is dispatched **after commit** — a runner is triggered by a
+  `@TransactionalEventListener(AFTER_COMMIT)` rather than called inline, because a runner on
+  another thread cannot see a row the writing transaction has not committed.
+- **DTOs come from the contract, and the service layer speaks them.** Controllers are pass-throughs
+  with no mapping, entity-to-DTO mapping lives in `service/`, and there are no hand-written request
+  or response types — same shape as `financial-management`. Three kinds of hand-written value type
+  are deliberate and stay: persisted enums in `entity/` (a contract rename must never turn into a
+  data migration), a module's published API records in its base package (they are inter-module
+  contracts, not wire types), and the forge port's records (they mirror GitHub, not SpecForge).
+- Packages inside a module are **n-tier**, the same layout as the CarePay services
+  (`financial-management`): `entity/`, `repository/`, `service/`, `api/`, `configuration/`,
+  `exception/`, plus a port package where a module talks to something outside (`forge/`). There is
+  no `internal/` segment — Spring Modulith already treats every sub-package of a module as internal
+  and exposes only the base package, so the base package holds the module's published API and
+  nothing else. `ModularityTests` fails on a reference into another module's sub-package, which is
+  what makes the convention enforceable rather than aspirational.
 - Spec versions are **content-addressed** — re-importing identical content is a no-op.
 - Comment anchors are heading-slug-plus-ordinal and are **carried, never fuzzily reattached**;
   they go stale/orphaned instead.

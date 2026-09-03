@@ -1,0 +1,3 @@
+type: string
+description: How a specification file in the connected repository is written.
+enum: [OPENSPEC, MARKDOWN]

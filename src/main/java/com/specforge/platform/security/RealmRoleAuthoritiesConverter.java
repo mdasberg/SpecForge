@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 class RealmRoleAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
     @Override
-    public Collection<GrantedAuthority> convert(Jwt jwt) {
+    public Collection<GrantedAuthority> convert(final Jwt jwt) {
         return TokenIdentity.of(jwt).roles().stream()
                 .map(Role::authority)
                 .map(SimpleGrantedAuthority::new)

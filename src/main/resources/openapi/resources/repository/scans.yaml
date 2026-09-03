@@ -1,0 +1,30 @@
+post:
+  operationId: startRepositoryScan
+  tags: [ Repository ]
+  summary: Scan a repository for importable specifications.
+  description: >
+    Runs before a connection exists, so an administrator can see what a path glob would import
+    before committing to it. The scan runs asynchronously; poll the returned id.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/ScanRequest.yaml
+  responses:
+    '202':
+      description: The scan was accepted and is running.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Scan.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      description: The installation is unknown.
+      content:
+        application/problem+json:
+          schema:
+            $ref: ../../schemas/Problem.yaml

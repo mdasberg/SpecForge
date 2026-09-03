@@ -1,0 +1,6 @@
+type: string
+description: >
+  When a connection re-imports from the repository. `ON_PULL_REQUEST` is the default: a pull
+  request touching a spec is the moment a team wants review, so that is the trigger that needs no
+  configuration.
+enum: [ON_PULL_REQUEST, ON_PUSH, MANUAL]

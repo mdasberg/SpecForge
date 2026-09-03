@@ -1,0 +1,8 @@
+type: object
+description: The import runs recorded for a connection.
+required: [items]
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./ImportRun.yaml

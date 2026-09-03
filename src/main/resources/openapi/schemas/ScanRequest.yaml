@@ -1,0 +1,20 @@
+type: object
+description: A request to scan a repository for importable specifications before a connection is made.
+required: [installationId, repositoryFullName, branch, pathGlob, specFormat]
+properties:
+  installationId:
+    type: string
+    format: uuid
+    description: The forge installation to read the repository through.
+  repositoryFullName:
+    type: string
+    example: acme/billing-specs
+  branch:
+    type: string
+    example: main
+  pathGlob:
+    type: string
+    default: openspec/specs/**/spec.md
+    description: Which files in the repository count as specifications.
+  specFormat:
+    $ref: ./SpecFormat.yaml

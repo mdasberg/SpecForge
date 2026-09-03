@@ -1,0 +1,22 @@
+type: object
+description: How the imported specifications are presented and governed once connected.
+required: [name, approvalRule]
+properties:
+  name:
+    type: string
+    example: Billing
+  team:
+    type: string
+    example: Payments
+  domains:
+    type: array
+    items:
+      type: string
+  tracker:
+    type: string
+    enum: [JIRA, GITHUB_ISSUES, NONE]
+  trackerProjectKey:
+    type: string
+    example: BILL
+  approvalRule:
+    $ref: ./ApprovalRule.yaml

@@ -1,0 +1,14 @@
+type: object
+description: >
+  The approval rule stored against a connected project. This module stores the rule and never
+  interprets it — the approval capability evaluates it.
+required: [minApprovals, requiredRoles]
+properties:
+  minApprovals:
+    type: integer
+    format: int32
+    minimum: 1
+  requiredRoles:
+    type: array
+    items:
+      type: string

@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -14,17 +15,15 @@ import tools.jackson.databind.json.JsonMapper;
  * Renders an RFC 9457 problem document from inside the security filter chain, which runs before
  * Spring MVC's exception handling and would otherwise return an empty 401 or 403 body.
  */
+@RequiredArgsConstructor
 @Component
 class ProblemResponses {
 
     private final JsonMapper json;
 
-    ProblemResponses(JsonMapper json) {
-        this.json = json;
-    }
-
-    void write(HttpServletRequest request, HttpServletResponse response, HttpStatus status, String detail) throws IOException {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
+    void write(final HttpServletRequest request, final HttpServletResponse response, final HttpStatus status,
+            final String detail) throws IOException {
+        final ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
         problem.setType(URI.create("about:blank"));
         problem.setInstance(URI.create(request.getRequestURI()));
         response.setStatus(status.value());

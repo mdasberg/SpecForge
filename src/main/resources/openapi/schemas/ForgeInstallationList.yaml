@@ -1,0 +1,8 @@
+type: object
+description: The forge installations the caller can connect a repository through.
+required: [items]
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./ForgeInstallation.yaml

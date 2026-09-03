@@ -1,0 +1,7 @@
+description: >
+  The request was understood but cannot be carried out — for instance a connection whose path
+  glob matches no specification.
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml

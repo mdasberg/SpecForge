@@ -5,6 +5,7 @@ import com.specforge.platform.api.dto.Identity;
 import com.specforge.platform.api.dto.Role;
 import com.specforge.platform.api.generated.IdentityApi;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -19,14 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
  * generated from {@code openapi/specforge-api.yaml}. Changing what this endpoint returns starts
  * with the contract, not with this class.
  */
+@RequiredArgsConstructor
 @RestController
 class MeController implements IdentityApi {
 
     private final IdentityMirror mirror;
-
-    MeController(IdentityMirror mirror) {
-        this.mirror = mirror;
-    }
 
     /**
      * The caller is not an operation parameter — it is the security scheme — so the contract
@@ -34,8 +32,8 @@ class MeController implements IdentityApi {
      */
     @Override
     public Identity getMe() {
-        Jwt jwt = ((JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getToken();
-        User user = mirror.mirror(TokenIdentity.of(jwt));
+        final Jwt jwt = ((JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getToken();
+        final User user = mirror.mirror(TokenIdentity.of(jwt));
         return new Identity(user.subjectId(), user.displayName(), actorKind(user), roles(user))
                 .avatarUrl(user.avatarUrl());
     }
@@ -45,11 +43,11 @@ class MeController implements IdentityApi {
      * allowed to outlive a rename inside the application, and the compiler catches the day they
      * stop lining up.
      */
-    private static ActorKind actorKind(User user) {
+    private static ActorKind actorKind(final User user) {
         return ActorKind.fromValue(user.actorKind().name());
     }
 
-    private static List<Role> roles(User user) {
+    private static List<Role> roles(final User user) {
         return user.roles().stream().sorted().map(role -> Role.fromValue(role.name())).toList();
     }
 }

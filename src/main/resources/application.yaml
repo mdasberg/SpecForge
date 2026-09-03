@@ -21,6 +21,17 @@ spring:
           # realm by omission.
           issuer-uri: ${SPECFORGE_ISSUER_URI:http://localhost:8081/realms/specforge}
 
+specforge:
+  github:
+    # The GitHub App SpecForge reads through. Absent in development: without an app id and key the
+    # forge client refuses every call rather than pretending a repository is unreachable.
+    app-id: ${SPECFORGE_GITHUB_APP_ID:}
+    private-key: ${SPECFORGE_GITHUB_PRIVATE_KEY:}
+    # Every inbound delivery is HMAC-verified against this. An empty secret rejects every webhook,
+    # which is the safe default: an unverified delivery is an unauthenticated write trigger.
+    webhook-secret: ${SPECFORGE_GITHUB_WEBHOOK_SECRET:}
+    api-base-url: ${SPECFORGE_GITHUB_API_URL:https://api.github.com}
+
 server:
   port: 8080
 

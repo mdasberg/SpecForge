@@ -1,0 +1,22 @@
+get:
+  operationId: listImportRuns
+  tags: [ Repository ]
+  summary: The import runs recorded for a connection.
+  parameters:
+    - name: connectionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The import runs.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ImportRunList.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
