@@ -1,0 +1,24 @@
+type: object
+description: >
+  The local mirror of a Keycloak identity. SpecForge stores no credentials; every field here is
+  refreshed from the token on each authenticated request.
+required: [id, displayName, actorKind, roles]
+properties:
+  id:
+    type: string
+    description: The Keycloak subject id, which is the stable key for this identity.
+    example: 31f66889-ed02-490c-bf54-7f4897645c6e
+  displayName:
+    type: string
+    example: Architect User
+  avatarUrl:
+    type: string
+    nullable: true
+    description: Absent when the token carries no picture claim.
+  actorKind:
+    $ref: ./ActorKind.yaml
+  roles:
+    type: array
+    description: The realm roles this identity holds. Never empty; every identity is at least a REVIEWER.
+    items:
+      $ref: ./Role.yaml

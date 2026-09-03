@@ -1,0 +1,5 @@
+description: No valid Keycloak token was presented.
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml

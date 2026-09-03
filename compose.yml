@@ -1,0 +1,47 @@
+# Local development environment for SpecForge. Nothing here is deployment configuration:
+# the realm export holds development credentials only, and PostgreSQL listens on loopback.
+services:
+  postgres:
+    image: postgres:18
+    container_name: specforge-postgres
+    restart: 'no'
+    environment:
+      POSTGRES_DB: specforge
+      POSTGRES_USER: specforge
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-specforge}
+    ports:
+      - "127.0.0.1:30301:5432"
+    volumes:
+      # postgres:18 puts PGDATA at /var/lib/postgresql/18/docker, so the volume goes one level up
+      # at /var/lib/postgresql rather than the pre-18 /var/lib/postgresql/data.
+      - specforge-postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U specforge -d specforge"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: specforge-keycloak
+    restart: 'no'
+    command: start-dev --import-realm
+    environment:
+      # Keycloak 26 reads the first-boot admin from KC_BOOTSTRAP_ADMIN_*; KEYCLOAK_ADMIN_* are
+      # deprecated. The KEYCLOAK_ADMIN/KEYCLOAK_ADMIN_PASSWORD names stay as the host-side knobs.
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+    ports:
+      - "127.0.0.1:8081:8080"
+    volumes:
+      - './keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro'
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /realms/specforge HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n' >&3 && grep -q 'realm' <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+volumes:
+  specforge-postgres:

@@ -1,0 +1,10 @@
+name: sort
+in: query
+required: false
+description: >
+  Comma-separated properties to sort by, each ascending unless prefixed with `-`
+  (`-updatedAt,title`). A property name must match `[a-zA-Z][a-zA-Z0-9_.]*`; anything else is
+  rejected as a bad request rather than passed to a query.
+schema:
+  type: string
+  example: -updatedAt,title

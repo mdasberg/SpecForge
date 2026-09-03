@@ -1,0 +1,5 @@
+description: The token is valid but the caller's roles do not permit this operation.
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/Problem.yaml

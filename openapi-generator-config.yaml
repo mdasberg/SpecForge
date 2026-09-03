@@ -1,0 +1,20 @@
+# Shared by both generator tasks in build.gradle. Kept out of the build file so the contract's
+# generation settings read as configuration rather than as build logic.
+additionalProperties:
+  # Jakarta EE, not javax: without this the generated code imports javax.validation and fails to
+  # compile against Spring Boot 4.
+  useSpringBoot3: true
+  # No annotation-scanning documentation provider: the contract is the document, so the generated
+  # code carries no swagger annotations describing what it already came from.
+  documentationProvider: none
+  annotationLibrary: none
+  interfaceOnly: true
+  skipDefaultInterface: true
+  openApiNullable: false
+  jackson: true
+  useBeanValidation: true
+  performBeanValidation: false
+  # Controllers return the payload; the status codes are the contract's, not each method's.
+  useResponseEntity: false
+  useTags: true
+  containerDefaultToNull: true
