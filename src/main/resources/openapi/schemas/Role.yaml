@@ -1,0 +1,5 @@
+type: string
+description: >
+  A SpecForge role. These come from the Keycloak realm roles and from nowhere else, so a role change
+  in Keycloak takes effect on the next token.
+enum: [REVIEWER, ARCHITECT, ADMIN]

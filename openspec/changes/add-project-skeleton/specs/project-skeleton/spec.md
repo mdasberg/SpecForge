@@ -132,6 +132,24 @@ pagination envelope carrying `items`, `total` and an optional `cursor`.
 - **THEN** the response carries `items`, `total` and the next `cursor`, in the same shape as every
   other collection endpoint
 
+### Requirement: The API is defined by a contract, not by its implementation
+
+The system SHALL define its HTTP API in an OpenAPI document held in the repository, SHALL generate
+the server interfaces and request and response types from that document, and SHALL implement each
+endpoint against a generated interface, so that an implementation that no longer matches the
+contract fails the build.
+
+#### Scenario: Implementation drifts from the contract
+
+- **WHEN** an endpoint's implementation no longer matches the operation the contract declares
+- **THEN** the build fails, rather than the difference being found by a reader or a consumer
+
+#### Scenario: The published document is the contract
+
+- **WHEN** a consumer fetches the API document from the running service
+- **THEN** it is the same contract the server interfaces were generated from, not a description
+  rebuilt from the implementation
+
 ### Requirement: Themed application shell
 
 The system SHALL present a single-page application shell with primary navigation Home, Specs,

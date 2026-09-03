@@ -9,10 +9,11 @@ no build file, and therefore no build/lint/test command yet. The implementation 
 substance of the project, and it lives in **GitHub issues #1–#10** on `mdasberg/SpecForge`
 (label `openspec`). Build commands appear once issue #1 lands.
 
-Local `openspec/` and `design/` directories from the 2026-09-03 planning session are **not
-present** in the working tree and were never committed. Treat the GitHub issues as the surviving
-source of truth; regenerate `openspec/` with `openspec init --tools claude` if the plan files are
-needed on disk again.
+`openspec/` and `design/` from the 2026-09-03 planning session **are committed**, on the sibling
+branch `plan/openspec-implementation` (pushed to origin): `2ace1e5` holds the design prototype and
+its tooling, `5b5fe40` the OpenSpec plan for all ten changes. That branch is not an ancestor of
+`main`. Take plan or design files from there — `git show plan/openspec-implementation:<path>` —
+rather than regenerating them from the GitHub issues.
 
 ## Product
 
@@ -72,6 +73,14 @@ by Keycloak subject id, so a rename in Keycloak never orphans a verdict. Dev rea
 
 ## Design decisions already settled (don't re-litigate)
 
+- The HTTP API is **contract-first**. `src/main/resources/openapi/specforge-api.yaml` is the source;
+  `org.openapi.generator` generates the server interfaces and DTOs into `build/generated`, and every
+  controller implements a generated interface, so drift fails to compile. Never edit generated Java,
+  and never add an annotation-scanning document generator — `/api/openapi.json` serves the bundled
+  contract itself. The document is split like the other CarePay services: `resources/<area>/` per
+  path, `schemas/`, `parameters/`, `responses/`. A resource `$ref`s a shared response directly;
+  shared responses are never also listed in the root `components`, or the bundle ships a dangling
+  `$ref`.
 - Spec versions are **content-addressed** — re-importing identical content is a no-op.
 - Comment anchors are heading-slug-plus-ordinal and are **carried, never fuzzily reattached**;
   they go stale/orphaned instead.

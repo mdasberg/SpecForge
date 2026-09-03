@@ -1,0 +1,8 @@
+name: cursor
+in: query
+required: false
+description: >
+  The `cursor` from a previous response, to fetch the next page. Absent on the first request, and
+  absent from a response that has no further pages.
+schema:
+  type: string

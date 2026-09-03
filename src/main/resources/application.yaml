@@ -12,6 +12,14 @@ spring:
       ddl-auto: validate
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # The realm this resource server trusts. Overridden per environment; the default is the
+          # local development realm from compose.yml and must never be pointed at a production
+          # realm by omission.
+          issuer-uri: ${SPECFORGE_ISSUER_URI:http://localhost:8081/realms/specforge}
 
 server:
   port: 8080

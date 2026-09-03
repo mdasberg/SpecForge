@@ -70,7 +70,7 @@
 
 ## 4. Authentication and identity mirroring
 
-- [ ] 4.1 Resource-server JWT validation:
+- [x] 4.1 Resource-server JWT validation:
 
       ```yaml
       spring:
@@ -82,43 +82,65 @@
       ```
 
       with the issuer overridden per environment and never defaulted to a production realm.
-- [ ] 4.2 Frontend login through `specforge-web` with authorization code plus PKCE, token refresh, and
-      logout that ends the Keycloak session.
-- [ ] 4.3 Map the token's realm roles to `REVIEWER` / `ARCHITECT` / `ADMIN` as granted authorities;
+- [x] 4.2 Frontend login through `specforge-web` with authorization code plus PKCE, token refresh, and
+      logout that ends the Keycloak session. Built on `oidc-client-ts` / `react-oidc-context` rather
+      than hand-rolled: PKCE, state and silent renew are security-critical and not worth
+      reimplementing. **Not browser-verified** — the redirect flow itself has no automated test; the
+      token path it produces is covered end to end by the integration suite.
+- [x] 4.3 Map the token's realm roles to `REVIEWER` / `ARCHITECT` / `ADMIN` as granted authorities;
       default `REVIEWER`; ignore unknown realm roles.
-- [ ] 4.4 Persist a `user` record keyed by the Keycloak subject id (display name, avatar, roles,
+- [x] 4.4 Persist a `user` record keyed by the Keycloak subject id (display name, avatar, roles,
       `actor_kind = HUMAN`) on first authenticated request, refreshing name, avatar and roles from each
       token — the same table later carries agent identities with `actor_kind = AGENT`.
-- [ ] 4.5 `/api/me` returning the mirrored identity and its roles.
-- [ ] 4.6 Refuse unauthenticated `/api/**` with 401 problem+json, and a request whose token lacks the
+- [x] 4.5 `/api/me` returning the mirrored identity and its roles.
+- [x] 4.6 Refuse unauthenticated `/api/**` with 401 problem+json, and a request whose token lacks the
       required role with 403 problem+json.
-- [ ] 4.7 No account-management endpoints or screens: point the user at Keycloak for profile, password
+- [x] 4.7 No account-management endpoints or screens: point the user at Keycloak for profile, password
       and MFA.
 
 ## 5. API conventions
 
-- [ ] 5.1 `@ControllerAdvice` rendering every error as RFC 9457 problem+json, including validation failures.
-- [ ] 5.2 Shared pagination envelope (`items`, `total`, `cursor`) and a shared sort/filter parameter parser.
-- [ ] 5.3 OpenAPI document generated from controllers and served at `/api/openapi.json`.
+- [x] 5.1 `@ControllerAdvice` rendering every error as RFC 9457 problem+json, including validation failures.
+- [x] 5.2 Shared pagination envelope (`items`, `total`, `cursor`) and a shared sort/filter parameter parser.
+- [x] 5.3 The API is contract-first. `src/main/resources/openapi/specforge-api.yaml` is the
+      contract; the `org.openapi.generator` Gradle plugin generates the server interfaces and the
+      request and response types from it, `compileJava` depends on that task, and every controller
+      implements a generated interface so drift fails the build. No annotation-scanning document
+      generator: the code does not describe the API, the contract does.
+- [x] 5.5 The contract is split the way the other CarePay services split theirs, so a capability
+      change edits its own file instead of one file every change has to touch: one file per path
+      under `resources/<area>/`, one per schema under `schemas/`, and the shared parameters and
+      responses under `parameters/` and `responses/`. The root file carries `info`, `servers`,
+      `security`, `tags`, the `paths` map of `$ref`s, and the shared `securitySchemes` and
+      `parameters`. Shared responses are **not** listed in the root: a resource references
+      `responses/<Name>.yaml` directly, because listing them in both places leaves the bundled
+      document carrying a `$ref` to a file that does not exist at the URL it is served from.
+- [x] 5.4 The contract is served at `/api/openapi.json` — the same document the interfaces were
+      generated from, bundled to JSON at build time, not a description rebuilt from the
+      implementation. It sits under `/api/**`, so it needs a token like every other route rather
+      than describing the API surface to anonymous callers.
 
 ## 6. Frontend shell
 
-- [ ] 6.1 Vite + React 19 + TypeScript app with routing for Home / Specs / Reviews / Projects / Activity.
-- [ ] 6.2 Copy the design system from `design/parts/shell.css` into `frontend/src/styles/tokens.css`;
-      port topbar, nav, side panel, badges, buttons and avatars as components.
-- [ ] 6.3 Dark default, light theme toggle, choice persisted per browser; both themes verified against
+- [x] 6.1 Vite + React 19 + TypeScript app with routing for Home / Specs / Reviews / Projects / Activity.
+- [x] 6.2 Copy the design system from `design/parts/shell.css` into `frontend/src/styles/tokens.css`;
+      port topbar, nav, side panel, badges, buttons and avatars as components. The source was
+      recovered from the `plan/openspec-implementation` branch, where `design/` is committed —
+      CLAUDE.md's claim that it was never committed is wrong. Copies are verbatim so drift shows as
+      a diff.
+- [x] 6.3 Dark default, light theme toggle, choice persisted per browser; both themes verified against
       the prototype.
-- [ ] 6.4 Empty state per screen ("no specifications yet — connect a repository"), pointing at the flow
+- [x] 6.4 Empty state per screen ("no specifications yet — connect a repository"), pointing at the flow
       that `add-spec-repository` delivers.
-- [ ] 6.5 Authenticated fetch wrapper that attaches the access token, renders problem+json errors, and
+- [x] 6.5 Authenticated fetch wrapper that attaches the access token, renders problem+json errors, and
       re-authenticates on 401 rather than redirecting to a dead end.
 
 ## 7. Verification
 
-- [ ] 7.1 Smoke test: application boots, migrations apply, `/api/me` is 401 anonymous and 200 with a
+- [x] 7.1 Smoke test: application boots, migrations apply, `/api/me` is 401 anonymous and 200 with a
       Keycloak-issued token.
-- [ ] 7.2 Test: a token carrying the `ARCHITECT` realm role yields the `ARCHITECT` authority, and a
+- [x] 7.2 Test: a token carrying the `ARCHITECT` realm role yields the `ARCHITECT` authority, and a
       role removed in Keycloak is gone from the mirrored identity after the next token.
-- [ ] 7.3 CI runs `build` (unit + Modulith + `integrationTest` against the composed PostgreSQL and
+- [x] 7.3 CI runs `build` (unit + Modulith + `integrationTest` against the composed PostgreSQL and
       Keycloak) and the frontend build and typecheck; the realm export is validated by the
       composed Keycloak importing it and reaching its healthcheck.

@@ -26,7 +26,9 @@ that follow about behaviour instead of plumbing.
   Projects / Activity, dark theme by default plus light, tokens lifted verbatim from
   `design/parts/shell.css`.
 - Fix the API conventions the other changes build on: JSON REST under `/api`, RFC 9457
-  `application/problem+json` errors, a single pagination envelope.
+  `application/problem+json` errors, a single pagination envelope, and an OpenAPI contract in the
+  repository from which the server interfaces are generated, so the nine capability changes that
+  follow agree on a request shape before any of them is implemented.
 - No product behaviour ships in this change — the screens are empty states.
 
 ## Capabilities

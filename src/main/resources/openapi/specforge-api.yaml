@@ -1,0 +1,57 @@
+openapi: 3.0.3
+info:
+  title: SpecForge API
+  description: >
+    The contract for the SpecForge HTTP API. This document is the source of truth: the server
+    interfaces and the request and response types are generated from it, and a controller
+    implements a generated interface, so an endpoint that drifts from this file fails to compile.
+    Edit the contract first, never the generated Java.
+
+    The document is split the way the other CarePay services split theirs — one file per path under
+    `resources/`, one per schema under `schemas/`, and shared parameters and responses under
+    `parameters/` and `responses/` — so a capability change touches its own resource file instead of
+    one file every change has to edit.
+
+    Interim location — it lives in this repository until a second consumer needs it, at which point
+    the CarePay convention is to move it to the shared API repository.
+  version: 0.1.0
+
+servers:
+  - url: /
+    description: >
+      Paths below are the real request paths, /api prefix included, so a generated request mapping
+      is the URL a client actually calls rather than one offset by a base path declared elsewhere.
+
+security:
+  - keycloak: []
+
+tags:
+  - name: Identity
+    description: Who the caller is, mirrored from the Keycloak token.
+
+paths:
+  /api/me:
+    $ref: ./resources/identity/me.yaml
+
+components:
+  securitySchemes:
+    keycloak:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: A Keycloak-issued access token from the `specforge` realm.
+
+  # Shared responses are not listed here: a resource file references responses/<Name>.yaml
+  # directly, the way the other CarePay services do it. Listing them here as well leaves the
+  # bundled document carrying a $ref to a file that does not exist at the URL it is served from.
+
+  # Shared across every collection endpoint the capability changes add, so they paginate
+  # identically instead of each inventing its own limit. They match ListParametersParser, which
+  # already implements them. No operation references them yet: /api/me returns one object.
+  parameters:
+    SortParam:
+      $ref: ./parameters/SortParam.yaml
+    LimitParam:
+      $ref: ./parameters/LimitParam.yaml
+    CursorParam:
+      $ref: ./parameters/CursorParam.yaml

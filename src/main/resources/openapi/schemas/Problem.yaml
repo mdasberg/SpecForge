@@ -1,0 +1,28 @@
+type: object
+description: >
+  An RFC 9457 problem document. Every error the API returns has this shape. MUST NOT carry
+  restricted data: the detail describes the failure, never the content that caused it.
+properties:
+  type:
+    type: string
+    format: uri
+    example: about:blank
+  title:
+    type: string
+    example: Unauthorized
+  status:
+    type: integer
+    format: int32
+    example: 401
+  detail:
+    type: string
+    example: Authentication is required.
+  instance:
+    type: string
+    format: uri
+    example: /api/me
+  errors:
+    type: object
+    additionalProperties:
+      type: string
+    description: Present on a validation failure, naming each invalid field and why.

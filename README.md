@@ -99,6 +99,33 @@ Keycloak, and a user who needs them is sent there.
 - `./gradlew build` — runs both.
 - `./gradlew moduleDocs` — generates the module graph into `build/spring-modulith-docs`.
 
+## The API is contract-first
+
+`src/main/resources/openapi/specforge-api.yaml` is the source of truth for the HTTP API. The
+`org.openapi.generator` plugin generates the server interfaces and the request and response types
+from it into `build/generated`, and every controller implements a generated interface — so an
+endpoint that no longer matches the contract fails to compile rather than being caught in review.
+
+Change an endpoint by editing the contract first, then the implementation. Never edit the generated
+Java: it is regenerated on every build. `/api/openapi.json` serves that same contract, bundled to
+JSON at build time, rather than a description rebuilt from the running controllers.
+
+The document is split so that a capability change edits its own file rather than one file every
+change has to touch:
+
+```
+src/main/resources/openapi/
+  specforge-api.yaml          info, servers, security, tags, the paths map, shared components
+  resources/<area>/<path>.yaml  one file per path, holding its operations
+  schemas/<Name>.yaml         one file per schema
+  parameters/<Name>.yaml      parameters shared across endpoints
+  responses/<Name>.yaml       responses shared across endpoints
+```
+
+A resource references a shared response as `../../responses/<Name>.yaml` directly. Shared responses
+are deliberately not also listed under the root's `components.responses`: doing both leaves the
+bundled document carrying a `$ref` to a file that does not exist at the URL it is served from.
+
 Integration tests live in their own `itest` source set at `src/itest/java`, matching the CarePay
 services. The source set is the filter, so an integration test is named `*Test` like any other and
 needs no `*IT` suffix; `BaseIntegrationTest` carries the shared Spring context. Classes and

@@ -1,0 +1,67 @@
+/*
+ * Layout rules copied from design/parts/shell.css, which is the source of truth. Update this file
+ * by re-copying from there, never by editing it here: drift is only visible in review if the copy
+ * stays exact.
+ */
+.topbar {
+  height: 48px;
+  flex: 0 0 48px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: -0.01em; }
+.brand svg { display: block; }
+.nav { display: flex; align-items: center; gap: 2px; }
+.nav span {
+  display: block; padding: 5px 10px; border-radius: 5px;
+  color: var(--fg-2); font-weight: 500; cursor: pointer;
+}
+.nav span:hover { color: var(--fg); background: var(--line-2); }
+.nav span.on { color: var(--fg); background: var(--raise); }
+.spacer { flex: 1 1 auto; }
+.searchbox {
+  display: flex; align-items: center; gap: 7px;
+  width: 300px; height: 30px; padding: 0 9px;
+  border: 1px solid var(--line); border-radius: 6px;
+  background: var(--panel-2); color: var(--fg-3);
+}
+.searchbox .kbd { margin-left: auto; }
+.kbd {
+  font-family: "IBM Plex Mono", monospace; font-size: 10px;
+  padding: 1px 5px; border: 1px solid var(--line); border-radius: 4px;
+  color: var(--fg-3); background: var(--raise);
+}
+.iconbtn {
+  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); color: var(--fg-2);
+}
+
+.body { flex: 1 1 auto; display: flex; min-height: 0; }
+.side {
+  flex: 0 0 236px; border-right: 1px solid var(--line);
+  background: var(--panel); padding: 14px 10px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 18px;
+}
+.side-t {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--fg-3); padding: 0 8px 6px;
+}
+.side-group { display: flex; flex-direction: column; gap: 1px; }
+.side-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border-radius: 5px; color: var(--fg-2); cursor: pointer;
+}
+.side-item:hover { background: var(--line-2); }
+.side-item .spacer + span { color: var(--fg-3); font-size: 11.5px; }
+.side-item.on { background: var(--raise); color: var(--fg); font-weight: 500; }
+.side-item.sub { padding-left: 24px; font-size: 12.5px; }
+.main { flex: 1 1 auto; min-width: 0; overflow-y: auto; }
+
+.main { flex: 1 1 auto; min-width: 0; overflow-y: auto; padding: 16px; }
+.card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); overflow: hidden; }
+.card-t { font-weight: 600; font-size: 12.5px; }
+.card-pad { padding: 14px; }

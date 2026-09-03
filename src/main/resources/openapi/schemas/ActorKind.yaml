@@ -1,0 +1,5 @@
+type: string
+description: >
+  Whether this identity is a person or an automated check runner. It is an API field rather than a
+  UI convention, because approval rules refuse a verdict from an AGENT.
+enum: [HUMAN, AGENT]

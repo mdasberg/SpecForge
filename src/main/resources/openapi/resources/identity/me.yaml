@@ -1,0 +1,20 @@
+get:
+  operationId: getMe
+  tags: [ Identity ]
+  summary: The mirrored identity of the authenticated caller.
+  description: >
+    SpecForge stores no credentials. This returns the local mirror of the caller's Keycloak token:
+    display name, avatar, actor kind and the realm roles. There is deliberately no endpoint to
+    change any of it — profile, password and multi-factor settings live in Keycloak.
+
+    The caller is the security scheme rather than an operation parameter, so this operation
+    declares none.
+  responses:
+    '200':
+      description: The caller's identity.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Identity.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml

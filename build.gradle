@@ -4,6 +4,7 @@ plugins {
     id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.avast.gradle.docker-compose' version '0.17.9'
+    id 'org.openapi.generator' version '7.16.0'
 }
 
 group = 'com.specforge'
@@ -18,6 +19,53 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+// The OpenAPI contract is the source of truth for the HTTP API: these tasks generate the server
+// interfaces and the request and response types from it, and a controller implements a generated
+// interface, so an endpoint that drifts from the contract fails to compile. Never edit the
+// generated Java — edit the contract.
+def apiContract = "$projectDir/src/main/resources/openapi/specforge-api.yaml"
+
+openApiGenerate {
+    generatorName = 'spring'
+    library = 'spring-cloud'
+    inputSpec = apiContract
+    configFile = "$projectDir/openapi-generator-config.yaml"
+    outputDir = layout.buildDirectory.dir('generated/openapi').get().asFile.toString()
+    apiPackage = 'com.specforge.platform.api.generated'
+    modelPackage = 'com.specforge.platform.api.dto'
+    modelNameSuffix = ''
+}
+
+// The same contract bundled to a single JSON file, which is what /api/openapi.json serves. Serving
+// the generated bundle rather than a hand-kept copy is what keeps the published document and the
+// interfaces provably the same artefact.
+def bundleApiContract = tasks.register('bundleApiContract', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = 'openapi'
+    inputSpec = apiContract
+    outputDir = layout.buildDirectory.dir('generated/openapi-doc').get().asFile.toString()
+    logToStderr = true
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir layout.buildDirectory.dir('generated/openapi/src/main/java')
+        }
+    }
+}
+
+tasks.named('compileJava') {
+    dependsOn tasks.openApiGenerate
+}
+
+processResources {
+    dependsOn bundleApiContract
+    from(layout.buildDirectory.dir('generated/openapi-doc')) {
+        include 'openapi.json'
+        into 'openapi'
+    }
 }
 
 // Integration tests live in their own source set at src/itest, the same layout as the CarePay
@@ -56,7 +104,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.modulith:spring-modulith-starter-core'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.1.0'
 
     runtimeOnly 'org.postgresql:postgresql'
     // Spring Boot 4 split auto-configuration into per-technology modules: liquibase-core alone

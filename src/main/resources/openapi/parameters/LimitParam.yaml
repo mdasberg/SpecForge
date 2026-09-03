@@ -1,0 +1,10 @@
+name: limit
+in: query
+required: false
+description: How many items to return. Values above the maximum are clamped to it rather than rejected.
+schema:
+  type: integer
+  format: int32
+  minimum: 1
+  default: 50
+  maximum: 200

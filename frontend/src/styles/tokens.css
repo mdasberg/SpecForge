@@ -1,0 +1,80 @@
+/*
+ * Design tokens copied from design/parts/shell.css, which is the source of truth. Update this
+ * file by re-copying from there, never by editing it here: drift is only visible in review if the
+ * copy stays exact.
+ */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+a { color: #8b99f7; text-decoration: none; }
+a:hover { color: #a6b1fa; text-decoration: underline; }
+
+.app {
+  --bg: #0b0d11;
+  --panel: #101317;
+  --panel-2: #14181d;
+  --raise: #191e24;
+  --line: #242a32;
+  --line-2: #1b2027;
+  --fg: #e6e9ee;
+  --fg-2: #a3abb7;
+  --fg-3: #6f7885;
+  --indigo: #7b8cf5;
+  --indigo-dim: #2b3157;
+  --green: #3fb27f;
+  --green-dim: #17402e;
+  --amber: #d59b4c;
+  --amber-dim: #40331a;
+  --red: #e0705f;
+  --red-dim: #4a2320;
+  --violet: #c07de6;
+  --violet-dim: #3b2547;
+  --add-bg: #10251a;
+  --add-line: #1e4a33;
+  --add-fg: #7fdda6;
+  --del-bg: #2a1518;
+  --del-line: #4d2429;
+  --del-fg: #f09a91;
+  --shadow: 0 12px 32px rgba(0,0,0,.45);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg);
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  font-variant-ligatures: none;
+}
+
+.app.light {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --panel-2: #fbfcfd;
+  --raise: #f1f3f5;
+  --line: #e2e5ea;
+  --line-2: #edeff2;
+  --fg: #14171c;
+  --fg-2: #58606c;
+  --fg-3: #868e9b;
+  --indigo: #4a5ad4;
+  --indigo-dim: #e5e8fb;
+  --green: #16875a;
+  --green-dim: #dcf2e6;
+  --amber: #9c6a10;
+  --amber-dim: #f8eed7;
+  --red: #c4453a;
+  --red-dim: #fbe6e3;
+  --violet: #8b3fbf;
+  --violet-dim: #f4e6fb;
+  --add-bg: #e9f7ee;
+  --add-line: #b5dfc4;
+  --add-fg: #10693f;
+  --del-bg: #fdebe9;
+  --del-line: #f1c1bb;
+  --del-fg: #a03127;
+  --shadow: 0 12px 32px rgba(20,25,40,.14);
+}
+.app.light a { color: #4a5ad4; }
+.app.light a:hover { color: #37479f; }

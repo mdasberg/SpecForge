@@ -42,6 +42,16 @@ UI is dense and already designed as a single-page app.
   exercise the identical containers, versions and realm import — a Testcontainers setup would be a
   second, silently diverging definition of the same environment, and it cannot import the realm
   export the running application depends on. Unit tests stay in `test` and need no Docker.
+- **The API is contract-first: the OpenAPI document is the source, the Java is generated.** The
+  contract lives at `src/main/resources/openapi/specforge-api.yaml` and the `org.openapi.generator`
+  Gradle plugin generates the controller interfaces and the request and response types from it into
+  `build/generated`. A controller implements a generated interface, so an endpoint that drifts from
+  the contract fails to compile rather than being caught in review. This replaces generating the
+  document from annotated controllers, which makes the code the source of truth and lets the
+  published contract change silently underneath a consumer. It matches the other CarePay services,
+  and it is what lets the ten capability changes that follow agree on a request shape before any of
+  them is built. The contract stays in this repository until there is a second consumer; the CarePay
+  convention is to move it to the shared API repository at that point.
 - **Audit is an owned append-only table, not Hibernate Envers.** The audit trail is a product
   feature with its own event shape (actor kind, review context), not a row-history side effect.
 - **React 19 + TypeScript + Vite, served separately in dev and as static assets in prod.** The
