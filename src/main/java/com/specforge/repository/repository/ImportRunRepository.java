@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-
 public interface ImportRunRepository extends JpaRepository<ImportRunEntity, UUID> {
 
     List<ImportRunEntity> findByConnectionIdOrderByStartedAtDesc(UUID connectionId);

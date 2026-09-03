@@ -63,15 +63,15 @@ public class ProjectEntity {
     }
 
     public ProjectEntity(
-            UUID id,
-            String name,
-            String team,
-            String tracker,
-            String trackerProjectKey,
-            int minApprovals,
-            Set<String> domains,
-            Set<String> requiredRoles,
-            Instant now) {
+            final UUID id,
+            final String name,
+            final String team,
+            final String tracker,
+            final String trackerProjectKey,
+            final int minApprovals,
+            final Set<String> domains,
+            final Set<String> requiredRoles,
+            final Instant now) {
         this.id = id;
         this.name = name;
         this.team = team;
@@ -85,13 +85,13 @@ public class ProjectEntity {
     }
 
     public void update(
-            String team,
-            String tracker,
-            String trackerProjectKey,
-            int minApprovals,
-            Set<String> domains,
-            Set<String> requiredRoles,
-            Instant now) {
+            final String team,
+            final String tracker,
+            final String trackerProjectKey,
+            final int minApprovals,
+            final Set<String> domains,
+            final Set<String> requiredRoles,
+            final Instant now) {
         this.team = team;
         this.tracker = tracker;
         this.trackerProjectKey = trackerProjectKey;

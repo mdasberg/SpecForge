@@ -28,12 +28,12 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 /**
  * Pull-request synchronisation, which is the default and the reason the product exists: a pull
@@ -43,7 +43,9 @@ import org.springframework.transaction.annotation.Transactional;
  * what the repository says. A further push to the same pull request replaces that head instead of
  * stacking a second proposal, so a review follows one moving target.
  */
+@RequiredArgsConstructor
 @Service
+@Transactional
 public class ProposalService {
 
     private static final Logger log = LoggerFactory.getLogger(ProposalService.class);
@@ -57,29 +59,10 @@ public class ProposalService {
     private final ApplicationEventPublisher events;
     private final Clock clock;
 
-    ProposalService(
-            SpecChangeProposalRepository proposals,
-            ProposalFileRepository proposalFiles,
-            RepositoryConnectionRepository connections,
-            ForgeInstallationRepository installations,
-            SpecCatalog catalog,
-            Forge forge,
-            ApplicationEventPublisher events,
-            Clock clock) {
-        this.proposals = proposals;
-        this.proposalFiles = proposalFiles;
-        this.connections = connections;
-        this.installations = installations;
-        this.catalog = catalog;
-        this.forge = forge;
-        this.events = events;
-        this.clock = clock;
-    }
-
     @Transactional
     public void pullRequestChanged(
-            String repositoryFullName, int number, String baseBranch, String headSha, String title, String author) {
-        for (RepositoryConnectionEntity connection :
+            final String repositoryFullName, final int number, final String baseBranch, final String headSha, final String title, final String author) {
+        for (final RepositoryConnectionEntity connection :
                 connections.findByRepositoryFullNameAndBranch(repositoryFullName, baseBranch)) {
             if (connection.syncMode() != SyncPolicy.ON_PULL_REQUEST || connection.state() == ConnectionState.DEGRADED) {
                 continue;
@@ -89,9 +72,9 @@ public class ProposalService {
     }
 
     @Transactional
-    public void pullRequestClosed(String repositoryFullName, int number, boolean merged) {
-        Instant now = clock.instant();
-        for (RepositoryConnectionEntity connection : connections.findByRepositoryFullName(repositoryFullName)) {
+    public void pullRequestClosed(final String repositoryFullName, final int number, final boolean merged) {
+        final Instant now = clock.instant();
+        for (final RepositoryConnectionEntity connection : connections.findByRepositoryFullName(repositoryFullName)) {
             proposals.findByConnectionIdAndPullRequestNumber(connection.id(), number).ifPresent(proposal -> {
                 proposal.close(merged ? ProposalState.MERGED : ProposalState.CLOSED, now);
                 proposals.save(proposal);
@@ -100,8 +83,8 @@ public class ProposalService {
     }
 
     private void record(
-            RepositoryConnectionEntity connection, int number, String headSha, String title, String author) {
-        String installationExternalId = installations
+            final RepositoryConnectionEntity connection, final int number, final String headSha, final String title, final String author) {
+        final String installationExternalId = installations
                 .findById(connection.installationId())
                 .map(ForgeInstallationEntity::externalId)
                 .orElse(null);
@@ -109,15 +92,15 @@ public class ProposalService {
             log.warn("Connection {} has no installation; ignoring pull request {}", connection.id(), number);
             return;
         }
-        List<String> changed = SpecPaths.matching(
+        final List<String> changed = SpecPaths.matching(
                 forge.changedFiles(installationExternalId, connection.repositoryFullName(), number),
                 connection.pathGlob());
         if (changed.isEmpty()) {
             return;
         }
 
-        Instant now = clock.instant();
-        SpecChangeProposalEntity proposal = proposals
+        final Instant now = clock.instant();
+        final SpecChangeProposalEntity proposal = proposals
                 .findByConnectionIdAndPullRequestNumber(connection.id(), number)
                 .orElseGet(() -> proposals.save(new SpecChangeProposalEntity(
                         UUID.randomUUID(), connection.id(), number, headSha, title, author, now)));
@@ -130,11 +113,11 @@ public class ProposalService {
         // remove.
         proposalFiles.deleteByProposalId(proposal.id());
         proposalFiles.flush();
-        ForgeRef ref = new ForgeRef(connection.repositoryFullName(), headSha);
-        List<ProposalFileEntity> files = new ArrayList<>(changed.size());
-        List<UUID> documentIds = new ArrayList<>();
-        for (String path : changed) {
-            Optional<ForgeFile> file = forge.readFile(installationExternalId, ref, path);
+        final ForgeRef ref = new ForgeRef(connection.repositoryFullName(), headSha);
+        final List<ProposalFileEntity> files = new ArrayList<>(changed.size());
+        final List<UUID> documentIds = new ArrayList<>();
+        for (final String path : changed) {
+            final Optional<ForgeFile> file = forge.readFile(installationExternalId, ref, path);
             if (file.isEmpty()) {
                 continue;
             }
@@ -168,14 +151,14 @@ public class ProposalService {
     }
 
     @Transactional
-    public void report(UUID proposalId, ReviewOutcome outcome, String description) {
-        SpecChangeProposalEntity proposal = proposals
+    public void report(final UUID proposalId, final ReviewOutcome outcome, final String description) {
+        final SpecChangeProposalEntity proposal = proposals
                 .findById(proposalId)
                 .orElseThrow(() -> Problems.notFound("No proposed change %s.".formatted(proposalId)));
-        RepositoryConnectionEntity connection = connections
+        final RepositoryConnectionEntity connection = connections
                 .findById(proposal.connectionId())
                 .orElseThrow(() -> Problems.notFound("No connection behind proposal %s.".formatted(proposalId)));
-        String installationExternalId = installations
+        final String installationExternalId = installations
                 .findById(connection.installationId())
                 .map(ForgeInstallationEntity::externalId)
                 .orElseThrow(() -> Problems.notFound("No installation behind proposal %s.".formatted(proposalId)));
@@ -192,11 +175,11 @@ public class ProposalService {
                 null);
     }
 
-    private static String sha256(String content) {
+    private static String sha256(final String content) {
         try {
             return HexFormat.of()
                     .formatHex(MessageDigest.getInstance("SHA-256").digest(content.getBytes(StandardCharsets.UTF_8)));
-        } catch (NoSuchAlgorithmException e) {
+        } catch (final NoSuchAlgorithmException e) {
             throw new IllegalStateException("SHA-256 is not available", e);
         }
     }

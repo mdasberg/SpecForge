@@ -13,12 +13,12 @@ public final class SpecClassifier {
 
     public record Verdict(Classification classification, String reason) {
 
-        static Verdict of(Classification classification) {
+        static Verdict of(final Classification classification) {
             return new Verdict(classification, null);
         }
     }
 
-    static Verdict classify(String path, String content) {
+    static Verdict classify(final String path, final String content) {
         if (isChangeProposal(path)) {
             return Verdict.of(Classification.CHANGE_PROPOSAL);
         }
@@ -34,8 +34,8 @@ public final class SpecClassifier {
     }
 
     /** OpenSpec keeps proposed changes under a {@code changes} directory; they are not specifications. */
-    private static boolean isChangeProposal(String path) {
-        for (String segment : path.split("/")) {
+    private static boolean isChangeProposal(final String path) {
+        for (final String segment : path.split("/")) {
             if (segment.equals("changes")) {
                 return true;
             }
@@ -43,10 +43,10 @@ public final class SpecClassifier {
         return false;
     }
 
-    private static boolean hasHeading(String content) {
+    private static boolean hasHeading(final String content) {
         boolean inFence = false;
-        for (String line : content.split("\\R")) {
-            String trimmed = line.strip();
+        for (final String line : content.split("\\R")) {
+            final String trimmed = line.strip();
             if (trimmed.startsWith("```") || trimmed.startsWith("~~~")) {
                 inFence = !inFence;
                 continue;

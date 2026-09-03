@@ -34,7 +34,8 @@ public class ScanFileEntity {
         // for JPA
     }
 
-    public ScanFileEntity(UUID id, UUID scanId, String path, Classification classification, String reason) {
+    public ScanFileEntity(final UUID id, final UUID scanId, final String path, final Classification classification,
+            final String reason) {
         this.id = id;
         this.scanId = scanId;
         this.path = path;

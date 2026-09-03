@@ -15,8 +15,8 @@ public final class SpecContent {
     private SpecContent() {}
 
     /** Line endings to LF, trailing whitespace off every line, exactly one closing newline. */
-    static String normalise(String raw) {
-        String[] lines = raw.replace("\r\n", "\n").replace('\r', '\n').split("\n", -1);
+    static String normalise(final String raw) {
+        final String[] lines = raw.replace("\r\n", "\n").replace('\r', '\n').split("\n", -1);
         int lastContentLine = -1;
         for (int i = 0; i < lines.length; i++) {
             lines[i] = lines[i].stripTrailing();
@@ -24,18 +24,18 @@ public final class SpecContent {
                 lastContentLine = i;
             }
         }
-        StringBuilder normalised = new StringBuilder(raw.length());
+        final StringBuilder normalised = new StringBuilder(raw.length());
         for (int i = 0; i <= lastContentLine; i++) {
             normalised.append(lines[i]).append('\n');
         }
         return normalised.toString();
     }
 
-    static String sha256(String content) {
+    static String sha256(final String content) {
         try {
-            byte[] digest = MessageDigest.getInstance("SHA-256").digest(content.getBytes(StandardCharsets.UTF_8));
+            final byte[] digest = MessageDigest.getInstance("SHA-256").digest(content.getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(digest);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (final NoSuchAlgorithmException e) {
             // Every JVM ships SHA-256; if this one does not, nothing downstream can be trusted.
             throw new IllegalStateException("SHA-256 is not available", e);
         }

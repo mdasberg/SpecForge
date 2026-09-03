@@ -10,12 +10,12 @@ public final class SpecPaths {
 
     private SpecPaths() {}
 
-    static List<String> matching(List<String> paths, String glob) {
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + glob);
+    static List<String> matching(final List<String> paths, final String glob) {
+        final PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + glob);
         return paths.stream().filter(path -> matcher.matches(Path.of(path))).sorted().toList();
     }
 
-    static boolean matches(String path, String glob) {
+    static boolean matches(final String path, final String glob) {
         return FileSystems.getDefault().getPathMatcher("glob:" + glob).matches(Path.of(path));
     }
 
@@ -24,8 +24,8 @@ public final class SpecPaths {
      * that is {@code billing}. It is a convention rather than a rule, so a path with nothing to
      * take it from simply has no domain.
      */
-    static String domainOf(String path) {
-        Path parent = Path.of(path).getParent();
+    static String domainOf(final String path) {
+        final Path parent = Path.of(path).getParent();
         return parent == null ? null : parent.getFileName().toString();
     }
 }

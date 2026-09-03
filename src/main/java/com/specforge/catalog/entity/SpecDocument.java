@@ -76,16 +76,16 @@ public class SpecDocument {
     }
 
     public SpecDocument(
-            UUID id,
-            UUID connectionId,
-            String path,
-            String title,
-            String project,
-            String domain,
-            String owningTeam,
-            String owner,
-            Set<String> tags,
-            Instant now) {
+            final UUID id,
+            final UUID connectionId,
+            final String path,
+            final String title,
+            final String project,
+            final String domain,
+            final String owningTeam,
+            final String owner,
+            final Set<String> tags,
+            final Instant now) {
         this.id = id;
         this.connectionId = connectionId;
         this.path = path;
@@ -104,7 +104,8 @@ public class SpecDocument {
      * Applies what the latest import found. Returns whether anything actually changed, so a
      * re-import that finds identical metadata does not write.
      */
-    public boolean updateMetadata(String title, String domain, String owningTeam, String owner, Set<String> tags, Instant now) {
+    public boolean updateMetadata(final String title, final String domain, final String owningTeam,
+            final String owner, final Set<String> tags, final Instant now) {
         if (this.title.equals(title)
                 && Objects.equals(this.domain, domain)
                 && Objects.equals(this.owningTeam, owningTeam)
@@ -125,7 +126,7 @@ public class SpecDocument {
      * Assigns the status and {@code updatedAt}. Validates nothing: the module's state machine is
      * the only caller and the only place a transition is judged legal.
      */
-    public void changeStatus(SpecStatus status, Instant now) {
+    public void changeStatus(final SpecStatus status, final Instant now) {
         this.status = status;
         this.updatedAt = now;
     }

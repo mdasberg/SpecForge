@@ -29,7 +29,7 @@ public class WebhookDeliveryEntity {
         // for JPA
     }
 
-    public WebhookDeliveryEntity(String deliveryId, String event, Instant receivedAt) {
+    public WebhookDeliveryEntity(final String deliveryId, final String event, final Instant receivedAt) {
         this.deliveryId = deliveryId;
         this.event = event;
         this.receivedAt = receivedAt;

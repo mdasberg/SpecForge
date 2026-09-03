@@ -6,9 +6,9 @@ import com.specforge.repository.entity.RepositoryConnectionEntity;
 import com.specforge.repository.exception.Problems;
 import com.specforge.repository.repository.RepositoryConnectionRepository;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 /**
  * The read-only guarantee, made concrete. Editing a specification through the API is refused with
@@ -18,23 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>It lives in this module because only the repository connection knows the repository name
  * behind a specification.
  */
+@RequiredArgsConstructor
 @Service
+@Transactional
 public class SpecContentService {
 
     private final SpecCatalog catalog;
     private final RepositoryConnectionRepository connections;
 
-    SpecContentService(SpecCatalog catalog, RepositoryConnectionRepository connections) {
-        this.catalog = catalog;
-        this.connections = connections;
-    }
-
     @Transactional(readOnly = true)
-    public void refuseEdit(UUID specId) {
-        SpecLocation location = catalog
+    public void refuseEdit(final UUID specId) {
+        final SpecLocation location = catalog
                 .locate(specId)
                 .orElseThrow(() -> Problems.notFound("No specification %s.".formatted(specId)));
-        String repository = connections
+        final String repository = connections
                 .findById(location.connectionId())
                 .map(RepositoryConnectionEntity::repositoryFullName)
                 .orElse("the connected repository");

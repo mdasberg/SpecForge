@@ -81,6 +81,14 @@ by Keycloak subject id, so a rename in Keycloak never orphans a verdict. Dev rea
   path, `schemas/`, `parameters/`, `responses/`. A resource `$ref`s a shared response directly;
   shared responses are never also listed in the root `components`, or the bundle ships a dangling
   `$ref`.
+- **Lombok is on the classpath** and `@RequiredArgsConstructor` replaces every hand-written
+  injection constructor, as in the CarePay services. Method parameters and locals are `final`
+  unless they are genuinely reassigned. Lombok works on Java 25; `lombok.config` stops it reading
+  configuration from parent directories.
+- Services carry class-level `@Transactional` (`readOnly = true` on the read methods), and
+  asynchronous work is dispatched **after commit** — a runner is triggered by a
+  `@TransactionalEventListener(AFTER_COMMIT)` rather than called inline, because a runner on
+  another thread cannot see a row the writing transaction has not committed.
 - **DTOs come from the contract, and the service layer speaks them.** Controllers are pass-throughs
   with no mapping, entity-to-DTO mapping lives in `service/`, and there are no hand-written request
   or response types — same shape as `financial-management`. Three kinds of hand-written value type

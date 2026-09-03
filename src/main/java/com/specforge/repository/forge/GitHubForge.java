@@ -34,7 +34,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-
 /**
  * The GitHub implementation of the forge port. Reads through short-lived installation tokens: the
  * App's private key signs a JWT, the JWT buys a token scoped to one installation, and that token
@@ -52,7 +51,7 @@ public class GitHubForge implements Forge {
     private final HttpClient http;
     private final Map<String, InstallationToken> tokens = new ConcurrentHashMap<>();
 
-    GitHubForge(GitHubProperties properties, ObjectMapper json, Clock clock) {
+    GitHubForge(final GitHubProperties properties, final ObjectMapper json, final Clock clock) {
         this.properties = properties;
         this.json = json;
         this.clock = clock;
@@ -60,16 +59,16 @@ public class GitHubForge implements Forge {
     }
 
     @Override
-    public Optional<ForgeInstallationInfo> installation(String installationExternalId) {
-        Optional<JsonNode> installation = getAsApp("/app/installations/" + installationExternalId);
+    public Optional<ForgeInstallationInfo> installation(final String installationExternalId) {
+        final Optional<JsonNode> installation = getAsApp("/app/installations/" + installationExternalId);
         if (installation.isEmpty()) {
             return Optional.empty();
         }
-        JsonNode node = installation.get();
-        JsonNode granted = getAsInstallation(installationExternalId, "/installation/repositories?per_page=100")
+        final JsonNode node = installation.get();
+        final JsonNode granted = getAsInstallation(installationExternalId, "/installation/repositories?per_page=100")
                 .orElse(json.createObjectNode());
-        List<ForgeRepositoryInfo> repositories = new ArrayList<>();
-        for (JsonNode repository : granted.path("repositories")) {
+        final List<ForgeRepositoryInfo> repositories = new ArrayList<>();
+        for (final JsonNode repository : granted.path("repositories")) {
             repositories.add(new ForgeRepositoryInfo(
                     repository.path("full_name").asText(),
                     repository.path("default_branch").asText(null),
@@ -87,11 +86,11 @@ public class GitHubForge implements Forge {
     }
 
     @Override
-    public List<String> listFiles(String installationExternalId, ForgeRef ref) {
-        String path = "/repos/%s/git/trees/%s?recursive=1".formatted(ref.repositoryFullName(), encode(ref.ref()));
-        JsonNode tree = getAsInstallation(installationExternalId, path).orElse(json.createObjectNode());
-        List<String> files = new ArrayList<>();
-        for (JsonNode entry : tree.path("tree")) {
+    public List<String> listFiles(final String installationExternalId, final ForgeRef ref) {
+        final String path = "/repos/%s/git/trees/%s?recursive=1".formatted(ref.repositoryFullName(), encode(ref.ref()));
+        final JsonNode tree = getAsInstallation(installationExternalId, path).orElse(json.createObjectNode());
+        final List<String> files = new ArrayList<>();
+        for (final JsonNode entry : tree.path("tree")) {
             if ("blob".equals(entry.path("type").asText())) {
                 files.add(entry.path("path").asText());
             }
@@ -100,21 +99,21 @@ public class GitHubForge implements Forge {
     }
 
     @Override
-    public Optional<ForgeFile> readFile(String installationExternalId, ForgeRef ref, String path) {
-        String contentsPath = "/repos/%s/contents/%s?ref=%s"
+    public Optional<ForgeFile> readFile(final String installationExternalId, final ForgeRef ref, final String path) {
+        final String contentsPath = "/repos/%s/contents/%s?ref=%s"
                 .formatted(ref.repositoryFullName(), encodePath(path), encode(ref.ref()));
-        Optional<JsonNode> contents = getAsInstallation(installationExternalId, contentsPath);
+        final Optional<JsonNode> contents = getAsInstallation(installationExternalId, contentsPath);
         if (contents.isEmpty() || !"base64".equals(contents.get().path("encoding").asText())) {
             return Optional.empty();
         }
         // GitHub wraps the base64 payload at 60 columns, which the strict decoder rejects.
-        String encoded = contents.get().path("content").asText().replaceAll("\\s", "");
-        String content = new String(Base64.getDecoder().decode(encoded), StandardCharsets.UTF_8);
+        final String encoded = contents.get().path("content").asText().replaceAll("\\s", "");
+        final String content = new String(Base64.getDecoder().decode(encoded), StandardCharsets.UTF_8);
 
-        String commitsPath = "/repos/%s/commits?path=%s&sha=%s&per_page=1"
+        final String commitsPath = "/repos/%s/commits?path=%s&sha=%s&per_page=1"
                 .formatted(ref.repositoryFullName(), encodePath(path), encode(ref.ref()));
-        JsonNode commits = getAsInstallation(installationExternalId, commitsPath).orElse(json.createArrayNode());
-        JsonNode last = commits.path(0);
+        final JsonNode commits = getAsInstallation(installationExternalId, commitsPath).orElse(json.createArrayNode());
+        final JsonNode last = commits.path(0);
         return Optional.of(new ForgeFile(
                 path,
                 content,
@@ -123,22 +122,23 @@ public class GitHubForge implements Forge {
     }
 
     @Override
-    public Optional<String> headCommit(String installationExternalId, ForgeRef ref) {
-        String path = "/repos/%s/commits/%s".formatted(ref.repositoryFullName(), encode(ref.ref()));
+    public Optional<String> headCommit(final String installationExternalId, final ForgeRef ref) {
+        final String path = "/repos/%s/commits/%s".formatted(ref.repositoryFullName(), encode(ref.ref()));
         return getAsInstallation(installationExternalId, path).map(commit -> commit.path("sha").asText(null));
     }
 
     @Override
-    public List<String> changedFiles(String installationExternalId, String repositoryFullName, int pullRequestNumber) {
-        List<String> paths = new ArrayList<>();
+    public List<String> changedFiles(final String installationExternalId, final String repositoryFullName,
+            final int pullRequestNumber) {
+        final List<String> paths = new ArrayList<>();
         for (int page = 1; ; page++) {
-            String path = "/repos/%s/pulls/%d/files?per_page=100&page=%d"
+            final String path = "/repos/%s/pulls/%d/files?per_page=100&page=%d"
                     .formatted(repositoryFullName, pullRequestNumber, page);
-            JsonNode files = getAsInstallation(installationExternalId, path).orElse(json.createArrayNode());
+            final JsonNode files = getAsInstallation(installationExternalId, path).orElse(json.createArrayNode());
             if (!files.isArray() || files.isEmpty()) {
                 break;
             }
-            for (JsonNode file : files) {
+            for (final JsonNode file : files) {
                 paths.add(file.path("filename").asText());
             }
             if (files.size() < 100) {
@@ -150,13 +150,13 @@ public class GitHubForge implements Forge {
 
     @Override
     public void reportReviewStatus(
-            String installationExternalId,
-            String repositoryFullName,
-            String commitSha,
-            ReviewStatusState state,
-            String description,
-            String targetUrl) {
-        Map<String, String> body = new java.util.LinkedHashMap<>();
+            final String installationExternalId,
+            final String repositoryFullName,
+            final String commitSha,
+            final ReviewStatusState state,
+            final String description,
+            final String targetUrl) {
+        final Map<String, String> body = new java.util.LinkedHashMap<>();
         body.put("state", switch (state) {
             case PENDING -> "pending";
             case SUCCESS -> "success";
@@ -181,16 +181,16 @@ public class GitHubForge implements Forge {
                 .build());
     }
 
-    private Optional<JsonNode> getAsApp(String path) {
+    private Optional<JsonNode> getAsApp(final String path) {
         return get(path, appJwt());
     }
 
-    private Optional<JsonNode> getAsInstallation(String installationExternalId, String path) {
+    private Optional<JsonNode> getAsInstallation(final String installationExternalId, final String path) {
         return get(path, installationToken(installationExternalId));
     }
 
-    private Optional<JsonNode> get(String path, String token) {
-        HttpResponse<String> response = send(HttpRequest.newBuilder()
+    private Optional<JsonNode> get(final String path, final String token) {
+        final HttpResponse<String> response = send(HttpRequest.newBuilder()
                 .uri(uri(path))
                 .header("Authorization", "Bearer " + token)
                 .header("Accept", "application/vnd.github+json")
@@ -204,25 +204,25 @@ public class GitHubForge implements Forge {
         return Optional.of(read(response.body()));
     }
 
-    private String installationToken(String installationExternalId) {
-        InstallationToken cached = tokens.get(installationExternalId);
-        Instant now = clock.instant();
+    private String installationToken(final String installationExternalId) {
+        final InstallationToken cached = tokens.get(installationExternalId);
+        final Instant now = clock.instant();
         if (cached != null && cached.expiresAt().isAfter(now.plus(TOKEN_EARLY_EXPIRY))) {
             return cached.token();
         }
-        HttpResponse<String> response = send(HttpRequest.newBuilder()
+        final HttpResponse<String> response = send(HttpRequest.newBuilder()
                 .uri(uri("/app/installations/%s/access_tokens".formatted(installationExternalId)))
                 .header("Authorization", "Bearer " + appJwt())
                 .header("Accept", "application/vnd.github+json")
                 .timeout(TIMEOUT)
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build());
-        JsonNode body = read(response.body());
-        String token = body.path("token").asText(null);
+        final JsonNode body = read(response.body());
+        final String token = body.path("token").asText(null);
         if (token == null) {
             throw new ForgeException("GitHub returned no installation token for " + installationExternalId);
         }
-        Instant expiresAt = body.hasNonNull("expires_at")
+        final Instant expiresAt = body.hasNonNull("expires_at")
                 ? Instant.parse(body.path("expires_at").asText())
                 : now.plus(Duration.ofMinutes(10));
         tokens.put(installationExternalId, new InstallationToken(token, expiresAt));
@@ -233,75 +233,75 @@ public class GitHubForge implements Forge {
         if (!properties.configured()) {
             throw new ForgeException("No GitHub App is configured; set specforge.github.app-id and private-key.");
         }
-        Instant now = clock.instant();
-        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+        final Instant now = clock.instant();
+        final JWTClaimsSet claims = new JWTClaimsSet.Builder()
                 .issuer(properties.appId())
                 // GitHub rejects a JWT issued in its own future, so back-date it against clock skew.
                 .issueTime(Date.from(now.minusSeconds(60)))
                 .expirationTime(Date.from(now.plusSeconds(540)))
                 .build();
-        SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claims);
+        final SignedJWT jwt = new SignedJWT(new JWSHeader(JWSAlgorithm.RS256), claims);
         try {
             jwt.sign(new RSASSASigner(privateKey()));
-        } catch (JOSEException e) {
+        } catch (final JOSEException e) {
             throw new ForgeException("Could not sign the GitHub App JWT", e);
         }
         return jwt.serialize();
     }
 
     private java.security.PrivateKey privateKey() {
-        String pem = properties.privateKey()
+        final String pem = properties.privateKey()
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
         try {
             return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(pem)));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | IllegalArgumentException e) {
+        } catch (final NoSuchAlgorithmException | InvalidKeySpecException | IllegalArgumentException e) {
             // A PKCS#1 key ("BEGIN RSA PRIVATE KEY") is what GitHub hands out by default and is not
             // what this expects; saying so beats a bare InvalidKeySpecException in the log.
             throw new ForgeException("The GitHub App private key must be PKCS#8 PEM", e);
         }
     }
 
-    private HttpResponse<String> send(HttpRequest request) {
+    private HttpResponse<String> send(final HttpRequest request) {
         try {
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            final HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() >= 400 && response.statusCode() != 404) {
                 throw new ForgeException("GitHub answered %d for %s".formatted(response.statusCode(), request.uri().getPath()));
             }
             return response;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new ForgeException("Could not reach GitHub at " + request.uri().getPath(), e);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ForgeException("Interrupted while calling GitHub", e);
         }
     }
 
-    private URI uri(String path) {
+    private URI uri(final String path) {
         return URI.create(properties.apiBaseUrl() + path);
     }
 
-    private JsonNode read(String body) {
+    private JsonNode read(final String body) {
         try {
             return json.readTree(body);
-        } catch (JacksonException e) {
+        } catch (final JacksonException e) {
             throw new ForgeException("GitHub returned a body that is not JSON", e);
         }
     }
 
-    private String write(Object body) {
+    private String write(final Object body) {
         return json.writeValueAsString(body);
     }
 
-    private static String encode(String value) {
+    private static String encode(final String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
     /** Path segments keep their slashes; only the segments themselves are escaped. */
-    private static String encodePath(String path) {
-        StringBuilder encoded = new StringBuilder(path.length());
-        for (String segment : path.split("/", -1)) {
+    private static String encodePath(final String path) {
+        final StringBuilder encoded = new StringBuilder(path.length());
+        for (final String segment : path.split("/", -1)) {
             if (!encoded.isEmpty()) {
                 encoded.append('/');
             }

@@ -52,7 +52,7 @@ public class SpecChangeProposalEntity {
     }
 
     public SpecChangeProposalEntity(
-            UUID id, UUID connectionId, int pullRequestNumber, String headSha, String title, String author, Instant now) {
+            final UUID id, final UUID connectionId, final int pullRequestNumber, final String headSha, final String title, final String author, final Instant now) {
         this.id = id;
         this.connectionId = connectionId;
         this.pullRequestNumber = pullRequestNumber;
@@ -64,14 +64,14 @@ public class SpecChangeProposalEntity {
         this.updatedAt = now;
     }
 
-    public void updateHead(String headSha, String title, String author, Instant now) {
+    public void updateHead(final String headSha, final String title, final String author, final Instant now) {
         this.headSha = headSha;
         this.title = title;
         this.author = author;
         this.updatedAt = now;
     }
 
-    public void close(ProposalState state, Instant now) {
+    public void close(final ProposalState state, final Instant now) {
         this.state = state;
         this.updatedAt = now;
     }

@@ -34,7 +34,8 @@ public class ImportRunFileEntity {
         // for JPA
     }
 
-    public ImportRunFileEntity(UUID id, UUID runId, String path, FileOutcome outcome, String reason) {
+    public ImportRunFileEntity(final UUID id, final UUID runId, final String path, final FileOutcome outcome,
+            final String reason) {
         this.id = id;
         this.runId = runId;
         this.path = path;

@@ -1,6 +1,5 @@
 package com.specforge.platform.identity;
 
-
 /**
  * The only roles SpecForge recognises. They come from the token's realm roles and from nowhere
  * else, so a role change in Keycloak takes effect on the next token.

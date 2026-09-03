@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Set;
 
-
 /**
  * The local mirror of a Keycloak identity, keyed by the token's subject id so a rename in the
  * provider never orphans a comment or a verdict. SpecForge owns no credential: everything here is
@@ -57,7 +56,8 @@ public class User {
         // for JPA
     }
 
-    User(String subjectId, String displayName, String avatarUrl, ActorKind actorKind, Set<Role> roles, Instant now) {
+    User(final String subjectId, final String displayName, final String avatarUrl, final ActorKind actorKind,
+            final Set<Role> roles, final Instant now) {
         this.subjectId = subjectId;
         this.displayName = displayName;
         this.avatarUrl = avatarUrl;
@@ -71,7 +71,8 @@ public class User {
      * Applies what the current token says. Returns whether anything actually changed, so a request
      * that presents the same claims as the last one does not write.
      */
-    boolean refreshFrom(String displayName, String avatarUrl, ActorKind actorKind, Set<Role> roles, Instant now) {
+    boolean refreshFrom(final String displayName, final String avatarUrl, final ActorKind actorKind,
+            final Set<Role> roles, final Instant now) {
         if (this.displayName.equals(displayName)
                 && java.util.Objects.equals(this.avatarUrl, avatarUrl)
                 && this.actorKind == actorKind

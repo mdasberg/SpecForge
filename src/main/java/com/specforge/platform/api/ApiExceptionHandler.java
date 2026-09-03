@@ -31,15 +31,16 @@ class ApiExceptionHandler extends ResponseEntityExceptionHandler {
      * denial as an internal error.
      */
     @ExceptionHandler({AccessDeniedException.class, AuthenticationException.class})
-    void rethrowToSecurityFilterChain(RuntimeException exception) {
+    void rethrowToSecurityFilterChain(final RuntimeException exception) {
         throw exception;
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    ProblemDetail handleConstraintViolation(ConstraintViolationException exception) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Request validation failed.");
-        Map<String, String> errors = new LinkedHashMap<>();
-        for (ConstraintViolation<?> violation : exception.getConstraintViolations()) {
+    ProblemDetail handleConstraintViolation(final ConstraintViolationException exception) {
+        final ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Request validation failed.");
+        final Map<String, String> errors = new LinkedHashMap<>();
+        for (final ConstraintViolation<?> violation : exception.getConstraintViolations()) {
             errors.put(violation.getPropertyPath().toString(), violation.getMessage());
         }
         problem.setProperty("errors", errors);
@@ -47,7 +48,7 @@ class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    ProblemDetail handleIllegalArgument(IllegalArgumentException exception) {
+    ProblemDetail handleIllegalArgument(final IllegalArgumentException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
@@ -56,7 +57,7 @@ class ApiExceptionHandler extends ResponseEntityExceptionHandler {
      * says nothing about internals to the caller. The stack trace goes to the log instead.
      */
     @ExceptionHandler(Exception.class)
-    ProblemDetail handleUnexpected(Exception exception) {
+    ProblemDetail handleUnexpected(final Exception exception) {
         logger.error("Unhandled exception serving an API request", exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong.");
     }
@@ -64,10 +65,11 @@ class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     /** Adds the offending fields to the problem document Spring already builds for a bean validation failure. */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException exception, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Request validation failed.");
-        Map<String, String> errors = new LinkedHashMap<>();
-        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
+            final MethodArgumentNotValidException exception, final HttpHeaders headers, final HttpStatusCode status, final WebRequest request) {
+        final ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Request validation failed.");
+        final Map<String, String> errors = new LinkedHashMap<>();
+        for (final FieldError error : exception.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
         problem.setProperty("errors", errors);

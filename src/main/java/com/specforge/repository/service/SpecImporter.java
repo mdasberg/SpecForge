@@ -14,16 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 
 /**
  * Turns matched files into specification documents. Every file gets a row in the import run,
  * including the ones nothing happened to, because "why is this file not a specification" has to be
  * answerable afterwards without running the import again.
  */
+@RequiredArgsConstructor
 @Component
 public class SpecImporter {
 
@@ -33,38 +34,32 @@ public class SpecImporter {
     private final SpecCatalog catalog;
     private final ImportRunFileRepository runFiles;
 
-    SpecImporter(Forge forge, SpecCatalog catalog, ImportRunFileRepository runFiles) {
-        this.forge = forge;
-        this.catalog = catalog;
-        this.runFiles = runFiles;
-    }
-
     public ImportSummary importPaths(
-            RepositoryConnectionEntity connection,
-            ProjectEntity project,
-            String installationExternalId,
-            ForgeRef ref,
-            List<String> paths,
-            UUID runId) {
-        List<ImportRunFileEntity> outcomes = new ArrayList<>(paths.size());
+            final RepositoryConnectionEntity connection,
+            final ProjectEntity project,
+            final String installationExternalId,
+            final ForgeRef ref,
+            final List<String> paths,
+            final UUID runId) {
+        final List<ImportRunFileEntity> outcomes = new ArrayList<>(paths.size());
         int imported = 0;
         int unchanged = 0;
         int skipped = 0;
         int failed = 0;
 
-        for (String path : paths) {
+        for (final String path : paths) {
             FileOutcome outcome;
             String reason = null;
             try {
-                Optional<ForgeFile> file = forge.readFile(installationExternalId, ref, path);
+                final Optional<ForgeFile> file = forge.readFile(installationExternalId, ref, path);
                 if (file.isEmpty()) {
                     outcome = FileOutcome.SKIPPED;
                     reason = "The file could not be read from the repository.";
                 } else {
-                    SpecClassifier.Verdict verdict = SpecClassifier.classify(path, file.get().content());
+                    final SpecClassifier.Verdict verdict = SpecClassifier.classify(path, file.get().content());
                     switch (verdict.classification()) {
                         case IMPORTABLE_SPEC -> {
-                            boolean created = importOne(connection, project, path, file.get());
+                            final boolean created = importOne(connection, project, path, file.get());
                             outcome = created ? FileOutcome.IMPORTED : FileOutcome.UNCHANGED;
                         }
                         case CHANGE_PROPOSAL -> {
@@ -77,7 +72,7 @@ public class SpecImporter {
                         }
                     }
                 }
-            } catch (RuntimeException e) {
+            } catch (final RuntimeException e) {
                 log.warn("Importing {} from {} failed", path, connection.repositoryFullName(), e);
                 outcome = FileOutcome.FAILED;
                 reason = e.getMessage();
@@ -95,7 +90,7 @@ public class SpecImporter {
     }
 
     private boolean importOne(
-            RepositoryConnectionEntity connection, ProjectEntity project, String path, ForgeFile file) {
+            final RepositoryConnectionEntity connection, final ProjectEntity project, final String path, final ForgeFile file) {
         return catalog
                 .importVersion(new SpecImport(
                         connection.id(),

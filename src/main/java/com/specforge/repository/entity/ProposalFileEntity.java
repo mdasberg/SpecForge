@@ -34,7 +34,8 @@ public class ProposalFileEntity {
         // for JPA
     }
 
-    public ProposalFileEntity(UUID id, UUID proposalId, String path, String contentSha, String content) {
+    public ProposalFileEntity(final UUID id, final UUID proposalId, final String path, final String contentSha,
+            final String content) {
         this.id = id;
         this.proposalId = proposalId;
         this.path = path;

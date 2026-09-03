@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-
 public interface RepositoryConnectionRepository extends JpaRepository<RepositoryConnectionEntity, UUID> {
 
     /** The uniqueness the wizard enforces: one connection per repository, branch and path. */

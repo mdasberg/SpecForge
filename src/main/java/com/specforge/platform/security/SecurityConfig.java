@@ -15,7 +15,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
-
 /**
  * The API is a stateless resource server: it validates Keycloak-issued JWTs and holds no session,
  * no login form and no account management of its own. Anything a user needs to do to their own
@@ -29,19 +28,19 @@ import org.springframework.security.web.SecurityFilterChain;
 class SecurityConfig {
 
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter(Converter<Jwt, Collection<GrantedAuthority>> authorities) {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+    JwtAuthenticationConverter jwtAuthenticationConverter(final Converter<Jwt, Collection<GrantedAuthority>> authorities) {
+        final JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(authorities);
         return converter;
     }
 
     @Bean
     SecurityFilterChain apiFilterChain(
-            HttpSecurity http,
-            JwtAuthenticationConverter jwtAuthenticationConverter,
-            IdentityMirrorFilter identityMirrorFilter,
-            ProblemAuthenticationEntryPoint entryPoint,
-            ProblemAccessDeniedHandler accessDeniedHandler) throws Exception {
+            final HttpSecurity http,
+            final JwtAuthenticationConverter jwtAuthenticationConverter,
+            final IdentityMirrorFilter identityMirrorFilter,
+            final ProblemAuthenticationEntryPoint entryPoint,
+            final ProblemAccessDeniedHandler accessDeniedHandler) throws Exception {
         return http
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(requests -> requests

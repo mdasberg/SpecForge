@@ -23,7 +23,7 @@ public class ListParametersParser {
     private static final String CURSOR = "cursor";
     private static final Pattern PROPERTY = Pattern.compile("[a-zA-Z][a-zA-Z0-9_.]*");
 
-    public ListParameters parse(Map<String, String> queryParameters) {
+    public ListParameters parse(final Map<String, String> queryParameters) {
         return new ListParameters(
                 parseSort(queryParameters.get(SORT)),
                 parseFilters(queryParameters),
@@ -31,34 +31,34 @@ public class ListParametersParser {
                 blankToNull(queryParameters.get(CURSOR)));
     }
 
-    private static List<SortOrder> parseSort(String raw) {
+    private static List<SortOrder> parseSort(final String raw) {
         if (raw == null || raw.isBlank()) {
             return List.of();
         }
-        List<SortOrder> sort = new ArrayList<>();
-        for (String field : raw.split(",")) {
-            boolean descending = field.startsWith("-");
-            String property = descending ? field.substring(1) : field;
+        final List<SortOrder> sort = new ArrayList<>();
+        for (final String field : raw.split(",")) {
+            final boolean descending = field.startsWith("-");
+            final String property = descending ? field.substring(1) : field;
             sort.add(new SortOrder(validProperty(property), descending ? SortOrder.Direction.DESC : SortOrder.Direction.ASC));
         }
         return sort;
     }
 
-    private static String validProperty(String property) {
+    private static String validProperty(final String property) {
         if (!PROPERTY.matcher(property).matches()) {
             throw new IllegalArgumentException("Illegal property name: '" + property + "'");
         }
         return property;
     }
 
-    private static int parseLimit(String raw) {
+    private static int parseLimit(final String raw) {
         if (raw == null) {
             return DEFAULT_LIMIT;
         }
         int limit;
         try {
             limit = Integer.parseInt(raw);
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw new IllegalArgumentException("Illegal limit: '" + raw + "'", e);
         }
         if (limit <= 0) {
@@ -67,14 +67,14 @@ public class ListParametersParser {
         return Math.min(limit, MAX_LIMIT);
     }
 
-    private static Map<String, String> parseFilters(Map<String, String> queryParameters) {
-        Map<String, String> filters = new LinkedHashMap<>();
-        for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
-            String name = entry.getKey();
+    private static Map<String, String> parseFilters(final Map<String, String> queryParameters) {
+        final Map<String, String> filters = new LinkedHashMap<>();
+        for (final Map.Entry<String, String> entry : queryParameters.entrySet()) {
+            final String name = entry.getKey();
             if (SORT.equals(name) || LIMIT.equals(name) || CURSOR.equals(name)) {
                 continue;
             }
-            String value = entry.getValue();
+            final String value = entry.getValue();
             if (value != null && !value.isBlank()) {
                 // A filter name reaches a query exactly like a sort property does, so it is held to
                 // the same rule rather than trusted because it arrived under a different key.
@@ -84,7 +84,7 @@ public class ListParametersParser {
         return filters;
     }
 
-    private static String blankToNull(String raw) {
+    private static String blankToNull(final String raw) {
         return raw == null || raw.isBlank() ? null : raw;
     }
 }

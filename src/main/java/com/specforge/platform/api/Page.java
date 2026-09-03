@@ -12,12 +12,12 @@ public record Page<T>(List<T> items, long total, String cursor) {
         items = List.copyOf(items);
     }
 
-    public static <T> Page<T> of(List<T> items, long total, String cursor) {
+    public static <T> Page<T> of(final List<T> items, final long total, final String cursor) {
         return new Page<>(items, total, cursor);
     }
 
     /** A complete, un-paged result: the total is simply how many items there are. */
-    public static <T> Page<T> of(List<T> items) {
+    public static <T> Page<T> of(final List<T> items) {
         return new Page<>(items, items.size(), null);
     }
 }

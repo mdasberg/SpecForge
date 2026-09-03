@@ -18,10 +18,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+@RequiredArgsConstructor
 @Service
 public class SpecCatalogService implements SpecCatalog {
 
@@ -30,23 +31,12 @@ public class SpecCatalogService implements SpecCatalog {
     private final SpecSectionRepository sections;
     private final Clock clock;
 
-    SpecCatalogService(
-            SpecDocumentRepository documents,
-            SpecVersionRepository versions,
-            SpecSectionRepository sections,
-            Clock clock) {
-        this.documents = documents;
-        this.versions = versions;
-        this.sections = sections;
-        this.clock = clock;
-    }
-
     @Override
     @Transactional
-    public ImportResult importVersion(SpecImport specImport) {
-        String content = SpecContent.normalise(specImport.content());
-        List<ParsedSection> parsed = MarkdownSections.parse(content);
-        String title = MarkdownSections.title(parsed);
+    public ImportResult importVersion(final SpecImport specImport) {
+        final String content = SpecContent.normalise(specImport.content());
+        final List<ParsedSection> parsed = MarkdownSections.parse(content);
+        final String title = MarkdownSections.title(parsed);
         if (title == null) {
             // Without a heading there is no title and no anchor to hang a discussion on, which is
             // exactly what the scan calls unparsable. Refusing here keeps that judgement in one
@@ -54,10 +44,10 @@ public class SpecCatalogService implements SpecCatalog {
             throw new IllegalArgumentException(
                     "%s has no heading, so it cannot be imported as a specification.".formatted(specImport.path()));
         }
-        Instant now = clock.instant();
-        Set<String> tags = specImport.tags() == null ? Set.of() : specImport.tags();
+        final Instant now = clock.instant();
+        final Set<String> tags = specImport.tags() == null ? Set.of() : specImport.tags();
 
-        SpecDocument document = documents
+        final SpecDocument document = documents
                 .findByConnectionIdAndPath(specImport.connectionId(), specImport.path())
                 .orElseGet(() -> documents.save(new SpecDocument(
                         UUID.randomUUID(),
@@ -72,14 +62,14 @@ public class SpecCatalogService implements SpecCatalog {
                         now)));
         document.updateMetadata(title, specImport.domain(), specImport.owningTeam(), specImport.author(), tags, now);
 
-        String contentSha = SpecContent.sha256(content);
-        Optional<SpecVersion> current = versions.findFirstByDocumentIdOrderByOrdinalDesc(document.id());
+        final String contentSha = SpecContent.sha256(content);
+        final Optional<SpecVersion> current = versions.findFirstByDocumentIdOrderByOrdinalDesc(document.id());
         if (current.isPresent() && current.get().contentSha().equals(contentSha)) {
             return new ImportResult(document.id(), current.get().ordinal(), false);
         }
 
-        int ordinal = current.map(version -> version.ordinal() + 1).orElse(1);
-        SpecVersion version = versions.save(new SpecVersion(
+        final int ordinal = current.map(version -> version.ordinal() + 1).orElse(1);
+        final SpecVersion version = versions.save(new SpecVersion(
                 UUID.randomUUID(),
                 document.id(),
                 ordinal,
@@ -94,34 +84,35 @@ public class SpecCatalogService implements SpecCatalog {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<SpecLocation> locate(UUID documentId) {
-        return documents.findById(documentId).map(document -> new SpecLocation(document.connectionId(), document.path()));
+    public Optional<SpecLocation> locate(final UUID documentId) {
+        return documents.findById(documentId).map(document -> new SpecLocation(document.connectionId(),
+                document.path()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UUID> find(UUID connectionId, String path) {
+    public Optional<UUID> find(final UUID connectionId, final String path) {
         return documents.findByConnectionIdAndPath(connectionId, path).map(SpecDocument::id);
     }
 
     @Override
     @Transactional
-    public void proposeChange(UUID documentId) {
-        SpecDocument document = documents
+    public void proposeChange(final UUID documentId) {
+        final SpecDocument document = documents
                 .findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("No specification %s.".formatted(documentId)));
         SpecLifecycle.transition(document, SpecStatus.IN_REVIEW, clock.instant());
     }
 
     /** Ids are assigned before saving so a child can reference the parent that precedes it. */
-    private static List<SpecSection> sectionsOf(UUID versionId, List<ParsedSection> parsed) {
-        List<UUID> ids = new ArrayList<>(parsed.size());
+    private static List<SpecSection> sectionsOf(final UUID versionId, final List<ParsedSection> parsed) {
+        final List<UUID> ids = new ArrayList<>(parsed.size());
         for (int i = 0; i < parsed.size(); i++) {
             ids.add(UUID.randomUUID());
         }
-        List<SpecSection> rows = new ArrayList<>(parsed.size());
+        final List<SpecSection> rows = new ArrayList<>(parsed.size());
         for (int i = 0; i < parsed.size(); i++) {
-            ParsedSection section = parsed.get(i);
+            final ParsedSection section = parsed.get(i);
             rows.add(new SpecSection(
                     ids.get(i),
                     versionId,

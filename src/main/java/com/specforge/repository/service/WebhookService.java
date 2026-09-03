@@ -11,6 +11,7 @@ import java.time.Clock;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-
 /**
  * Turns a verified GitHub delivery into the synchronisation it implies.
  *
@@ -27,7 +27,9 @@ import tools.jackson.databind.ObjectMapper;
  * redelivers on any doubt about the response, and an import triggered twice would be harmless but
  * a status write and a proposal update would not be.
  */
+@RequiredArgsConstructor
 @Service
+@Transactional
 public class WebhookService {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookService.class);
@@ -40,24 +42,7 @@ public class WebhookService {
     private final ObjectMapper json;
     private final Clock clock;
 
-    WebhookService(
-            WebhookDeliveryRepository deliveries,
-            RepositoryConnectionRepository connections,
-            InstallationService installationService,
-            ProposalService proposals,
-            ImportService imports,
-            ObjectMapper json,
-            Clock clock) {
-        this.deliveries = deliveries;
-        this.connections = connections;
-        this.installationService = installationService;
-        this.proposals = proposals;
-        this.imports = imports;
-        this.json = json;
-        this.clock = clock;
-    }
-
-    public void handle(String event, String deliveryId, String rawBody) {
+    public void handle(final String event, final String deliveryId, final String rawBody) {
         if (deliveryId != null && !recordDelivery(event, deliveryId)) {
             log.debug("Ignoring redelivered {} webhook {}", event, deliveryId);
             return;
@@ -65,7 +50,7 @@ public class WebhookService {
         JsonNode payload;
         try {
             payload = json.readTree(rawBody);
-        } catch (JacksonException e) {
+        } catch (final JacksonException e) {
             throw new IllegalArgumentException("The webhook payload is not JSON.");
         }
         switch (event == null ? "" : event) {
@@ -78,7 +63,7 @@ public class WebhookService {
 
     /** @return false when this delivery has already been processed */
     @Transactional
-    public boolean recordDelivery(String event, String deliveryId) {
+    public boolean recordDelivery(final String event, final String deliveryId) {
         if (deliveries.existsById(deliveryId)) {
             return false;
         }
@@ -88,8 +73,8 @@ public class WebhookService {
         return true;
     }
 
-    private void handleInstallation(JsonNode payload) {
-        String externalId = payload.path("installation").path("id").asText(null);
+    private void handleInstallation(final JsonNode payload) {
+        final String externalId = payload.path("installation").path("id").asText(null);
         if (externalId == null) {
             return;
         }
@@ -100,25 +85,25 @@ public class WebhookService {
         }
     }
 
-    private void handlePush(JsonNode payload) {
-        String ref = payload.path("ref").asText("");
+    private void handlePush(final JsonNode payload) {
+        final String ref = payload.path("ref").asText("");
         if (!ref.startsWith("refs/heads/")) {
             return;
         }
-        String branch = ref.substring("refs/heads/".length());
-        String repositoryFullName = payload.path("repository").path("full_name").asText(null);
+        final String branch = ref.substring("refs/heads/".length());
+        final String repositoryFullName = payload.path("repository").path("full_name").asText(null);
         if (repositoryFullName == null) {
             return;
         }
-        Set<String> changed = new LinkedHashSet<>();
-        for (JsonNode commit : payload.path("commits")) {
+        final Set<String> changed = new LinkedHashSet<>();
+        for (final JsonNode commit : payload.path("commits")) {
             commit.path("added").forEach(path -> changed.add(path.asText()));
             commit.path("modified").forEach(path -> changed.add(path.asText()));
         }
         if (changed.isEmpty()) {
             return;
         }
-        for (RepositoryConnectionEntity connection :
+        for (final RepositoryConnectionEntity connection :
                 connections.findByRepositoryFullNameAndBranch(repositoryFullName, branch)) {
             if (connection.syncMode() == SyncPolicy.ON_PUSH && connection.state() != ConnectionState.DEGRADED) {
                 imports.start(connection, ImportTrigger.PUSH, List.copyOf(changed));
@@ -126,14 +111,14 @@ public class WebhookService {
         }
     }
 
-    private void handlePullRequest(JsonNode payload) {
-        JsonNode pullRequest = payload.path("pull_request");
-        String repositoryFullName = payload.path("repository").path("full_name").asText(null);
-        int number = payload.path("number").asInt(pullRequest.path("number").asInt());
+    private void handlePullRequest(final JsonNode payload) {
+        final JsonNode pullRequest = payload.path("pull_request");
+        final String repositoryFullName = payload.path("repository").path("full_name").asText(null);
+        final int number = payload.path("number").asInt(pullRequest.path("number").asInt());
         if (repositoryFullName == null || number == 0) {
             return;
         }
-        String action = payload.path("action").asText("");
+        final String action = payload.path("action").asText("");
         if ("closed".equals(action)) {
             proposals.pullRequestClosed(repositoryFullName, number, pullRequest.path("merged").asBoolean(false));
             return;

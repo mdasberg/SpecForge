@@ -52,15 +52,15 @@ public class SpecSection {
     }
 
     public SpecSection(
-            UUID id,
-            UUID versionId,
-            UUID parentId,
-            String anchorKey,
-            String heading,
-            int level,
-            int ordinal,
-            int startLine,
-            int endLine) {
+            final UUID id,
+            final UUID versionId,
+            final UUID parentId,
+            final String anchorKey,
+            final String heading,
+            final int level,
+            final int ordinal,
+            final int startLine,
+            final int endLine) {
         this.id = id;
         this.versionId = versionId;
         this.parentId = parentId;

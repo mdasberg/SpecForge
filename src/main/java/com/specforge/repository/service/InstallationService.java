@@ -1,8 +1,8 @@
 package com.specforge.repository.service;
 
+import com.specforge.platform.api.dto.ForgeInstallationList;
 import com.specforge.repository.entity.ConnectionState;
 import com.specforge.repository.entity.ForgeInstallationEntity.GrantedRepositoryRow;
-import com.specforge.platform.api.dto.ForgeInstallationList;
 import com.specforge.repository.entity.ForgeInstallationEntity;
 import com.specforge.repository.entity.InstallationStatus;
 import com.specforge.repository.entity.RepositoryConnectionEntity;
@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 /**
  * The GitHub App installations SpecForge reads through. An installation arrives over the webhook
@@ -30,7 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
  * GitHub reports it, so SpecForge never asks a user to type a repository it may not be allowed to
  * read.
  */
+@RequiredArgsConstructor
 @Service
+@Transactional
 public class InstallationService {
 
     private static final Logger log = LoggerFactory.getLogger(InstallationService.class);
@@ -39,17 +41,6 @@ public class InstallationService {
     private final RepositoryConnectionRepository connections;
     private final Forge forge;
     private final Clock clock;
-
-    InstallationService(
-            ForgeInstallationRepository installations,
-            RepositoryConnectionRepository connections,
-            Forge forge,
-            Clock clock) {
-        this.installations = installations;
-        this.connections = connections;
-        this.forge = forge;
-        this.clock = clock;
-    }
 
     @Transactional(readOnly = true)
     public ForgeInstallationList list() {
@@ -65,8 +56,8 @@ public class InstallationService {
      * the review history of what it used to hold.
      */
     @Transactional
-    public void refresh(String externalId) {
-        Optional<ForgeInstallationInfo> info = forge.installation(externalId);
+    public void refresh(final String externalId) {
+        final Optional<ForgeInstallationInfo> info = forge.installation(externalId);
         if (info.isEmpty()) {
             installations.findByExternalId(externalId).ifPresent(installation -> {
                 installation.changeStatus(InstallationStatus.REVOKED, clock.instant());
@@ -75,16 +66,16 @@ public class InstallationService {
             });
             return;
         }
-        ForgeInstallationInfo current = info.get();
-        Instant now = clock.instant();
-        InstallationStatus status = current.suspended() ? InstallationStatus.SUSPENDED : InstallationStatus.ACTIVE;
-        Set<GrantedRepositoryRow> repositories = new LinkedHashSet<>();
-        for (ForgeRepositoryInfo repository : current.repositories()) {
+        final ForgeInstallationInfo current = info.get();
+        final Instant now = clock.instant();
+        final InstallationStatus status = current.suspended() ? InstallationStatus.SUSPENDED : InstallationStatus.ACTIVE;
+        final Set<GrantedRepositoryRow> repositories = new LinkedHashSet<>();
+        for (final ForgeRepositoryInfo repository : current.repositories()) {
             repositories.add(new GrantedRepositoryRow(
                     repository.fullName(), repository.externalId(), repository.defaultBranch()));
         }
 
-        ForgeInstallationEntity installation = installations
+        final ForgeInstallationEntity installation = installations
                 .findByExternalId(externalId)
                 .orElseGet(() -> installations.save(new ForgeInstallationEntity(
                         UUID.randomUUID(), "GITHUB", externalId, current.accountLogin(), now)));
@@ -102,7 +93,7 @@ public class InstallationService {
 
     /** Called when the forge reports the installation gone, which the webhook knows before a read fails. */
     @Transactional
-    public void revoke(String externalId) {
+    public void revoke(final String externalId) {
         installations.findByExternalId(externalId).ifPresent(installation -> {
             installation.changeStatus(InstallationStatus.REVOKED, clock.instant());
             installations.save(installation);
@@ -110,9 +101,9 @@ public class InstallationService {
         });
     }
 
-    private void degradeConnections(ForgeInstallationEntity installation, String reason) {
-        Instant now = clock.instant();
-        for (RepositoryConnectionEntity connection : connections.findByInstallationId(installation.id())) {
+    private void degradeConnections(final ForgeInstallationEntity installation, final String reason) {
+        final Instant now = clock.instant();
+        for (final RepositoryConnectionEntity connection : connections.findByInstallationId(installation.id())) {
             if (connection.state() != ConnectionState.DEGRADED) {
                 log.info("Degrading connection {} : {}", connection.id(), reason);
                 connection.degrade(reason, now);
@@ -122,14 +113,15 @@ public class InstallationService {
     }
 
     /** A connection only comes back if its repository is still granted; access can return partially. */
-    private void restoreConnections(ForgeInstallationEntity installation, Set<GrantedRepositoryRow> repositories) {
-        Instant now = clock.instant();
-        Set<String> granted = new LinkedHashSet<>();
-        for (GrantedRepositoryRow repository : repositories) {
+    private void restoreConnections(final ForgeInstallationEntity installation,
+            final Set<GrantedRepositoryRow> repositories) {
+        final Instant now = clock.instant();
+        final Set<String> granted = new LinkedHashSet<>();
+        for (final GrantedRepositoryRow repository : repositories) {
             granted.add(repository.fullName());
         }
-        for (RepositoryConnectionEntity connection : connections.findByInstallationId(installation.id())) {
-            boolean stillGranted = granted.contains(connection.repositoryFullName());
+        for (final RepositoryConnectionEntity connection : connections.findByInstallationId(installation.id())) {
+            final boolean stillGranted = granted.contains(connection.repositoryFullName());
             if (stillGranted && connection.state() == ConnectionState.DEGRADED) {
                 connection.restore(now);
                 connections.save(connection);

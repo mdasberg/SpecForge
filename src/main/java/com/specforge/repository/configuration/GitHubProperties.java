@@ -12,7 +12,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @param webhookSecret the shared secret every inbound delivery is HMAC-verified against
  */
 @ConfigurationProperties(prefix = "specforge.github")
-public record GitHubProperties(String appId, String privateKey, String webhookSecret, String apiBaseUrl, String statusContext) {
+public record GitHubProperties(String appId, String privateKey, String webhookSecret, String apiBaseUrl,
+        String statusContext) {
 
     public GitHubProperties {
         apiBaseUrl = apiBaseUrl == null ? "https://api.github.com" : apiBaseUrl.replaceAll("/+$", "");

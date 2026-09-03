@@ -63,15 +63,15 @@ public class RepositoryConnectionEntity {
     }
 
     public RepositoryConnectionEntity(
-            UUID id,
-            UUID projectId,
-            UUID installationId,
-            String repositoryFullName,
-            String branch,
-            String pathGlob,
-            SpecFileFormat specFormat,
-            SyncPolicy syncMode,
-            Instant now) {
+            final UUID id,
+            final UUID projectId,
+            final UUID installationId,
+            final String repositoryFullName,
+            final String branch,
+            final String pathGlob,
+            final SpecFileFormat specFormat,
+            final SyncPolicy syncMode,
+            final Instant now) {
         this.id = id;
         this.projectId = projectId;
         this.installationId = installationId;
@@ -85,13 +85,13 @@ public class RepositoryConnectionEntity {
         this.updatedAt = now;
     }
 
-    public void degrade(String reason, Instant now) {
+    public void degrade(final String reason, final Instant now) {
         this.state = ConnectionState.DEGRADED;
         this.degradedReason = reason;
         this.updatedAt = now;
     }
 
-    public void restore(Instant now) {
+    public void restore(final Instant now) {
         this.state = ConnectionState.ACTIVE;
         this.degradedReason = null;
         this.updatedAt = now;

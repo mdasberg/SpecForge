@@ -65,13 +65,13 @@ public class RepositoryScanEntity {
     }
 
     public RepositoryScanEntity(
-            UUID id,
-            UUID installationId,
-            String repositoryFullName,
-            String branch,
-            String pathGlob,
-            SpecFileFormat specFormat,
-            Instant startedAt) {
+            final UUID id,
+            final UUID installationId,
+            final String repositoryFullName,
+            final String branch,
+            final String pathGlob,
+            final SpecFileFormat specFormat,
+            final Instant startedAt) {
         this.id = id;
         this.installationId = installationId;
         this.repositoryFullName = repositoryFullName;
@@ -86,7 +86,8 @@ public class RepositoryScanEntity {
         this.status = ScanStatus.RUNNING;
     }
 
-    public void succeed(int importableCount, int changeProposalCount, int unparsableCount, Instant finishedAt) {
+    public void succeed(final int importableCount, final int changeProposalCount, final int unparsableCount,
+            final Instant finishedAt) {
         this.status = ScanStatus.SUCCEEDED;
         this.importableCount = importableCount;
         this.changeProposalCount = changeProposalCount;
@@ -94,7 +95,7 @@ public class RepositoryScanEntity {
         this.finishedAt = finishedAt;
     }
 
-    public void fail(String failureReason, Instant finishedAt) {
+    public void fail(final String failureReason, final Instant finishedAt) {
         this.status = ScanStatus.FAILED;
         // Truncated to the column: a stack of nested causes would otherwise fail the insert and
         // lose the reason entirely.

@@ -25,7 +25,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-
 /**
  * Entities to contract types. The domain enums and the generated ones are separate on purpose —
  * the contract is allowed to be renamed without a migration, and the database is allowed to hold a
@@ -35,16 +34,16 @@ final class RepositoryMapper {
 
     private RepositoryMapper() {}
 
-    static SpecFileFormat format(SpecFormat format) {
+    static SpecFileFormat format(final SpecFormat format) {
         return SpecFileFormat.valueOf(format.name());
     }
 
-    static SyncPolicy syncPolicy(SyncMode syncMode) {
+    static SyncPolicy syncPolicy(final SyncMode syncMode) {
         return SyncPolicy.valueOf(syncMode.name());
     }
 
-    static Connection connection(RepositoryConnectionEntity entity, String projectName) {
-        Connection connection = new Connection(
+    static Connection connection(final RepositoryConnectionEntity entity, final String projectName) {
+        final Connection connection = new Connection(
                 entity.id(),
                 projectName,
                 entity.installationId(),
@@ -59,16 +58,16 @@ final class RepositoryMapper {
         return connection;
     }
 
-    static ForgeInstallation installation(ForgeInstallationEntity entity) {
-        List<GrantedRepository> repositories = entity.repositories().stream()
+    static ForgeInstallation installation(final ForgeInstallationEntity entity) {
+        final List<GrantedRepository> repositories = entity.repositories().stream()
                 .map(repository -> {
-                    GrantedRepository granted = new GrantedRepository(repository.fullName());
+                    final GrantedRepository granted = new GrantedRepository(repository.fullName());
                     granted.setDefaultBranch(repository.defaultBranch());
                     granted.setExternalId(repository.externalId());
                     return granted;
                 })
                 .toList();
-        ForgeInstallation installation = new ForgeInstallation(
+        final ForgeInstallation installation = new ForgeInstallation(
                 entity.id(),
                 ForgeProvider.valueOf(entity.provider()),
                 entity.accountLogin(),
@@ -80,8 +79,8 @@ final class RepositoryMapper {
         return installation;
     }
 
-    static Scan scan(RepositoryScanEntity entity, List<ScanFileEntity> files) {
-        Scan scan = new Scan(
+    static Scan scan(final RepositoryScanEntity entity, final List<ScanFileEntity> files) {
+        final Scan scan = new Scan(
                 entity.id(),
                 Scan.StatusEnum.valueOf(entity.status().name()),
                 entity.repositoryFullName(),
@@ -98,8 +97,8 @@ final class RepositoryMapper {
         return scan;
     }
 
-    static ImportRun importRun(ImportRunEntity entity, List<ImportRunFileEntity> files) {
-        ImportRun run = new ImportRun(
+    static ImportRun importRun(final ImportRunEntity entity, final List<ImportRunFileEntity> files) {
+        final ImportRun run = new ImportRun(
                 entity.id(),
                 entity.connectionId(),
                 ImportRun.TriggerEnum.valueOf(entity.trigger().name()),
@@ -115,19 +114,19 @@ final class RepositoryMapper {
         return run;
     }
 
-    private static ScanFile scanFile(ScanFileEntity entity) {
-        ScanFile file = new ScanFile(entity.path(), ScanClassification.valueOf(entity.classification().name()));
+    private static ScanFile scanFile(final ScanFileEntity entity) {
+        final ScanFile file = new ScanFile(entity.path(), ScanClassification.valueOf(entity.classification().name()));
         file.setReason(entity.reason());
         return file;
     }
 
-    private static ImportRunFile importRunFile(ImportRunFileEntity entity) {
-        ImportRunFile file = new ImportRunFile(entity.path(), ImportOutcome.valueOf(entity.outcome().name()));
+    private static ImportRunFile importRunFile(final ImportRunFileEntity entity) {
+        final ImportRunFile file = new ImportRunFile(entity.path(), ImportOutcome.valueOf(entity.outcome().name()));
         file.setReason(entity.reason());
         return file;
     }
 
-    private static OffsetDateTime at(Instant instant) {
+    private static OffsetDateTime at(final Instant instant) {
         return instant == null ? null : instant.atOffset(ZoneOffset.UTC);
     }
 }

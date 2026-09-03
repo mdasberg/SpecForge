@@ -71,11 +71,11 @@ public class ForgeInstallationEntity {
     }
 
     public ForgeInstallationEntity(
-            UUID id,
-            String provider,
-            String externalId,
-            String accountLogin,
-            Instant createdAt) {
+            final UUID id,
+            final String provider,
+            final String externalId,
+            final String accountLogin,
+            final Instant createdAt) {
         this.id = id;
         this.provider = provider;
         this.externalId = externalId;
@@ -92,11 +92,11 @@ public class ForgeInstallationEntity {
      * or a review that watches the row.
      */
     public void refresh(
-            String accountLogin,
-            String accountType,
-            Integer accountRepositoryCount,
-            Set<GrantedRepositoryRow> repositories,
-            Instant now) {
+            final String accountLogin,
+            final String accountType,
+            final Integer accountRepositoryCount,
+            final Set<GrantedRepositoryRow> repositories,
+            final Instant now) {
         this.accountLogin = accountLogin;
         this.accountType = accountType;
         this.accountRepositoryCount = accountRepositoryCount;
@@ -110,7 +110,7 @@ public class ForgeInstallationEntity {
      * Sets the status and {@code updatedAt}. Nothing is validated here: the installation's own
      * lifecycle is the only caller, and it is the only place a transition is judged legal.
      */
-    public void changeStatus(InstallationStatus status, Instant now) {
+    public void changeStatus(final InstallationStatus status, final Instant now) {
         this.status = status;
         this.updatedAt = now;
     }
@@ -174,7 +174,7 @@ public class ForgeInstallationEntity {
 
         public GrantedRepositoryRow() {}
 
-        public GrantedRepositoryRow(String fullName, String externalId, String defaultBranch) {
+        public GrantedRepositoryRow(final String fullName, final String externalId, final String defaultBranch) {
             this.fullName = fullName;
             this.externalId = externalId;
             this.defaultBranch = defaultBranch;
@@ -197,7 +197,7 @@ public class ForgeInstallationEntity {
          * same repository are different elements, and every refresh looks like a changed grant.
          */
         @Override
-        public boolean equals(Object other) {
+        public boolean equals(final Object other) {
             return other instanceof GrantedRepositoryRow row
                     && java.util.Objects.equals(fullName, row.fullName)
                     && java.util.Objects.equals(externalId, row.externalId)

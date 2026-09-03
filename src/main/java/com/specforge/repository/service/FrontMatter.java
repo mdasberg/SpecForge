@@ -14,16 +14,16 @@ public final class FrontMatter {
 
     private FrontMatter() {}
 
-    static Set<String> tags(String content) {
-        String[] lines = content.split("\\R");
+    static Set<String> tags(final String content) {
+        final String[] lines = content.split("\\R");
         if (lines.length == 0 || !lines[0].strip().equals("---")) {
             return Set.of();
         }
-        Set<String> tags = new LinkedHashSet<>();
+        final Set<String> tags = new LinkedHashSet<>();
         boolean inList = false;
         for (int i = 1; i < lines.length; i++) {
-            String line = lines[i];
-            String trimmed = line.strip();
+            final String line = lines[i];
+            final String trimmed = line.strip();
             if (trimmed.equals("---")) {
                 break;
             }
@@ -35,11 +35,11 @@ public final class FrontMatter {
                 inList = false;
             }
             if (trimmed.startsWith("tags:")) {
-                String value = trimmed.substring("tags:".length()).strip();
+                final String value = trimmed.substring("tags:".length()).strip();
                 if (value.isEmpty()) {
                     inList = true;
                 } else if (value.startsWith("[") && value.endsWith("]")) {
-                    for (String tag : value.substring(1, value.length() - 1).split(",")) {
+                    for (final String tag : value.substring(1, value.length() - 1).split(",")) {
                         if (!tag.isBlank()) {
                             tags.add(unquote(tag.strip()));
                         }
@@ -50,8 +50,8 @@ public final class FrontMatter {
         return Set.copyOf(tags);
     }
 
-    private static String unquote(String value) {
-        String trimmed = value.strip();
+    private static String unquote(final String value) {
+        final String trimmed = value.strip();
         if (trimmed.length() >= 2
                 && (trimmed.startsWith("\"") && trimmed.endsWith("\"") || trimmed.startsWith("'") && trimmed.endsWith("'"))) {
             return trimmed.substring(1, trimmed.length() - 1);

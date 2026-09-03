@@ -13,8 +13,6 @@ import static com.specforge.catalog.SpecStatus.DRAFT;
 import static com.specforge.catalog.SpecStatus.IMPLEMENTED;
 import static com.specforge.catalog.SpecStatus.IN_REVIEW;
 
-
-
 /**
  * The only place a specification's status is judged. Reviews, approvals and imports all route
  * their transitions through here, so "which moves are legal" is one table rather than a condition
@@ -36,12 +34,12 @@ public final class SpecLifecycle {
 
     private SpecLifecycle() {}
 
-    static boolean isLegal(SpecStatus from, SpecStatus to) {
+    static boolean isLegal(final SpecStatus from, final SpecStatus to) {
         return LEGAL.getOrDefault(from, Set.of()).contains(to);
     }
 
     /** Applies the transition, or refuses it. A move to the status already held is a no-op. */
-    static void transition(SpecDocument document, SpecStatus target, java.time.Instant now) {
+    static void transition(final SpecDocument document, final SpecStatus target, final java.time.Instant now) {
         if (document.status() == target) {
             return;
         }

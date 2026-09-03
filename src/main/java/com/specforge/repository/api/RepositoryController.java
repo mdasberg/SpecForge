@@ -19,6 +19,7 @@ import com.specforge.repository.service.SpecContentService;
 import com.specforge.repository.service.WebhookService;
 import com.specforge.repository.service.WebhookVerifier;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>There is no mapping here on purpose: the services speak the contract's own types, and this
  * class only routes and authorises.
  */
+@RequiredArgsConstructor
 @RestController
 class RepositoryController implements RepositoryApi {
 
@@ -41,23 +43,6 @@ class RepositoryController implements RepositoryApi {
     private final WebhookVerifier webhookVerifier;
     private final WebhookService webhooks;
 
-    RepositoryController(
-            ConnectionService connections,
-            ScanService scans,
-            ImportService imports,
-            InstallationService installations,
-            SpecContentService specContent,
-            WebhookVerifier webhookVerifier,
-            WebhookService webhooks) {
-        this.connections = connections;
-        this.scans = scans;
-        this.imports = imports;
-        this.installations = installations;
-        this.specContent = specContent;
-        this.webhookVerifier = webhookVerifier;
-        this.webhooks = webhooks;
-    }
-
     @Override
     public ForgeInstallationList listForgeInstallations() {
         return installations.list();
@@ -65,18 +50,18 @@ class RepositoryController implements RepositoryApi {
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
-    public Scan startRepositoryScan(ScanRequest request) {
+    public Scan startRepositoryScan(final ScanRequest request) {
         return scans.start(request);
     }
 
     @Override
-    public Scan getRepositoryScan(UUID scanId) {
+    public Scan getRepositoryScan(final UUID scanId) {
         return scans.get(scanId);
     }
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
-    public Connection createRepositoryConnection(ConnectionRequest request) {
+    public Connection createRepositoryConnection(final ConnectionRequest request) {
         return connections.create(request);
     }
 
@@ -86,23 +71,23 @@ class RepositoryController implements RepositoryApi {
     }
 
     @Override
-    public Connection getRepositoryConnection(UUID connectionId) {
+    public Connection getRepositoryConnection(final UUID connectionId) {
         return connections.get(connectionId);
     }
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
-    public ImportRun startImport(UUID connectionId) {
+    public ImportRun startImport(final UUID connectionId) {
         return imports.startManual(connectionId);
     }
 
     @Override
-    public ImportRunList listImportRuns(UUID connectionId) {
+    public ImportRunList listImportRuns(final UUID connectionId) {
         return imports.list(connectionId);
     }
 
     @Override
-    public ImportRun getImportRun(UUID connectionId, UUID runId) {
+    public ImportRun getImportRun(final UUID connectionId, final UUID runId) {
         return imports.get(connectionId, runId);
     }
 
@@ -111,7 +96,8 @@ class RepositoryController implements RepositoryApi {
      * unverified delivery is an unauthenticated trigger for imports and outbound writes.
      */
     @Override
-    public void receiveGitHubWebhook(String body, String event, String deliveryId, String signature) {
+    public void receiveGitHubWebhook(final String body, final String event, final String deliveryId,
+            final String signature) {
         if (!webhookVerifier.verify(body, signature)) {
             throw Problems.unauthorized("The webhook signature did not verify.");
         }
@@ -119,7 +105,7 @@ class RepositoryController implements RepositoryApi {
     }
 
     @Override
-    public void updateSpecContent(UUID specId, SpecContentUpdate update) {
+    public void updateSpecContent(final UUID specId, final SpecContentUpdate update) {
         specContent.refuseEdit(specId);
     }
 }

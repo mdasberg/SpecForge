@@ -13,16 +13,20 @@ import com.specforge.repository.repository.RepositoryConnectionRepository;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.specforge.repository.event.ImportRequested;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.stereotype.Component;
-
 
 /**
  * Executes one import run. It resolves the branch to a commit first and imports at that commit, so
  * every file in a run comes from the same repository state even if someone pushes while it runs.
  */
+@RequiredArgsConstructor
 @Component
 public class ImportRunner {
 
@@ -36,57 +40,47 @@ public class ImportRunner {
     private final Forge forge;
     private final Clock clock;
 
-    ImportRunner(
-            ImportRunRepository runs,
-            RepositoryConnectionRepository connections,
-            ProjectRepository projects,
-            ForgeInstallationRepository installations,
-            SpecImporter importer,
-            Forge forge,
-            Clock clock) {
-        this.runs = runs;
-        this.connections = connections;
-        this.projects = projects;
-        this.installations = installations;
-        this.importer = importer;
-        this.forge = forge;
-        this.clock = clock;
-    }
-
+    /** Runs after the transaction that recorded the run has committed; see {@link ScanRunner}. */
     @Async
-    public void run(UUID runId, List<String> onlyPaths) {
-        ImportRunEntity run = runs.findById(runId).orElse(null);
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    public void run(final ImportRequested requested) {
+        final UUID runId = requested.runId();
+        final List<String> onlyPaths = requested.onlyPaths();
+        final ImportRunEntity run = runs.findById(runId).orElse(null);
         if (run == null) {
             log.warn("Import run {} vanished before it ran", runId);
             return;
         }
         try {
-            RepositoryConnectionEntity connection = connections
+            final RepositoryConnectionEntity connection = connections
                     .findById(run.connectionId())
                     .orElseThrow(() -> new ForgeException("The connection behind this run no longer exists."));
-            ProjectEntity project = projects
+            final ProjectEntity project = projects
                     .findById(connection.projectId())
                     .orElseThrow(() -> new ForgeException("The project behind this connection no longer exists."));
-            String installationExternalId = installations
+            final String installationExternalId = installations
                     .findById(connection.installationId())
                     .orElseThrow(() -> new ForgeException("The installation behind this connection no longer exists."))
                     .externalId();
 
-            String commitSha = forge.headCommit(installationExternalId, new ForgeRef(connection.repositoryFullName(), connection.branch()))
+            final String commitSha = forge.headCommit(installationExternalId,
+                    new ForgeRef(connection.repositoryFullName(), connection.branch()))
                     .orElseThrow(() -> new ForgeException(
-                            "Branch %s does not exist on %s.".formatted(connection.branch(), connection.repositoryFullName())));
+                            "Branch %s does not exist on %s.".formatted(connection.branch(),
+                                    connection.repositoryFullName())));
             run.resolvedCommit(commitSha);
             runs.save(run);
 
-            ForgeRef ref = new ForgeRef(connection.repositoryFullName(), commitSha);
-            List<String> paths = onlyPaths != null
+            final ForgeRef ref = new ForgeRef(connection.repositoryFullName(), commitSha);
+            final List<String> paths = onlyPaths != null
                     ? SpecPaths.matching(onlyPaths, connection.pathGlob())
                     : SpecPaths.matching(forge.listFiles(installationExternalId, ref), connection.pathGlob());
 
-            ImportSummary summary = importer.importPaths(connection, project, installationExternalId, ref, paths, run.id());
+            final ImportSummary summary = importer.importPaths(connection, project, installationExternalId, ref,
+                    paths, run.id());
             run.succeed(summary.imported(), summary.unchanged(), summary.skipped(), summary.failed(), clock.instant());
             runs.save(run);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             log.warn("Import run {} failed", runId, e);
             run.fail(clock.instant());
             runs.save(run);

@@ -51,14 +51,14 @@ public class SpecVersion {
     }
 
     public SpecVersion(
-            UUID id,
-            UUID documentId,
-            int ordinal,
-            String content,
-            String contentSha,
-            String commitSha,
-            String author,
-            Instant createdAt) {
+            final UUID id,
+            final UUID documentId,
+            final int ordinal,
+            final String content,
+            final String contentSha,
+            final String commitSha,
+            final String author,
+            final Instant createdAt) {
         this.id = id;
         this.documentId = documentId;
         this.ordinal = ordinal;

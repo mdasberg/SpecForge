@@ -58,7 +58,8 @@ public class ImportRunEntity {
         // for JPA
     }
 
-    public ImportRunEntity(UUID id, UUID connectionId, ImportTrigger trigger, Instant startedAt) {
+    public ImportRunEntity(final UUID id, final UUID connectionId, final ImportTrigger trigger,
+            final Instant startedAt) {
         this.id = id;
         this.connectionId = connectionId;
         this.trigger = trigger;
@@ -66,11 +67,12 @@ public class ImportRunEntity {
         this.startedAt = startedAt;
     }
 
-    public void resolvedCommit(String commitSha) {
+    public void resolvedCommit(final String commitSha) {
         this.commitSha = commitSha;
     }
 
-    public void succeed(int importedCount, int unchangedCount, int skippedCount, int failedCount, Instant finishedAt) {
+    public void succeed(final int importedCount, final int unchangedCount, final int skippedCount,
+            final int failedCount, final Instant finishedAt) {
         this.status = RunStatus.SUCCEEDED;
         this.importedCount = importedCount;
         this.unchangedCount = unchangedCount;
@@ -79,7 +81,7 @@ public class ImportRunEntity {
         this.finishedAt = finishedAt;
     }
 
-    public void fail(Instant finishedAt) {
+    public void fail(final Instant finishedAt) {
         this.status = RunStatus.FAILED;
         this.finishedAt = finishedAt;
     }
