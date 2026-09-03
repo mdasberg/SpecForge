@@ -100,6 +100,7 @@ class SpecRepositoryTest extends BaseIntegrationTest {
 
     @BeforeEach
     void reset() {
+        awaitQuiet();
         jdbc.sql("""
                 TRUNCATE TABLE spec_section, spec_version, spec_document_tag, spec_document,
                     import_run_file, import_run, repository_scan_file, repository_scan,
@@ -383,6 +384,33 @@ class SpecRepositoryTest extends BaseIntegrationTest {
         assertThat(run.get("importedCount").asInt()).isEqualTo(1);
         assertThat(jdbc.sql("select count(*) from spec_change_proposal").query(Integer.class).single())
                 .isZero();
+    }
+
+    /**
+     * A test that does not wait for its own import leaves the runner writing on another thread.
+     * TRUNCATE then asks for a lock that concurrent writer will not yield, which fails the *next*
+     * test rather than the one that caused it — and only on a machine slow enough to still be
+     * importing, which is why this passed locally and failed in CI. Wait for the tables to go
+     * quiet before clearing them.
+     */
+    private void awaitQuiet() {
+        final long deadline = System.nanoTime() + Duration.ofSeconds(20).toNanos();
+        while (System.nanoTime() < deadline) {
+            final Integer inFlight = jdbc.sql("""
+                    select (select count(*) from import_run where status = 'RUNNING')
+                         + (select count(*) from repository_scan where status in ('PENDING', 'RUNNING'))
+                    """).query(Integer.class).single();
+            if (inFlight == 0) {
+                return;
+            }
+            try {
+                Thread.sleep(100);
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+        throw new AssertionError("A scan or import from a previous test never finished.");
     }
 
     // --- helpers -------------------------------------------------------------------------------
