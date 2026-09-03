@@ -1,11 +1,11 @@
 package com.specforge;
 
-import com.specforge.repository.internal.forge.Forge;
-import com.specforge.repository.internal.forge.ForgeFile;
-import com.specforge.repository.internal.forge.ForgeInstallationInfo;
-import com.specforge.repository.internal.forge.ForgeRef;
-import com.specforge.repository.internal.forge.ForgeRepositoryInfo;
-import com.specforge.repository.internal.forge.ReviewStatusState;
+import com.specforge.repository.forge.Forge;
+import com.specforge.repository.forge.ForgeFile;
+import com.specforge.repository.forge.ForgeInstallationInfo;
+import com.specforge.repository.forge.ForgeRef;
+import com.specforge.repository.forge.ForgeRepositoryInfo;
+import com.specforge.repository.forge.ReviewStatusState;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;

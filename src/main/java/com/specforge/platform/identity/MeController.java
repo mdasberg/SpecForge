@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.RestController;
 
+
 /**
  * The mirrored identity of the caller. This is the only identity endpoint SpecForge has: there is
  * deliberately nothing here to change a password, a profile or a second factor, because those live

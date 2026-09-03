@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.specforge.repository.ReviewOutcome;
 import com.specforge.repository.ReviewStatusReporter;
 import com.specforge.repository.SpecChangeProposed;
-import com.specforge.repository.internal.forge.ReviewStatusState;
+import com.specforge.repository.forge.ReviewStatusState;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;

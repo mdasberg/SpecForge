@@ -5,6 +5,7 @@ import java.time.Instant;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 /**
  * Keeps the local {@code app_user} row in step with the token. The first authenticated request for
  * a subject creates the row; every later one refreshes the display name, avatar and roles, so a

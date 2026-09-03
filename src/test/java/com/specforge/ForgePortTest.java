@@ -3,7 +3,7 @@ package com.specforge;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.specforge.repository.internal.forge.Forge;
+import com.specforge.repository.forge.Forge;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -33,7 +33,7 @@ class ForgePortTest {
                 .resideOutsideOfPackage("com.specforge.repository..")
                 .should()
                 .dependOnClassesThat()
-                .resideInAPackage("com.specforge.repository.internal.forge..")
+                .resideInAPackage("com.specforge.repository.forge..")
                 .check(classes);
     }
 

@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Set;
 
+
 /**
  * The local mirror of a Keycloak identity, keyed by the token's subject id so a rename in the
  * provider never orphans a comment or a verdict. SpecForge owns no credential: everything here is

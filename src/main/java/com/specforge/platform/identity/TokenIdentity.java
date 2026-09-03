@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import org.springframework.security.oauth2.jwt.Jwt;
 
+
 /**
  * What a Keycloak access token says about who is calling. Reading the claims lives here so the
  * role converter and the identity mirror cannot disagree about them.
