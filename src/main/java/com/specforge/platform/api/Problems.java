@@ -1,17 +1,21 @@
-package com.specforge.repository.exception;
+package com.specforge.platform.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.ErrorResponseException;
 
 /**
- * The failures this module reports to a caller. They are thrown as {@link ErrorResponseException}
+ * The failures a capability module reports to a caller. They are thrown as {@link ErrorResponseException}
  * so Spring renders them as RFC 9457 problem documents, the same shape everything else in the API
  * uses.
  */
 public final class Problems {
 
     private Problems() {}
+
+    public static ErrorResponseException badRequest(final String detail) {
+        return of(HttpStatus.BAD_REQUEST, detail);
+    }
 
     public static ErrorResponseException notFound(final String detail) {
         return of(HttpStatus.NOT_FOUND, detail);

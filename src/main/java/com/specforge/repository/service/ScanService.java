@@ -1,18 +1,18 @@
 package com.specforge.repository.service;
 
+import com.specforge.platform.api.Problems;
 import com.specforge.platform.api.dto.Scan;
 import com.specforge.platform.api.dto.ScanRequest;
 import com.specforge.repository.entity.RepositoryScanEntity;
 import com.specforge.repository.entity.ScanFileEntity;
 import com.specforge.repository.entity.SpecFileFormat;
-import com.specforge.repository.exception.Problems;
+import com.specforge.repository.event.ScanRequested;
 import com.specforge.repository.repository.ForgeInstallationRepository;
 import com.specforge.repository.repository.RepositoryScanRepository;
 import com.specforge.repository.repository.ScanFileRepository;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
-import com.specforge.repository.event.ScanRequested;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
