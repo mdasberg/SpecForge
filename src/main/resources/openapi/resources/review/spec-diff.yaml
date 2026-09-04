@@ -1,0 +1,46 @@
+get:
+  operationId: compareSpecificationVersions
+  tags: [ Review ]
+  summary: Compare any two versions of a specification.
+  description: >
+    The same diff presentation a review uses, without opening one. Comparing v1 with v3 out of
+    curiosity creates no review, no reviewers and no review history — it only renders.
+
+    Tagged Review rather than Catalog because the diff engine belongs to the review capability, and
+    a catalog controller reaching into it would invert the dependency between the two modules.
+  parameters:
+    - name: specId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: base
+      in: query
+      required: true
+      description: The ordinal of the version to compare from.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+    - name: head
+      in: query
+      required: true
+      description: The ordinal of the version to compare to.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+  responses:
+    '200':
+      description: The diff between the two versions.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/SpecDiff.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

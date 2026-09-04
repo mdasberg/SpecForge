@@ -1,0 +1,13 @@
+type: object
+description: >
+  The pull request a review was opened from, when it was opened from one. A manually created review
+  has none.
+required: [repositoryFullName, number, headSha]
+properties:
+  repositoryFullName:
+    type: string
+  number:
+    type: integer
+    format: int32
+  headSha:
+    type: string

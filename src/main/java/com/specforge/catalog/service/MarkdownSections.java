@@ -24,7 +24,7 @@ public final class MarkdownSections {
 
     private MarkdownSections() {}
 
-    static List<ParsedSection> parse(final String normalisedContent) {
+    public static List<ParsedSection> parse(final String normalisedContent) {
         final String[] lines = normalisedContent.isEmpty() ? new String[0] : normalisedContent.split("\n", -1);
         final List<ParsedSection> sections = new ArrayList<>();
         final List<Integer> levels = new ArrayList<>();

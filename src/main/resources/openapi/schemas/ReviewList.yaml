@@ -1,0 +1,15 @@
+type: object
+description: A page of reviews, newest activity first.
+required: [items, total]
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./ReviewSummary.yaml
+  total:
+    type: integer
+    format: int64
+  cursor:
+    type: string
+    nullable: true
+    description: Opaque; pass it back as `cursor` to fetch the next page. Absent on the last page.

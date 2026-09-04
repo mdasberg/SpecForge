@@ -12,4 +12,6 @@ public interface SpecVersionRepository extends JpaRepository<SpecVersion, UUID> 
     Optional<SpecVersion> findFirstByDocumentIdOrderByOrdinalDesc(UUID documentId);
 
     List<SpecVersion> findByDocumentIdOrderByOrdinalAsc(UUID documentId);
+
+    Optional<SpecVersion> findByDocumentIdAndOrdinal(UUID documentId, int ordinal);
 }

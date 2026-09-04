@@ -1,0 +1,13 @@
+type: object
+description: >
+  A half-open character range `[start, end)` into the line's own text, marking the words that
+  actually changed. Ranges rather than a re-tokenised copy of the line, so the client highlights the
+  text it is already rendering instead of reassembling it.
+required: [start, end]
+properties:
+  start:
+    type: integer
+    format: int32
+  end:
+    type: integer
+    format: int32

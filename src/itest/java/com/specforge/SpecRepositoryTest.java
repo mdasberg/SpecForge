@@ -257,7 +257,8 @@ class SpecRepositoryTest extends BaseIntegrationTest {
                 .satisfies(event -> {
                     assertThat(event.pullRequestNumber()).isEqualTo(42);
                     assertThat(event.headSha()).isEqualTo("feedbeef");
-                    assertThat(event.documentIds()).hasSize(1);
+                    assertThat(event.specs()).hasSize(1);
+                    assertThat(event.specs().getFirst().content()).isNotBlank();
                 });
     }
 

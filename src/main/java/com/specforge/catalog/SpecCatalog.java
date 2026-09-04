@@ -1,5 +1,7 @@
 package com.specforge.catalog;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,4 +30,13 @@ public interface SpecCatalog {
      * refused if the document's current status does not allow it.
      */
     void proposeChange(UUID documentId);
+
+    /**
+     * One imported version's body. A null {@code ordinal} asks for the current version, which is
+     * what a review's base is when a change is proposed.
+     */
+    Optional<SpecVersionContent> version(UUID documentId, Integer ordinal);
+
+    /** Names the given documents, skipping any that no longer exist. */
+    Map<UUID, SpecRefView> refs(Collection<UUID> documentIds);
 }

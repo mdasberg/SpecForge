@@ -1,0 +1,17 @@
+type: object
+description: >
+  Opens a review of one specification between two of its imported versions. Comparing two versions
+  out of curiosity is not this — that is `GET /api/specs/{specId}/diff`, which creates nothing.
+required: [specId, baseVersion, headVersion]
+properties:
+  specId:
+    type: string
+    format: uuid
+  baseVersion:
+    type: integer
+    format: int32
+    minimum: 1
+  headVersion:
+    type: integer
+    format: int32
+    minimum: 1

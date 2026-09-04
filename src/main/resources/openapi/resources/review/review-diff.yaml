@@ -1,0 +1,25 @@
+get:
+  operationId: getReviewDiff
+  tags: [ Review ]
+  summary: The computed diff between the review's base and head.
+  description: >
+    Served from the cache keyed by the two content hashes, so repeating the request — or opening a
+    second review over the same content — recomputes nothing.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The diff.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/SpecDiff.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

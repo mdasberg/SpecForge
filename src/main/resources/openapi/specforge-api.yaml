@@ -36,6 +36,10 @@ tags:
     description: >
       Connecting a repository that holds specifications, scanning it, importing specs and keeping
       them in sync. SpecForge is read-only on the repository.
+  - name: Review
+    description: >
+      Reviewing a proposed change to a specification: one review per specification, the computed diff
+      between its base and head, and the sections that changed.
 
 paths:
   /api/me:
@@ -60,10 +64,18 @@ paths:
     $ref: ./resources/catalog/specs.yaml
   /api/specs/{specId}:
     $ref: ./resources/catalog/spec.yaml
+  /api/specs/{specId}/diff:
+    $ref: ./resources/review/spec-diff.yaml
   /api/projects:
     $ref: ./resources/catalog/projects.yaml
   /api/specs/{specId}/content:
     $ref: ./resources/repository/spec-content.yaml
+  /api/reviews:
+    $ref: ./resources/review/reviews.yaml
+  /api/reviews/{reviewId}:
+    $ref: ./resources/review/review.yaml
+  /api/reviews/{reviewId}/diff:
+    $ref: ./resources/review/review-diff.yaml
   /api/webhooks/github:
     $ref: ./resources/repository/github-webhook.yaml
 

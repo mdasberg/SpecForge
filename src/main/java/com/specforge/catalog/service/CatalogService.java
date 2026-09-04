@@ -1,6 +1,7 @@
 package com.specforge.catalog.service;
 
 import com.specforge.catalog.repository.SpecDocumentRepository;
+import com.specforge.platform.api.Cursors;
 import com.specforge.platform.api.Problems;
 import com.specforge.platform.api.dto.ProjectList;
 import com.specforge.platform.api.dto.ProjectOverview;
@@ -55,7 +56,7 @@ public class CatalogService {
         final CatalogQueries.Where where = CatalogQueries.where(filters);
         final String groupExpression = CatalogQueries.groupExpression(grouping);
         final int pageSize = limit == null ? DEFAULT_LIMIT : limit;
-        final int offset = offsetOf(cursor);
+        final int offset = Cursors.offsetOf(cursor);
 
         final Map<String, Object> params = new LinkedHashMap<>(where.params());
         params.put("ungrouped", CatalogQueries.UNGROUPED);
@@ -128,7 +129,7 @@ public class CatalogService {
         final List<SpecSummary> items = hasMore ? rows.subList(0, pageSize) : rows;
         attachTags(items);
         return new SpecList(items, groups, grouping, total)
-                .cursor(hasMore ? String.valueOf(offset + pageSize) : null);
+                .cursor(Cursors.next(offset, pageSize, hasMore));
     }
 
     public SpecDetail get(final UUID specId, final Integer version) {
@@ -197,25 +198,6 @@ public class CatalogService {
                 .param("ids", byId.keySet())
                 .query((rs, row) -> byId.get(rs.getObject(1, UUID.class)).getTags().add(rs.getString(2)))
                 .list();
-    }
-
-    /**
-     * The cursor is the offset the next page starts at. It is checked rather than trusted: it
-     * arrives in a URL, and a URL is edited.
-     */
-    private static int offsetOf(final String cursor) {
-        if (cursor == null || cursor.isBlank()) {
-            return 0;
-        }
-        try {
-            final int offset = Integer.parseInt(cursor.strip());
-            if (offset < 0) {
-                throw new NumberFormatException(cursor);
-            }
-            return offset;
-        } catch (final NumberFormatException e) {
-            throw Problems.badRequest("'%s' is not a cursor from a previous response.".formatted(cursor));
-        }
     }
 
 }

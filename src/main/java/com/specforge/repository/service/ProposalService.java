@@ -2,6 +2,8 @@ package com.specforge.repository.service;
 
 import com.specforge.catalog.SpecCatalog;
 import com.specforge.platform.api.Problems;
+import com.specforge.repository.ProposalClosed;
+import com.specforge.repository.ProposedSpec;
 import com.specforge.repository.ReviewOutcome;
 import com.specforge.repository.SpecChangeProposed;
 import com.specforge.repository.entity.ConnectionState;
@@ -78,6 +80,7 @@ public class ProposalService {
             proposals.findByConnectionIdAndPullRequestNumber(connection.id(), number).ifPresent(proposal -> {
                 proposal.close(merged ? ProposalState.MERGED : ProposalState.CLOSED, now);
                 proposals.save(proposal);
+                events.publishEvent(new ProposalClosed(proposal.id(), merged, now));
             });
         }
     }
@@ -115,7 +118,7 @@ public class ProposalService {
         proposalFiles.flush();
         final ForgeRef ref = new ForgeRef(connection.repositoryFullName(), headSha);
         final List<ProposalFileEntity> files = new ArrayList<>(changed.size());
-        final List<UUID> documentIds = new ArrayList<>();
+        final List<ProposedSpec> proposed = new ArrayList<>();
         for (final String path : changed) {
             final Optional<ForgeFile> file = forge.readFile(installationExternalId, ref, path);
             if (file.isEmpty()) {
@@ -123,10 +126,11 @@ public class ProposalService {
             }
             files.add(new ProposalFileEntity(
                     UUID.randomUUID(), proposal.id(), path, sha256(file.get().content()), file.get().content()));
-            catalog.find(connection.id(), path).ifPresent(documentId -> {
-                catalog.proposeChange(documentId);
-                documentIds.add(documentId);
-            });
+            // The specification's move into review belongs to the review capability, which makes it
+            // when it actually opens a review. Doing it here would put a specification in review
+            // even when nothing was ever opened for it.
+            catalog.find(connection.id(), path)
+                    .ifPresent(documentId -> proposed.add(new ProposedSpec(documentId, path, file.get().content())));
         }
         proposalFiles.saveAll(files);
 
@@ -136,7 +140,8 @@ public class ProposalService {
                 connection.repositoryFullName(),
                 number,
                 headSha,
-                List.copyOf(documentIds),
+                author,
+                List.copyOf(proposed),
                 now));
 
         // Pending the moment the change is proposed: the pull request says a review is running

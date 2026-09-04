@@ -1,0 +1,16 @@
+type: object
+description: What changed, in counts, for the jump list's header and the review row in a list.
+required: [addedSections, removedSections, modifiedSections, changedLines]
+properties:
+  addedSections:
+    type: integer
+    format: int32
+  removedSections:
+    type: integer
+    format: int32
+  modifiedSections:
+    type: integer
+    format: int32
+  changedLines:
+    type: integer
+    format: int32

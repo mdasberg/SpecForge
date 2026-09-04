@@ -1,0 +1,26 @@
+type: object
+description: >
+  The computed difference between two versions of one specification: every section classified, and a
+  line diff inside each modified one.
+
+  It is computed on the server and cached under the pair of content hashes. Versions are immutable,
+  so the diff is a pure function of those two hashes and never needs invalidating — and the reviewer,
+  an automated reviewer and the audit trail all read the identical artefact.
+
+  Inline and side-by-side are two renderings of this one payload, derived on the client, so switching
+  between them refetches nothing and they cannot disagree.
+required: [specId, base, head, summary, sections]
+properties:
+  specId:
+    type: string
+    format: uuid
+  base:
+    $ref: ./ReviewSide.yaml
+  head:
+    $ref: ./ReviewSide.yaml
+  summary:
+    $ref: ./DiffSummary.yaml
+  sections:
+    type: array
+    items:
+      $ref: ./DiffSection.yaml
