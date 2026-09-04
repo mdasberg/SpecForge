@@ -2,8 +2,8 @@ package com.specforge.repository.service;
 
 import com.specforge.catalog.SpecCatalog;
 import com.specforge.catalog.SpecLocation;
+import com.specforge.platform.api.Problems;
 import com.specforge.repository.entity.RepositoryConnectionEntity;
-import com.specforge.repository.exception.Problems;
 import com.specforge.repository.repository.RepositoryConnectionRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

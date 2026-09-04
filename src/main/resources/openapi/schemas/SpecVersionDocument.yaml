@@ -1,0 +1,27 @@
+type: object
+description: >
+  The body and outline of one version, immutable once imported.
+required: [ordinal, createdAt, current, content, sections]
+properties:
+  ordinal:
+    type: integer
+    format: int32
+  author:
+    type: string
+    nullable: true
+  commitSha:
+    type: string
+    nullable: true
+  createdAt:
+    type: string
+    format: date-time
+  current:
+    type: boolean
+  content:
+    type: string
+    description: >
+      The normalised markdown source; SpecForge never emits HTML, the client renders it.
+  sections:
+    type: array
+    items:
+      $ref: ./SpecOutlineSection.yaml

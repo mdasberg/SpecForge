@@ -28,6 +28,10 @@ security:
 tags:
   - name: Identity
     description: Who the caller is, mirrored from the Keycloak token.
+  - name: Catalog
+    description: >
+      Browsing, grouping, filtering and searching the imported specifications, and rendering one
+      version of a document with its outline.
   - name: Repository
     description: >
       Connecting a repository that holds specifications, scanning it, importing specs and keeping
@@ -52,6 +56,12 @@ paths:
     $ref: ./resources/repository/import-runs.yaml
   /api/repository-connections/{connectionId}/import-runs/{runId}:
     $ref: ./resources/repository/import-run.yaml
+  /api/specs:
+    $ref: ./resources/catalog/specs.yaml
+  /api/specs/{specId}:
+    $ref: ./resources/catalog/spec.yaml
+  /api/projects:
+    $ref: ./resources/catalog/projects.yaml
   /api/specs/{specId}/content:
     $ref: ./resources/repository/spec-content.yaml
   /api/webhooks/github:

@@ -1,0 +1,25 @@
+type: object
+description: What a project looks like at a glance.
+required: [name, repositories, specCount, counts, openReviews]
+properties:
+  name:
+    type: string
+  team:
+    type: string
+    nullable: true
+  repositories:
+    type: array
+    description: >
+      The full names of the connected repositories the project's specifications were imported
+      from.
+    items:
+      type: string
+  specCount:
+    type: integer
+    format: int64
+  counts:
+    $ref: ./SpecStatusCounts.yaml
+  openReviews:
+    type: integer
+    format: int64
+    description: How many of the project's specifications are currently in review.

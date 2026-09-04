@@ -1,0 +1,17 @@
+get:
+  operationId: listProjects
+  tags: [ Catalog ]
+  summary: Every project, with its repositories, specification counts and open reviews.
+  description: >
+    Built from the imported specifications themselves rather than from the connection records, so
+    the overview says what the catalogue actually holds. A project appears once it has at least one
+    imported specification.
+  responses:
+    '200':
+      description: The projects.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ProjectList.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml

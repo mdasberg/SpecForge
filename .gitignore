@@ -21,3 +21,8 @@ hot.prev.md
 
 # Local environment
 .env
+
+# IntelliJ HTTP client — the public env file holds the composed dev realm's credentials, which are
+# already in keycloak/realm-export.json. Anything pointing at a real environment goes here instead.
+http/http-client.private.env.json
+http/.idea/

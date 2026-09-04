@@ -1,0 +1,47 @@
+type: object
+description: One row of the specification list.
+required: [id, title, path, project, repositoryFullName, status, tags, currentVersion, updatedAt, groupKey]
+properties:
+  id:
+    type: string
+    format: uuid
+  title:
+    type: string
+  path:
+    type: string
+    example: openspec/specs/billing/spec.md
+  project:
+    type: string
+  repositoryFullName:
+    type: string
+    example: acme/billing-specs
+  domain:
+    type: string
+    nullable: true
+  owningTeam:
+    type: string
+    nullable: true
+  owner:
+    type: string
+    nullable: true
+  status:
+    $ref: ./SpecStatus.yaml
+  tags:
+    type: array
+    items:
+      type: string
+  currentVersion:
+    type: integer
+    format: int32
+  updatedAt:
+    type: string
+    format: date-time
+  groupKey:
+    type: string
+    description: >
+      The bucket this row belongs to under the active grouping, so a client groups the rows
+      without re-deriving the rule.
+  # Absent unless the request carried a search term. There is no sibling description here on
+  # purpose: OAS 3.0 ignores any key next to a $ref, so it would document nothing.
+  match:
+    $ref: ./SpecMatch.yaml

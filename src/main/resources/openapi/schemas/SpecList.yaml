@@ -1,0 +1,22 @@
+type: object
+description: >
+  A page of the specification list plus the group counts for the whole filtered result.
+required: [items, groups, groupBy, total]
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./SpecSummary.yaml
+  groups:
+    type: array
+    items:
+      $ref: ./SpecGroup.yaml
+  groupBy:
+    $ref: ./SpecGrouping.yaml
+  total:
+    type: integer
+    format: int64
+  cursor:
+    type: string
+    nullable: true
+    description: Absent on the last page.

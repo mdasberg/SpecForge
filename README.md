@@ -77,6 +77,79 @@ Two clients are configured in the realm:
 - `specforge-api` — the confidential client whose service accounts automated check runners
   authenticate as.
 
+## Connecting a repository that holds specifications
+
+There is no wizard yet, so a connection is made over the API. The flow is scripted in
+`http/specforge.http` — open it in IntelliJ, pick the `dev` environment and run the requests in
+order. Everything below is the part that has to happen outside the application first.
+
+### A GitHub App is required
+
+SpecForge reads through a GitHub App installation, never a personal access token: access is scoped
+per repository, the account controls revocation, and a revoked installation degrades its
+connections rather than deleting what was imported. Without `SPECFORGE_GITHUB_APP_ID` and
+`SPECFORGE_GITHUB_PRIVATE_KEY` the forge client refuses every call rather than pretending a
+repository is unreachable.
+
+Create one under **Settings → Developer settings → GitHub Apps → New GitHub App**.
+
+**Repository permissions** — these are exactly what the code calls, and nothing more:
+
+| Permission | Access | Why |
+|---|---|---|
+| Metadata | Read-only | Mandatory for every app |
+| Contents | Read-only | The file tree, file contents, and the last commit per path |
+| Pull requests | Read-only | Which files a pull request touched |
+| Commit statuses | Read **and write** | The one outbound write: a review's state reported back onto the pull request |
+
+**Subscribe to events**: Installation, Installation repositories, Push, Pull request. Anything else
+is ignored.
+
+**Webhook URL**: your tunnel's address plus `/api/webhooks/github` (see below). **Webhook secret**:
+generate one; every delivery is HMAC-verified against it, and an empty secret rejects everything —
+an unverified delivery would be an unauthenticated trigger for imports and outbound writes.
+
+Then **Generate a private key** and keep the `.pem` it downloads.
+
+### The webhook has to reach your machine
+
+An installation is only ever created by the `installation` webhook. No endpoint creates one, so a
+local instance with no inbound webhook will show an empty installation list forever. Tunnel it:
+
+```
+npx smee-client --url https://smee.io/<your-channel> --path /api/webhooks/github --port 8080
+```
+
+Use that `smee.io` URL as the app's webhook URL. Install the app on the repository
+(**Only select repositories**), and the delivery that follows registers the installation.
+
+### Run with the app configured
+
+```
+export SPECFORGE_GITHUB_APP_ID=<the app id>
+export SPECFORGE_GITHUB_PRIVATE_KEY="$(cat /path/to/app.private-key.pem)"
+export SPECFORGE_GITHUB_WEBHOOK_SECRET=<the webhook secret>
+./gradlew bootRun
+```
+
+`GET /api/forge/installations` should now list the installation and the repositories it grants.
+Only those repositories can be connected.
+
+### Then scan, then connect
+
+Scan first: it reports what would import, what is a change proposal rather than a specification,
+and what cannot be parsed — before anything is created. Then connect, which also triggers the
+initial import.
+
+**Get the path glob right.** It is the one setting with no safe default: `openspec/specs/**/spec.md`
+is the OpenSpec convention, but a repository that keeps its specifications anywhere else matches
+nothing, and a connection that matches nothing importable is refused with a 422 rather than created
+empty. The glob is a `java.nio` glob, so `**` crosses directories.
+
+The domain each specification lands in is the path segment directly under the `specs` directory, so
+`openspec/specs/billing/spec.md` is domain `billing` and `openspecs/specs/clm/claim/spec.md` is
+domain `clm`.
+
 ## The deployment realm is different
 
 `keycloak/realm-export.json` is the development realm only — it is not the deployment

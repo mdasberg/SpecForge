@@ -1,0 +1,16 @@
+type: object
+description: >
+  Which section of a specification a search term matched, so a result names a place in the
+  document rather than just the document.
+required: [anchorKey, heading, snippet]
+properties:
+  anchorKey:
+    type: string
+    description: The heading-slug-plus-ordinal anchor of the section that matched.
+  heading:
+    type: string
+  snippet:
+    type: string
+    description: >
+      The matching text with the search terms highlighted by the database's own headline
+      function.

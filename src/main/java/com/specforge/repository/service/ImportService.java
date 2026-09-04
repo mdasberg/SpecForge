@@ -1,5 +1,6 @@
 package com.specforge.repository.service;
 
+import com.specforge.platform.api.Problems;
 import com.specforge.platform.api.dto.ImportRun;
 import com.specforge.platform.api.dto.ImportRunList;
 import com.specforge.repository.entity.ConnectionState;
@@ -7,14 +8,13 @@ import com.specforge.repository.entity.ImportRunEntity;
 import com.specforge.repository.entity.ImportRunFileEntity;
 import com.specforge.repository.entity.ImportTrigger;
 import com.specforge.repository.entity.RepositoryConnectionEntity;
-import com.specforge.repository.exception.Problems;
+import com.specforge.repository.event.ImportRequested;
 import com.specforge.repository.repository.ImportRunFileRepository;
 import com.specforge.repository.repository.ImportRunRepository;
 import com.specforge.repository.repository.RepositoryConnectionRepository;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
-import com.specforge.repository.event.ImportRequested;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;

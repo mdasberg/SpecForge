@@ -1,0 +1,258 @@
+### SpecForge — connect a repository, then browse what it imported
+#
+# Run against the composed stack: `docker compose up -d` (PostgreSQL on 30301, Keycloak on 8081)
+# and the application on 8080. Pick the `dev` environment in the client before sending anything —
+# the variables live in `http-client.env.json`.
+#
+# The requests below are in order and chained: each one stores what the next needs
+# (`adminToken`, `installationId`, `scanId`, `connectionId`, `specId`), so run them top to bottom
+# the first time. Afterwards any single request can be re-sent on its own.
+#
+# Steps 2 to 5 are the connection flow, which has no UI yet. Steps 6 onward are the catalogue.
+
+### 1. Sign in
+# Keycloak is the only user store — SpecForge issues no credentials of its own. The dev realm
+# enables the direct access grant so a token can be had without a browser; a real realm does not.
+# The realm ships three users, each with the roles their name implies:
+#   reviewer / reviewer        REVIEWER
+#   architect / architect      REVIEWER, ARCHITECT
+#   admin-user / admin-user    REVIEWER, ADMIN   ← connecting a repository needs this one
+POST {{keycloak}}/realms/specforge/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=specforge-web&username={{user}}&password={{password}}
+
+> {%
+    client.global.set("token", response.body.access_token);
+    client.test("a token came back", () => client.assert(response.status === 200));
+%}
+
+### 1b. Who am I
+# The local mirror of the token: display name, actor kind and the realm roles. Check that `roles`
+# contains ADMIN before trying to connect anything.
+GET {{host}}/api/me
+Authorization: Bearer {{token}}
+
+### 1c. A check runner's token
+# Agents authenticate through the confidential client's service account, not as a person. Its
+# `actorKind` is AGENT — the field that keeps human and automated output distinguishable. Sending
+# this overwrites `token`; re-run request 1 to go back to being a human.
+POST {{keycloak}}/realms/specforge/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id=specforge-api&client_secret=specforge-api-dev-secret
+
+> {% client.global.set("token", response.body.access_token); %}
+
+### 2. The forge installations SpecForge can read through
+# Nothing here creates an installation. It arrives over the GitHub App's `installation` webhook
+# (request 11), and the repositories it grants are the boundary every read stays inside. An empty
+# list means the app is not installed, or `SPECFORGE_GITHUB_APP_ID` / `SPECFORGE_GITHUB_PRIVATE_KEY`
+# are unset — without them the forge client refuses every call rather than pretending a repository
+# is unreachable.
+GET {{host}}/api/forge/installations
+Authorization: Bearer {{token}}
+
+> {%
+    const first = response.body.items[0];
+    if (first) {
+        client.global.set("installationId", first.id);
+    }
+%}
+
+### 3. Scan before connecting                                                          [ADMIN]
+# What would import, what is a change proposal rather than a specification, and what cannot be
+# parsed — answered before anything is created. The scan runs asynchronously; this returns
+# immediately with a RUNNING scan.
+POST {{host}}/api/forge/scans
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "installationId": "{{installationId}}",
+  "repositoryFullName": "{{repositoryFullName}}",
+  "branch": "{{branch}}",
+  "pathGlob": "{{pathGlob}}",
+  "specFormat": "{{specFormat}}"
+}
+
+> {% client.global.set("scanId", response.body.id); %}
+
+### 3b. Read the scan
+# Re-send until `status` is SUCCEEDED. `files` carries a row per matched path with why it was
+# classified as it was, so "why is this file not a specification" is answerable without scanning
+# again.
+GET {{host}}/api/forge/scans/{{scanId}}
+Authorization: Bearer {{token}}
+
+### 4. Connect the repository                                                          [ADMIN]
+# Creates the connection and triggers the initial import in one call. Two things are refused here:
+# a repository, branch and path already connected (409, never a silent duplicate), and a glob that
+# matches nothing importable (422 — a connection that imports nothing is a dead end).
+#
+# `syncMode` defaults to ON_PULL_REQUEST: a pull request touching a spec is the moment a team wants
+# review, and approvals report back as a commit status. ON_PUSH and MANUAL are the alternatives.
+#
+# The approval rule is stored verbatim and never read by this module; the approval capability
+# evaluates it.
+POST {{host}}/api/repository-connections
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "installationId": "{{installationId}}",
+  "repositoryFullName": "{{repositoryFullName}}",
+  "branch": "{{branch}}",
+  "pathGlob": "{{pathGlob}}",
+  "specFormat": "{{specFormat}}",
+  "syncMode": "{{syncMode}}",
+  "scanId": "{{scanId}}",
+  "project": {
+    "name": "{{projectName}}",
+    "team": "{{projectTeam}}",
+    "tracker": "NONE",
+    "approvalRule": {
+      "minApprovals": 2,
+      "requiredRoles": ["ARCHITECT"]
+    }
+  }
+}
+
+> {% client.global.set("connectionId", response.body.id); %}
+
+### 4b. The connections the caller can see
+# A connection whose installation was revoked or suspended shows as DEGRADED with a reason, not
+# deleted: losing a grant is not a reason to lose the review history of what the repository held.
+GET {{host}}/api/repository-connections
+Authorization: Bearer {{token}}
+
+> {%
+    const first = response.body.items[0];
+    if (first) {
+        client.global.set("connectionId", first.id);
+    }
+%}
+
+### 5. Watch the import
+# A row per file including the ones nothing happened to. `importedCount` counts new versions,
+# `unchangedCount` the files whose content hash matched what was already stored — re-importing an
+# unchanged file from a later commit is deliberately a no-op.
+GET {{host}}/api/repository-connections/{{connectionId}}/import-runs
+Authorization: Bearer {{token}}
+
+### 5b. Re-import by hand                                                              [ADMIN]
+# Independent of the sync mode. Useful after pushing to the branch when sync is ON_PULL_REQUEST.
+POST {{host}}/api/repository-connections/{{connectionId}}/imports
+Authorization: Bearer {{token}}
+
+### 6. Browse the catalogue
+# Grouped by project unless `groupBy` says otherwise. The group counts are computed over the whole
+# filtered result rather than over the returned page, so they still sum to `total`.
+GET {{host}}/api/specs
+Authorization: Bearer {{token}}
+
+> {%
+    const first = response.body.items[0];
+    if (first) {
+        client.global.set("specId", first.id);
+    }
+%}
+
+### 6b. Regroup
+# The same specifications, bucketed differently. PROJECT, REPOSITORY, DOMAIN or TEAM.
+GET {{host}}/api/specs?groupBy=REPOSITORY
+Authorization: Bearer {{token}}
+
+### 6c. Filters combine
+# Every filter is optional, they apply as a conjunction, and a repeated parameter matches any of
+# its values. This asks for specifications that are (in review OR changes requested) AND in the
+# billing domain.
+GET {{host}}/api/specs?status=IN_REVIEW&status=CHANGES_REQUESTED&domain=billing
+Authorization: Bearer {{token}}
+
+### 6d. Search
+# Titles, repository paths, section headings and body text. Each hit names the section that matched
+# and returns a snippet with the terms wrapped in `[[` and `]]` — deliberately not HTML, because
+# the snippet is body text from someone else's repository. A heading match outranks a body match.
+GET {{host}}/api/specs?q=validation
+Authorization: Bearer {{token}}
+
+### 6e. Search applies on top of the filters, not instead of them
+GET {{host}}/api/specs?q=validation&status=APPROVED&groupBy=TEAM
+Authorization: Bearer {{token}}
+
+### 6f. Page through
+# `cursor` comes from the previous response and is absent on the last page. It is validated on the
+# way in — it arrives in a URL, and a URL is edited.
+GET {{host}}/api/specs?limit=2
+Authorization: Bearer {{token}}
+
+> {%
+    if (response.body.cursor) {
+        client.global.set("cursor", response.body.cursor);
+    }
+%}
+
+### 6g. The next page
+GET {{host}}/api/specs?limit=2&cursor={{cursor}}
+Authorization: Bearer {{token}}
+
+### 7. Read a specification
+# The document's metadata, the current version's markdown body and outline, and every version that
+# can be selected — one response, so opening a document is one request rather than three. The body
+# is markdown; SpecForge never emits HTML.
+GET {{host}}/api/specs/{{specId}}
+Authorization: Bearer {{token}}
+
+### 7b. Read an older version
+# `current` is false and the version selector still lists all of them. An ordinal that does not
+# exist is a 404.
+GET {{host}}/api/specs/{{specId}}?version=1
+Authorization: Bearer {{token}}
+
+### 8. The projects overview
+# Per project: its connected repositories, counts per lifecycle status, and open reviews. Built
+# from the imported specifications themselves, so a project appears once it holds one.
+GET {{host}}/api/projects
+Authorization: Bearer {{token}}
+
+### 9. Editing a specification is refused — always 409
+# The connected repository is the source of truth and SpecForge is a read-only mirror. The problem
+# document names the repository and path, directing the author to change the file in git. This
+# endpoint exists to say so in the contract rather than to leave the rule implicit.
+PUT {{host}}/api/specs/{{specId}}/content
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "# Billing\n\nEdited in SpecForge, which is not a thing.\n"
+}
+
+### 10. The contract itself
+# The bundled document the server generates from `src/main/resources/openapi/`, not something a
+# scanner reconstructed from annotations.
+GET {{host}}/api/openapi.json
+Authorization: Bearer {{token}}
+
+### 11. A GitHub webhook delivery
+# Every delivery is HMAC-verified against `SPECFORGE_GITHUB_WEBHOOK_SECRET` before anything is
+# parsed — an unverified delivery is an unauthenticated trigger for imports and outbound writes.
+# The signature below is a placeholder, so this returns 401 until it is replaced with a real
+# `sha256=` HMAC of the exact body bytes. Copy a real one out of the GitHub App's delivery log.
+POST {{host}}/api/webhooks/github
+X-GitHub-Event: installation
+X-GitHub-Delivery: 00000000-0000-0000-0000-000000000000
+X-Hub-Signature-256: sha256=replace-me
+Content-Type: application/json
+
+{
+  "action": "created",
+  "installation": {
+    "id": 1,
+    "account": { "login": "acme", "type": "Organization" }
+  }
+}
+
+### 12. No token at all — 401
+# Every endpoint is authenticated; there is no anonymous read.
+GET {{host}}/api/specs

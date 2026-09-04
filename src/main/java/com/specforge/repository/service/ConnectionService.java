@@ -1,5 +1,6 @@
 package com.specforge.repository.service;
 
+import com.specforge.platform.api.Problems;
 import com.specforge.platform.api.dto.Connection;
 import com.specforge.platform.api.dto.ConnectionList;
 import com.specforge.platform.api.dto.ConnectionRequest;
@@ -10,7 +11,6 @@ import com.specforge.repository.entity.ProjectEntity;
 import com.specforge.repository.entity.RepositoryConnectionEntity;
 import com.specforge.repository.entity.RepositoryScanEntity;
 import com.specforge.repository.entity.ScanStatus;
-import com.specforge.repository.exception.Problems;
 import com.specforge.repository.forge.Forge;
 import com.specforge.repository.forge.ForgeRef;
 import com.specforge.repository.repository.ForgeInstallationRepository;

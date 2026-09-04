@@ -94,6 +94,7 @@ public class SpecImporter {
         return catalog
                 .importVersion(new SpecImport(
                         connection.id(),
+                        connection.repositoryFullName(),
                         path,
                         project.name(),
                         SpecPaths.domainOf(path),

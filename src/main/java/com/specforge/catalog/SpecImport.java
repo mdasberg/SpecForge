@@ -8,9 +8,12 @@ import java.util.UUID;
  * first heading, so it cannot disagree with the document it describes.
  *
  * @param author the last commit author for this path, which is also taken as the document's owner
+ * @param repositoryFullName denormalised onto the document so grouping and filtering by repository
+ *     stay inside the catalogue's own tables instead of joining into another module's
  */
 public record SpecImport(
         UUID connectionId,
+        String repositoryFullName,
         String path,
         String project,
         String domain,

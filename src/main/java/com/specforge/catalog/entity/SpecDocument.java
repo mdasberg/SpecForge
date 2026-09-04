@@ -38,6 +38,9 @@ public class SpecDocument {
     @Column(name = "connection_id", nullable = false)
     private UUID connectionId;
 
+    @Column(name = "repository_full_name", nullable = false, length = 512)
+    private String repositoryFullName;
+
     @Column(name = "path", nullable = false, length = 1024)
     private String path;
 
@@ -78,6 +81,7 @@ public class SpecDocument {
     public SpecDocument(
             final UUID id,
             final UUID connectionId,
+            final String repositoryFullName,
             final String path,
             final String title,
             final String project,
@@ -88,6 +92,7 @@ public class SpecDocument {
             final Instant now) {
         this.id = id;
         this.connectionId = connectionId;
+        this.repositoryFullName = repositoryFullName;
         this.path = path;
         this.title = title;
         this.project = project;
@@ -104,15 +109,17 @@ public class SpecDocument {
      * Applies what the latest import found. Returns whether anything actually changed, so a
      * re-import that finds identical metadata does not write.
      */
-    public boolean updateMetadata(final String title, final String domain, final String owningTeam,
-            final String owner, final Set<String> tags, final Instant now) {
-        if (this.title.equals(title)
+    public boolean updateMetadata(final String repositoryFullName, final String title, final String domain,
+            final String owningTeam, final String owner, final Set<String> tags, final Instant now) {
+        if (this.repositoryFullName.equals(repositoryFullName)
+                && this.title.equals(title)
                 && Objects.equals(this.domain, domain)
                 && Objects.equals(this.owningTeam, owningTeam)
                 && Objects.equals(this.owner, owner)
                 && this.tags.equals(tags)) {
             return false;
         }
+        this.repositoryFullName = repositoryFullName;
         this.title = title;
         this.domain = domain;
         this.owningTeam = owningTeam;
@@ -137,6 +144,10 @@ public class SpecDocument {
 
     public UUID connectionId() {
         return connectionId;
+    }
+
+    public String repositoryFullName() {
+        return repositoryFullName;
     }
 
     public String path() {

@@ -1,0 +1,8 @@
+type: object
+description: Every project the caller can see, ordered by name.
+required: [items]
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./ProjectOverview.yaml

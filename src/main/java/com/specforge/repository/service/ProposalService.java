@@ -1,6 +1,7 @@
 package com.specforge.repository.service;
 
 import com.specforge.catalog.SpecCatalog;
+import com.specforge.platform.api.Problems;
 import com.specforge.repository.ReviewOutcome;
 import com.specforge.repository.SpecChangeProposed;
 import com.specforge.repository.entity.ConnectionState;
@@ -10,7 +11,6 @@ import com.specforge.repository.entity.ProposalState;
 import com.specforge.repository.entity.RepositoryConnectionEntity;
 import com.specforge.repository.entity.SpecChangeProposalEntity;
 import com.specforge.repository.entity.SyncPolicy;
-import com.specforge.repository.exception.Problems;
 import com.specforge.repository.forge.Forge;
 import com.specforge.repository.forge.ForgeFile;
 import com.specforge.repository.forge.ForgeRef;
