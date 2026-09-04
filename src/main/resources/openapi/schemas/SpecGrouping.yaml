@@ -1,0 +1,5 @@
+type: string
+description: >
+  Which dimension the specification list is grouped by. Regrouping never changes which
+  specifications match, only how they are bucketed.
+enum: [PROJECT, REPOSITORY, DOMAIN, TEAM]

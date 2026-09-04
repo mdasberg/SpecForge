@@ -627,4 +627,77 @@
                              constraintName="uq_spec_section_version_anchor"/>
     </changeSet>
 
+
+    <changeSet id="catalog-0002-catalog-read-model" author="specforge">
+        <comment>
+            The catalog is the everyday read surface — browse, group, filter, search. Grouping by
+            repository needs the repository's name on the row rather than a join into another
+            module's tables, and full-text search needs its own denormalised index that is rebuilt
+            whenever a version is imported.
+        </comment>
+
+        <addColumn tableName="spec_document">
+            <column name="repository_full_name" type="VARCHAR(512)" defaultValue="">
+                <!-- Denormalised from the connection so grouping and filtering by repository stay
+                     inside this module's own tables, and is refreshed on every import. -->
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <createTable tableName="spec_search">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_spec_search" nullable="false"/>
+            </column>
+            <column name="document_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="anchor_key" type="VARCHAR(512)">
+                <!-- The empty string is the document itself, the row that makes the title and
+                     path searchable through the same index. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="heading" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="spec_search"
+                                 baseColumnNames="document_id"
+                                 constraintName="fk_spec_search_document"
+                                 referencedTableName="spec_document"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="spec_search"
+                                 baseColumnNames="version_id"
+                                 constraintName="fk_spec_search_version"
+                                 referencedTableName="spec_version"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addUniqueConstraint tableName="spec_search"
+                             columnNames="version_id, anchor_key"
+                             constraintName="uq_spec_search_version_anchor"/>
+
+        <createIndex tableName="spec_search" indexName="idx_spec_search_document">
+            <column name="document_id"/>
+        </createIndex>
+
+        <!-- The vector is a stored generated column so the index can never disagree with the row,
+             and the heading is weighted above the body so a heading match outranks a body match. -->
+        <sql splitStatements="true" endDelimiter=";">
+            ALTER TABLE spec_search ADD COLUMN tsv tsvector GENERATED ALWAYS AS (
+                setweight(to_tsvector('english', coalesce(heading, '')), 'A') ||
+                setweight(to_tsvector('english', coalesce(body, '')), 'B')) STORED;
+            CREATE INDEX idx_spec_search_tsv ON spec_search USING GIN (tsv);
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>

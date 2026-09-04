@@ -1,0 +1,12 @@
+type: object
+description: >
+  One bucket of the specification list, with how many specifications fall in it. Counts are
+  computed over the whole filtered result, not over the current page, so they still sum to the
+  total.
+required: [key, count]
+properties:
+  key:
+    type: string
+  count:
+    type: integer
+    format: int64

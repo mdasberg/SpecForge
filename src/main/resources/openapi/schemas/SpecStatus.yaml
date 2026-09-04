@@ -1,0 +1,5 @@
+type: string
+description: >
+  The lifecycle of a specification document; the legal transitions between these are enforced
+  server-side.
+enum: [DRAFT, IN_REVIEW, CHANGES_REQUESTED, APPROVED, IMPLEMENTED]

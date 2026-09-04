@@ -1,0 +1,18 @@
+type: object
+description: >
+  One entry of a version's outline. The list is flat and in document order; the nesting is
+  rebuilt from level, which keeps the contract free of a self-referencing schema.
+required: [anchorKey, heading, level, ordinal]
+properties:
+  anchorKey:
+    type: string
+  heading:
+    type: string
+  level:
+    type: integer
+    format: int32
+    description: The markdown heading level, 1 for `#`.
+  ordinal:
+    type: integer
+    format: int32
+    description: Position in document order.

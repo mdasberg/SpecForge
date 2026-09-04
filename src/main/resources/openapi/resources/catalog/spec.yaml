@@ -1,0 +1,39 @@
+get:
+  operationId: getSpecification
+  tags: [ Catalog ]
+  summary: A specification with one version's body and outline.
+  description: >
+    Returns the document's metadata, the requested version's markdown body and section outline, and
+    the list of every version that can be selected — one response, so opening a document costs one
+    request rather than three.
+
+    The body is markdown, never HTML: rendering is the client's job, and the outline the backend
+    already parsed is what the section anchors and deep links are built from.
+  parameters:
+    - name: specId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: version
+      in: query
+      required: false
+      description: >
+        The ordinal of the version to render, 1 being the first import. Omitted renders the current
+        version.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+  responses:
+    '200':
+      description: The specification and the requested version.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/SpecDetail.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

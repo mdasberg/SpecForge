@@ -68,6 +68,7 @@ class SpecLifecycleTest {
         return new SpecDocument(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
+                "acme/care-management-specs",
                 "openspec/specs/billing/spec.md",
                 "Billing",
                 "Care Management",

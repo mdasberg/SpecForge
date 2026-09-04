@@ -1,0 +1,44 @@
+type: object
+description: >
+  A specification with the requested version's body and outline, and the list of every version
+  that can be selected — one response, so opening a document is one request rather than three.
+required: [id, title, path, project, repositoryFullName, status, tags, createdAt, updatedAt, version, versions]
+properties:
+  id:
+    type: string
+    format: uuid
+  title:
+    type: string
+  path:
+    type: string
+  project:
+    type: string
+  repositoryFullName:
+    type: string
+  domain:
+    type: string
+    nullable: true
+  owningTeam:
+    type: string
+    nullable: true
+  owner:
+    type: string
+    nullable: true
+  status:
+    $ref: ./SpecStatus.yaml
+  tags:
+    type: array
+    items:
+      type: string
+  createdAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time
+  version:
+    $ref: ./SpecVersionDocument.yaml
+  versions:
+    type: array
+    items:
+      $ref: ./SpecVersionSummary.yaml

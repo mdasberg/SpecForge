@@ -1,0 +1,19 @@
+type: object
+description: One entry of a specification's version selector.
+required: [ordinal, createdAt, current]
+properties:
+  ordinal:
+    type: integer
+    format: int32
+    description: 1 for the first imported version.
+  author:
+    type: string
+    nullable: true
+  commitSha:
+    type: string
+    nullable: true
+  createdAt:
+    type: string
+    format: date-time
+  current:
+    type: boolean

@@ -1,0 +1,19 @@
+type: object
+description: How many of a project's specifications sit in each lifecycle status.
+required: [draft, inReview, changesRequested, approved, implemented]
+properties:
+  draft:
+    type: integer
+    format: int64
+  inReview:
+    type: integer
+    format: int64
+  changesRequested:
+    type: integer
+    format: int64
+  approved:
+    type: integer
+    format: int64
+  implemented:
+    type: integer
+    format: int64

@@ -78,3 +78,8 @@ a:hover { color: #a6b1fa; text-decoration: underline; }
 }
 .app.light a { color: #4a5ad4; }
 .app.light a:hover { color: #37479f; }
+
+.mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+.muted { color: var(--fg-2); }
+.faint { color: var(--fg-3); }
+.tnum { font-variant-numeric: tabular-nums; }

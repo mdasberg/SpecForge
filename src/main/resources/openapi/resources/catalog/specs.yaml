@@ -1,0 +1,89 @@
+get:
+  operationId: listSpecifications
+  tags: [ Catalog ]
+  summary: Browse, group, filter and search specifications.
+  description: >
+    The everyday surface. Every filter is optional and they combine as a conjunction; a filter that
+    accepts several values matches any of them. The grouping never changes which specifications
+    match, only how they are bucketed, and the group counts are computed over the whole filtered
+    result rather than over the returned page, so they still sum to the total.
+
+    A search term applies on top of the active filters instead of replacing them, and each matching
+    row names the section that matched so a result points at a place in the document.
+
+    Every parameter here is a query parameter on purpose: the whole view is then addressable by
+    URL, which is what makes a filtered list shareable.
+  parameters:
+    - name: groupBy
+      in: query
+      required: false
+      description: Which dimension to bucket the result by. Defaults to grouping by project.
+      schema:
+        $ref: ../../schemas/SpecGrouping.yaml
+    - name: status
+      in: query
+      required: false
+      description: Lifecycle statuses to include. Repeat the parameter to accept several.
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          $ref: ../../schemas/SpecStatus.yaml
+    - name: owner
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+    - name: team
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+    - name: domain
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+    - name: tag
+      in: query
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+    - name: q
+      in: query
+      required: false
+      description: >
+        Free text matched against titles, repository paths, section headings and body text. A
+        heading match outranks a body match.
+      schema:
+        type: string
+    - $ref: ../../parameters/LimitParam.yaml
+    - $ref: ../../parameters/CursorParam.yaml
+  responses:
+    '200':
+      description: The matching specifications, the group counts and the next cursor.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/SpecList.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml

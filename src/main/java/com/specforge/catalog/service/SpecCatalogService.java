@@ -9,6 +9,7 @@ import com.specforge.catalog.entity.SpecDocument;
 import com.specforge.catalog.entity.SpecSection;
 import com.specforge.catalog.entity.SpecVersion;
 import com.specforge.catalog.repository.SpecDocumentRepository;
+import com.specforge.catalog.repository.SpecSearchRepository;
 import com.specforge.catalog.repository.SpecSectionRepository;
 import com.specforge.catalog.repository.SpecVersionRepository;
 import java.time.Clock;
@@ -29,6 +30,7 @@ public class SpecCatalogService implements SpecCatalog {
     private final SpecDocumentRepository documents;
     private final SpecVersionRepository versions;
     private final SpecSectionRepository sections;
+    private final SpecSearchRepository search;
     private final Clock clock;
 
     @Override
@@ -52,6 +54,7 @@ public class SpecCatalogService implements SpecCatalog {
                 .orElseGet(() -> documents.save(new SpecDocument(
                         UUID.randomUUID(),
                         specImport.connectionId(),
+                        specImport.repositoryFullName(),
                         specImport.path(),
                         title,
                         specImport.project(),
@@ -60,7 +63,8 @@ public class SpecCatalogService implements SpecCatalog {
                         specImport.author(),
                         tags,
                         now)));
-        document.updateMetadata(title, specImport.domain(), specImport.owningTeam(), specImport.author(), tags, now);
+        document.updateMetadata(specImport.repositoryFullName(), title, specImport.domain(),
+                specImport.owningTeam(), specImport.author(), tags, now);
 
         final String contentSha = SpecContent.sha256(content);
         final Optional<SpecVersion> current = versions.findFirstByDocumentIdOrderByOrdinalDesc(document.id());
@@ -79,6 +83,11 @@ public class SpecCatalogService implements SpecCatalog {
                 specImport.author(),
                 now));
         sections.saveAll(sectionsOf(version.id(), parsed));
+        // Only the current version is searchable, so the previous version's rows go before the new
+        // ones arrive; a hit on text that has since been rewritten would point at nothing.
+        search.deleteByDocumentId(document.id());
+        search.saveAll(SpecSearchIndex.rowsOf(
+                document.id(), version.id(), title, document.path(), content, parsed));
         return new ImportResult(document.id(), ordinal, true);
     }
 
