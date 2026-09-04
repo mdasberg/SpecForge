@@ -700,4 +700,100 @@
     </changeSet>
 
 
+    <changeSet id="review-0001-review" author="specforge">
+        <comment>
+            A review is per specification rather than per pull request, so at most one may be open
+            for a specification at a time. The head is stored as content rather than as a version
+            id because content proposed by a pull request is not a version — the repository has not
+            accepted it yet. The diff is cached under the pair of content hashes because versions
+            are immutable, so a computed diff is a pure function of those two hashes and never
+            needs invalidating.
+        </comment>
+
+        <createTable tableName="review">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_review" nullable="false"/>
+            </column>
+            <column name="document_id" type="UUID">
+                <!-- The specification under review; deliberately no foreign key, it belongs to another module. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_version_ordinal" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_content_sha" type="VARCHAR(64)">
+                <!-- Denormalised from the version so listing reviews does not read the catalogue
+                     once per row; it is also half the key the computed diff is cached under. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="head_version_ordinal" type="INT">
+                <!-- Set only when the head is an imported version; a pull request head has no ordinal. -->
+            </column>
+            <column name="head_content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="head_content_sha" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="head_author" type="VARCHAR(255)"/>
+            <column name="head_commit_sha" type="VARCHAR(64)"/>
+            <column name="head_created_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="state" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="proposal_id" type="UUID">
+                <!-- The proposed change this review followed, when it came from a pull request; no foreign key, another module owns it. -->
+            </column>
+            <column name="repository_full_name" type="VARCHAR(512)"/>
+            <column name="pull_request_number" type="INT"/>
+            <column name="opened_by" type="VARCHAR(255)"/>
+            <column name="opened_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="closed_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+
+        <createIndex tableName="review" indexName="idx_review_document">
+            <column name="document_id"/>
+        </createIndex>
+
+        <createIndex tableName="review" indexName="idx_review_state_updated">
+            <column name="state"/>
+            <column name="updated_at"/>
+        </createIndex>
+
+        <createIndex tableName="review" indexName="idx_review_proposal">
+            <column name="proposal_id"/>
+        </createIndex>
+
+        <!-- At most one review may be open per specification while any number of closed ones may
+             accumulate. -->
+        <sql splitStatements="true" endDelimiter=";">
+            CREATE UNIQUE INDEX uq_review_open_document ON review (document_id) WHERE state = 'OPEN';
+        </sql>
+
+        <createTable tableName="spec_diff">
+            <column name="base_sha" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="head_sha" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payload" type="TEXT">
+                <!-- The serialised section classification and line diff, the part of the answer that depends only on the two contents. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="computed_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="spec_diff"
+                       columnNames="base_sha, head_sha"
+                       constraintName="pk_spec_diff"/>
+    </changeSet>
+
 </databaseChangeLog>

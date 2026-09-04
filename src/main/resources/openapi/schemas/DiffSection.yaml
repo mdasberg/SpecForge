@@ -1,0 +1,35 @@
+type: object
+description: >
+  One section of the specification, classified and — when it changed — carrying its line diff. The
+  anchor key is the heading slug plus that slug's ordinal in the document, which is the same address
+  a discussion anchors to.
+required: [anchorKey, heading, level, change, changedLines, lines]
+properties:
+  anchorKey:
+    type: string
+  heading:
+    type: string
+  level:
+    type: integer
+    format: int32
+  change:
+    $ref: ./DiffChange.yaml
+  changedLines:
+    type: integer
+    format: int32
+    description: Added plus removed lines in this section; 0 when the section is unchanged.
+  author:
+    type: string
+    nullable: true
+    description: Who last changed this section, taken from the head's commit. Absent when unchanged.
+  changedAt:
+    type: string
+    format: date-time
+    nullable: true
+  lines:
+    type: array
+    description: >
+      Empty for an unchanged section — its body is already in the document view, and shipping it
+      again would double the payload for content nobody is reviewing.
+    items:
+      $ref: ./DiffLine.yaml

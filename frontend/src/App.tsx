@@ -7,7 +7,9 @@ import { useTheme } from './theme/useTheme';
 import { Home } from './pages/Home';
 import { Specs } from './pages/Specs';
 import { SpecDocument } from './pages/SpecDocument';
+import { CompareVersions } from './pages/CompareVersions';
 import { Reviews } from './pages/Reviews';
+import { Review } from './pages/Review';
 import { Projects } from './pages/Projects';
 import { Activity } from './pages/Activity';
 
@@ -58,7 +60,9 @@ export function App() {
               <Route path="/" element={<Home />} />
               <Route path="/specs" element={<Specs />} />
               <Route path="/specs/:specId" element={<SpecDocument />} />
+              <Route path="/specs/:specId/compare" element={<CompareVersions />} />
               <Route path="/reviews" element={<Reviews />} />
+              <Route path="/reviews/:reviewId" element={<Review />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/activity" element={<Activity />} />
             </Routes>

@@ -141,3 +141,40 @@
 .app.light .hljs-keyword, .app.light .hljs-built_in, .app.light .hljs-type, .app.light .hljs-title.function_ { color: #3f4fc4; }
 .app.light .hljs-string, .app.light .hljs-attr { color: #146b45; }
 .app.light .hljs-number, .app.light .hljs-literal { color: #96601a; }
+
+/* ---- Review tabs -------------------------------------------------------- */
+.tabs { display: flex; align-items: center; gap: 2px; border-bottom: 1px solid var(--line); }
+.tab {
+  appearance: none; background: none; border: none; font: inherit; cursor: pointer;
+  color: var(--fg-3); padding: 7px 11px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tab:hover { color: var(--fg-2); }
+.tab.on { color: var(--fg); border-bottom-color: var(--indigo); font-weight: 500; }
+.tab .count { color: var(--fg-3); font-size: 11px; margin-left: 5px; }
+
+/* ---- Diff --------------------------------------------------------------- */
+/* One payload, two renderings. Both use the same line classes, so a colour or a
+   highlight can never mean one thing inline and another side by side. */
+.diff { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; line-height: 1.65; }
+.diff-sec { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+.diff-sec-h {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 12px; border-bottom: 1px solid var(--line); background: var(--panel-2);
+}
+.diff-sec-h .name { font-weight: 600; font-size: 12.5px; }
+.diff-body { overflow-x: auto; }
+.diff-row { display: flex; align-items: flex-start; }
+.diff-half { display: flex; align-items: flex-start; flex: 1 1 50%; min-width: 0; border-right: 1px solid var(--line-2); }
+.diff-half:last-child { border-right: none; }
+.diff-num {
+  flex: 0 0 auto; width: 44px; padding: 1px 8px; text-align: right;
+  color: var(--fg-3); background: var(--panel-2); user-select: none;
+}
+.diff-text { flex: 1 1 auto; padding: 1px 10px; white-space: pre-wrap; word-break: break-word; }
+.dl-add { background: var(--add-bg); color: var(--add-fg); }
+.dl-del { background: var(--del-bg); color: var(--del-fg); }
+.dl-ctx { color: var(--fg-2); }
+.dl-void { background: var(--panel-2); }
+.diff-word { border-radius: 2px; padding: 0 1px; background: color-mix(in srgb, currentColor 22%, transparent); }
+.diff-jump { display: flex; flex-direction: column; gap: 1px; }
+.diff-jump .count { margin-left: auto; color: var(--fg-3); font-size: 11px; }

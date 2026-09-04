@@ -1,0 +1,26 @@
+type: object
+description: One review as it appears in a list, without the head body.
+required: [id, spec, state, base, head, openedAt, updatedAt]
+properties:
+  id:
+    type: string
+    format: uuid
+  spec:
+    $ref: ./SpecRef.yaml
+  state:
+    $ref: ./ReviewState.yaml
+  base:
+    $ref: ./ReviewSide.yaml
+  head:
+    $ref: ./ReviewSide.yaml
+  pullRequest:
+    $ref: ./PullRequestRef.yaml
+  openedBy:
+    type: string
+    nullable: true
+  openedAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time

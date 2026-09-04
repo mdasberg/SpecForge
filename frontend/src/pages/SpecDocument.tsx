@@ -1,23 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ComponentPropsWithoutRef } from 'react';
-import { Link, useLocation, useParams, useSearchParams } from 'react-router';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { useAuth } from 'react-oidc-context';
-import ReactMarkdown from 'react-markdown';
-import type { Components, ExtraProps } from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeHighlight from 'rehype-highlight';
 import { getSpec } from '../api/catalog';
 import type { SpecDetail } from '../api/catalog';
 import { ApiError } from '../auth/api';
 import { Avatar } from '../components/Avatar';
+import { SpecMarkdown } from '../components/SpecMarkdown';
 import { StatusBadge } from '../components/StatusBadge';
 import { formatRelativeTime } from '../lib/format';
-
-type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 export function SpecDocument() {
   const { specId } = useParams<{ specId: string }>();
   const auth = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const versionParam = searchParams.get('version');
@@ -74,6 +69,20 @@ export function SpecDocument() {
     [detail],
   );
 
+  // Default the comparison to "the previous version against the current one", the question a reader
+  // asks first. Adjusted during render rather than in an effect, per React's guidance for resetting
+  // state when the data it derives from changes.
+  const [compareBase, setCompareBase] = useState(1);
+  const [compareHead, setCompareHead] = useState(1);
+  const [lastLoadedVersion, setLastLoadedVersion] = useState<string | null>(null);
+  const loadedKey = detail ? `${detail.id}:${detail.versions.length}` : null;
+  if (loadedKey && loadedKey !== lastLoadedVersion && detail) {
+    const latest = detail.versions[detail.versions.length - 1].ordinal;
+    setLastLoadedVersion(loadedKey);
+    setCompareBase(detail.versions.length > 1 ? detail.versions[detail.versions.length - 2].ordinal : latest);
+    setCompareHead(latest);
+  }
+
   function selectVersion(ordinal: number) {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
@@ -81,30 +90,6 @@ export function SpecDocument() {
       return next;
     });
   }
-
-  // Fresh per render: a heading component must not keep state across renders, or a re-render of
-  // the same content would double-count and diverge from the outline. A `const`-bound counter
-  // object (mutated via a property, never reassigned) is recreated on every call to this render
-  // function, so there is nothing to go stale between renders.
-  const headingCursor = { next: 0 };
-  function nextHeadingId(): string {
-    const id = outlineAnchors[headingCursor.next] ?? `section-${headingCursor.next + 1}`;
-    headingCursor.next += 1;
-    return id;
-  }
-  function heading(Tag: HeadingTag) {
-    return function Heading({ children }: ComponentPropsWithoutRef<HeadingTag> & ExtraProps) {
-      return <Tag id={nextHeadingId()}>{children}</Tag>;
-    };
-  }
-  const markdownComponents: Components = {
-    h1: heading('h1'),
-    h2: heading('h2'),
-    h3: heading('h3'),
-    h4: heading('h4'),
-    h5: heading('h5'),
-    h6: heading('h6'),
-  };
 
   if (loading && !detail) {
     return <div className="card card-pad">Loading specification…</div>;
@@ -218,13 +203,52 @@ export function SpecDocument() {
               ))}
             </div>
           </div>
+
+          {detail.versions.length > 1 && (
+            <div>
+              <div className="side-t">Compare</div>
+              {/* Comparing two versions creates no review and no history — it only renders. The
+                  affordance lives beside the version selector because that is where a reader
+                  already is when they wonder what changed. */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 8px' }}>
+                <select
+                  className="input"
+                  aria-label="Compare from version"
+                  value={compareBase}
+                  onChange={(e) => setCompareBase(Number(e.target.value))}
+                  style={{ flex: '1 1 0', minWidth: 0 }}
+                >
+                  {detail.versions.map((v) => (
+                    <option key={v.ordinal} value={v.ordinal}>v{v.ordinal}</option>
+                  ))}
+                </select>
+                <span className="faint">→</span>
+                <select
+                  className="input"
+                  aria-label="Compare to version"
+                  value={compareHead}
+                  onChange={(e) => setCompareHead(Number(e.target.value))}
+                  style={{ flex: '1 1 0', minWidth: 0 }}
+                >
+                  {detail.versions.map((v) => (
+                    <option key={v.ordinal} value={v.ordinal}>v{v.ordinal}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                className="btn btn-sm"
+                style={{ margin: '6px 8px 0' }}
+                disabled={compareBase === compareHead}
+                onClick={() => navigate(`/specs/${detail.id}/compare?base=${compareBase}&head=${compareHead}`)}
+              >
+                Compare
+              </button>
+            </div>
+          )}
         </aside>
 
-        <article className="doc" style={{ maxWidth: 'none' }}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]} components={markdownComponents}>
-            {detail.version.content}
-          </ReactMarkdown>
-        </article>
+        <SpecMarkdown content={detail.version.content} anchors={outlineAnchors} />
       </div>
     </div>
   );

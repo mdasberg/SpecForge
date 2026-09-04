@@ -1,0 +1,8 @@
+type: string
+description: >
+  Whether the review is still being worked through. A review closes when the pull request behind it
+  is merged or closed; it is never deleted, because the verdicts and discussions attached to it stay
+  citable afterwards.
+enum:
+  - OPEN
+  - CLOSED

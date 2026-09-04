@@ -1,0 +1,25 @@
+type: object
+description: >
+  One line of a modified section's diff. `baseLine` is set on CONTEXT and REMOVED lines, `headLine`
+  on CONTEXT and ADDED lines, both being 1-based line numbers within their own version.
+required: [type, text, words]
+properties:
+  type:
+    $ref: ./DiffLineType.yaml
+  baseLine:
+    type: integer
+    format: int32
+    nullable: true
+  headLine:
+    type: integer
+    format: int32
+    nullable: true
+  text:
+    type: string
+  words:
+    type: array
+    description: >
+      Empty unless this line was paired with one on the other side, in which case it carries the
+      character ranges that differ between the two.
+    items:
+      $ref: ./WordRange.yaml

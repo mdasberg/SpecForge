@@ -1,0 +1,10 @@
+type: string
+description: >
+  How a section fared between the two versions. A renamed heading is a REMOVED plus an ADDED, never a
+  MODIFIED: the heading slug is the anchor key, so a rename really does retire one address and mint
+  another.
+enum:
+  - ADDED
+  - REMOVED
+  - MODIFIED
+  - UNCHANGED

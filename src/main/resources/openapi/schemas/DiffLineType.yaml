@@ -1,0 +1,8 @@
+type: string
+description: >
+  A line's role in the diff. The inline and side-by-side renderings are both derived from this one
+  ordered list of lines, which is why they can never disagree.
+enum:
+  - CONTEXT
+  - ADDED
+  - REMOVED

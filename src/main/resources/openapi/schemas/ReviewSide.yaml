@@ -1,0 +1,29 @@
+type: object
+description: >
+  One end of a review's comparison. `ordinal` is the imported version's number, and it is absent when
+  that end is content proposed by a pull request — proposed content is not a version, because the
+  repository has not accepted it yet. `label` is what to show either way.
+required: [label, contentSha]
+properties:
+  ordinal:
+    type: integer
+    format: int32
+    nullable: true
+  label:
+    type: string
+    description: '`v3` for an imported version, `#219` for a pull request head.'
+  contentSha:
+    type: string
+    description: >
+      The sha256 of the normalised content. The pair of these is what the computed diff is cached
+      under, so the reviewer, an agent and the audit trail all cite one artefact.
+  author:
+    type: string
+    nullable: true
+  commitSha:
+    type: string
+    nullable: true
+  createdAt:
+    type: string
+    format: date-time
+    nullable: true

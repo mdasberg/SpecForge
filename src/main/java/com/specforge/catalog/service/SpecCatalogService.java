@@ -4,7 +4,11 @@ import com.specforge.catalog.ImportResult;
 import com.specforge.catalog.SpecCatalog;
 import com.specforge.catalog.SpecImport;
 import com.specforge.catalog.SpecLocation;
+import com.specforge.catalog.SpecRefView;
+import com.specforge.catalog.SpecSectionRange;
 import com.specforge.catalog.SpecStatus;
+import com.specforge.catalog.SpecText;
+import com.specforge.catalog.SpecVersionContent;
 import com.specforge.catalog.entity.SpecDocument;
 import com.specforge.catalog.entity.SpecSection;
 import com.specforge.catalog.entity.SpecVersion;
@@ -15,7 +19,10 @@ import com.specforge.catalog.repository.SpecVersionRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -111,6 +118,46 @@ public class SpecCatalogService implements SpecCatalog {
                 .findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("No specification %s.".formatted(documentId)));
         SpecLifecycle.transition(document, SpecStatus.IN_REVIEW, clock.instant());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<SpecVersionContent> version(final UUID documentId, final Integer ordinal) {
+        final Optional<SpecVersion> current = versions.findFirstByDocumentIdOrderByOrdinalDesc(documentId);
+        if (current.isEmpty()) {
+            return Optional.empty();
+        }
+        final Optional<SpecVersion> selected = ordinal == null
+                ? current
+                : versions.findByDocumentIdAndOrdinal(documentId, ordinal);
+        return selected.map(version -> new SpecVersionContent(
+                documentId,
+                version.ordinal(),
+                version.content(),
+                version.contentSha(),
+                version.commitSha(),
+                version.author(),
+                version.createdAt(),
+                version.ordinal() == current.get().ordinal()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, SpecRefView> refs(final Collection<UUID> documentIds) {
+        if (documentIds.isEmpty()) {
+            return Map.of();
+        }
+        final Map<UUID, SpecRefView> refs = new LinkedHashMap<>();
+        for (final SpecDocument document : documents.findAllById(documentIds)) {
+            refs.put(document.id(), new SpecRefView(
+                    document.id(),
+                    document.title(),
+                    document.path(),
+                    document.project(),
+                    document.repositoryFullName(),
+                    document.status()));
+        }
+        return refs;
     }
 
     /** Ids are assigned before saving so a child can reference the parent that precedes it. */

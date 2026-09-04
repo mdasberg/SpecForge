@@ -1,0 +1,38 @@
+type: object
+description: >
+  A review of one specification between two versions. There is one review per specification rather
+  than one per pull request: reviewers approve specifications, and a review spanning four of them
+  could not say "approved" honestly about any single one.
+
+  The head's body and outline ride along so the review screen's Document tab costs no second request.
+required: [id, spec, state, base, head, content, sections, openedAt, updatedAt]
+properties:
+  id:
+    type: string
+    format: uuid
+  spec:
+    $ref: ./SpecRef.yaml
+  state:
+    $ref: ./ReviewState.yaml
+  base:
+    $ref: ./ReviewSide.yaml
+  head:
+    $ref: ./ReviewSide.yaml
+  content:
+    type: string
+    description: The head's normalised markdown source. SpecForge never emits HTML.
+  sections:
+    type: array
+    items:
+      $ref: ./SpecOutlineSection.yaml
+  pullRequest:
+    $ref: ./PullRequestRef.yaml
+  openedBy:
+    type: string
+    nullable: true
+  openedAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time

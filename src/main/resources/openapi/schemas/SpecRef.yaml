@@ -1,0 +1,19 @@
+type: object
+description: >
+  Just enough of a specification to name it in a breadcrumb and link to it, so a review response
+  does not have to embed the whole catalogue entry.
+required: [id, title, path, project, repositoryFullName, status]
+properties:
+  id:
+    type: string
+    format: uuid
+  title:
+    type: string
+  path:
+    type: string
+  project:
+    type: string
+  repositoryFullName:
+    type: string
+  status:
+    $ref: ./SpecStatus.yaml

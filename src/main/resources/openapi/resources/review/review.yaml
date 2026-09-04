@@ -1,0 +1,26 @@
+get:
+  operationId: getReview
+  tags: [ Review ]
+  summary: One review, with the head's body and outline.
+  description: >
+    One request serves the review shell and its Document tab: the metadata, the two ends being
+    compared, and the head's markdown with the outline its anchors are built from. The Changes tab
+    fetches the diff separately, because a reviewer who only reads the document never pays for it.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The review.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Review.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
