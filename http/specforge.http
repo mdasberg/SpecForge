@@ -9,11 +9,14 @@
 # `installationId`, `scanId`, `connectionId`, `specId`), so run them top to bottom the first time.
 # Afterwards any single request can be re-sent on its own.
 #
+# One step is not instant: the scan started by request 3 runs asynchronously, so request 3b is
+# re-sent until it settles. Request 4 deliberately does not depend on it — see the note there.
+#
 # Step 1e registers the installation the connection flow needs. Steps 2 to 5 are that flow,
 # which has no UI yet. Steps 6 onward are the catalogue.
 #
-# https://github.com/mdasberg/requirements is private and holds 21 specifications at
-# `openspecs/specs/<clm|fin|mem>/<capability>/spec.md`. Two things about that layout matter:
+# https://github.com/mdasberg/requirements is private and holds 40 specifications at
+# `openspecs/specs/<domain>/<capability>/spec.md`. Two things about that layout matter:
 #
 #   1. The directory is `openspecs`, with an s, and the files sit two levels deep. The OpenSpec
 #      default glob `openspec/specs/**/spec.md` matches NONE of them. The glob in the environment
@@ -21,8 +24,8 @@
 #   2. Private means the GitHub App has to be installed on it explicitly — Only select
 #      repositories. Until it is, request 2 lists no installation to connect through.
 #
-# The domain a specification lands in is the segment under `specs`, so these import as `clm`, `fin`
-# and `mem` — the three the repository is already organised around.
+# The domain a specification lands in is the segment under `specs`, so these import as `bil`, `clm`,
+# `fin`, `mem`, `prv` and `uwr` — the six the repository is already organised around.
 
 ### 1. Sign in
 # Keycloak is the only user store — SpecForge issues no credentials of its own. The dev realm
@@ -181,7 +184,7 @@ Content-Type: application/json
 %}
 
 ### 3b. Read the scan
-# Re-send until the status settles. For this repository, expect 21 importable and nothing
+# Re-send until the status settles. For this repository, expect 40 importable and nothing
 # unparsable: every file carries a heading, and there is no `changes` directory, so nothing is
 # classified as a change proposal. `files` carries a row per matched path with why it was
 # classified as it was, so "why is this file not a specification" is answerable without scanning
@@ -197,10 +200,28 @@ Content-Type: application/json
 #
 # Note that a scan is not a grant check — it will attempt any repository name. The grant is
 # enforced when the connection is created.
+#
+# This is a pre-flight, not a precondition: request 4 does not wait for it, so a PENDING scan here
+# is nothing to fix — re-send until it reports SUCCEEDED to see the counts.
 GET {{host}}/api/forge/scans/{{scanId}}
 Authorization: Bearer {{token}}
 
+> {%
+    client.test("the scan did not fail", () => {
+        client.assert(response.body.status !== "FAILED",
+            "The scan failed: " + (response.body.failureReason ?? "no reason given")
+            + ". PENDING or RUNNING is not a failure — re-send this request to watch it settle.");
+    });
+%}
+
 ### 4. Connect the repository                                                          [ADMIN]
+# No `scanId` in the body, deliberately. The endpoint accepts one as the wizard's evidence, but a
+# scan runs asynchronously and one that has not reached SUCCEEDED is refused with a 422 — which is
+# why sending 3 and 4 back to back used to fail and the identical request succeeded a moment later.
+# Without it the glob is checked live against the forge, synchronously, so this request needs no
+# waiting and no re-sending. The UI wizard sends the scan it just showed the administrator; a
+# top-to-bottom run of this file does not need to.
+#
 # Creates the connection and triggers the initial import in one call. Three things are refused
 # here: a repository the installation does not grant, a repository, branch and path already
 # connected (409, never a silent duplicate), and a glob that matches nothing importable (422 — a
@@ -222,7 +243,6 @@ Content-Type: application/json
   "pathGlob": "{{pathGlob}}",
   "specFormat": "{{specFormat}}",
   "syncMode": "{{syncMode}}",
-  "scanId": "{{scanId}}",
   "project": {
     "name": "{{projectName}}",
     "team": "{{projectTeam}}",
@@ -240,8 +260,8 @@ Content-Type: application/json
         client.assert(response.status === 201,
             "Not connected. 404: the installation does not grant this repository — a scan will "
             + "attempt any name, but connecting checks the grant. 409: this repository, branch and "
-            + "path is already connected. 422: the glob matched nothing importable — check "
-            + "request 3b first.");
+            + "path is already connected. 422: the glob matched nothing importable — request 3b "
+            + "lists what it did match, once it reports SUCCEEDED.");
     });
 %}
 
@@ -289,7 +309,7 @@ Authorization: Bearer {{token}}
 %}
 
 ### 6b. Group by domain
-# For this repository: clm, fin and mem. The domain is the segment under `specs`, so a repository
+# For this repository: bil, clm, fin, mem, prv and uwr. The domain is the segment under `specs`, so a repository
 # that nests one level deeper still groups the way it is organised rather than reporting every
 # capability as its own domain.
 GET {{host}}/api/specs?groupBy=DOMAIN
