@@ -1,0 +1,32 @@
+post:
+  operationId: discussFinding
+  tags: [ Checks ]
+  summary: Open a thread on a finding's anchor, without disposing of it.
+  parameters:
+    - name: findingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/DiscussFindingRequest.yaml
+  responses:
+    '201':
+      description: The finding, still undisposed, and the thread now discussing it.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Finding.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+    '409':
+      $ref: ../../responses/Conflict.yaml

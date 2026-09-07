@@ -87,6 +87,58 @@
           }
         }
       ]
+    },
+    {
+      "clientId": "specforge-check-structure",
+      "name": "OpenSpec structural check runner",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "specforge-check-structure-dev-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "access.token.claim": "true",
+            "id.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "specforge-check-reviewer",
+      "name": "Model-backed spec review runner",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "specforge-check-reviewer-dev-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "access.token.claim": "true",
+            "id.token.claim": "true"
+          }
+        }
+      ]
     }
   ],
   "users": [
@@ -148,6 +200,24 @@
         "REVIEWER",
         "ADMIN"
       ]
+    },
+    {
+      "id": "a9e15ac6-0000-4000-8000-000000000001",
+      "username": "service-account-specforge-check-structure",
+      "serviceAccountClientId": "specforge-check-structure",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "OpenSpec",
+      "lastName": "Validator"
+    },
+    {
+      "id": "a9e15ac6-0000-4000-8000-000000000002",
+      "username": "service-account-specforge-check-reviewer",
+      "serviceAccountClientId": "specforge-check-reviewer",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Spec",
+      "lastName": "Reviewer"
     }
   ]
 }

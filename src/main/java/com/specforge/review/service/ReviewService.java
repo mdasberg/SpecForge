@@ -17,6 +17,7 @@ import com.specforge.repository.ProposalClosed;
 import com.specforge.repository.ProposedSpec;
 import com.specforge.repository.SpecChangeProposed;
 import com.specforge.review.ReviewHeadAdvanced;
+import com.specforge.review.ReviewHeadSet;
 import com.specforge.review.entity.ReviewEntity;
 import com.specforge.review.entity.ReviewState;
 import com.specforge.review.repository.ReviewRepository;
@@ -189,6 +190,8 @@ public class ReviewService {
                 head.createdAt(),
                 now);
         reviews.save(review);
+        events.publishEvent(new ReviewHeadSet(
+                review.id(), specId, head.contentSha(), "v" + head.ordinal(), false, now));
         return mapper.detail(review, requireSpec(specId), base, SpecTexts.of(head.content()));
     }
 
@@ -234,6 +237,17 @@ public class ReviewService {
                     now);
             reviews.save(review);
 
+            if (moved) {
+                // Raised for a first head as well as for a later one: checks run against whatever
+                // the review's head is, and a review's first head is the one most worth checking.
+                events.publishEvent(new ReviewHeadSet(
+                        review.id(),
+                        review.documentId(),
+                        head.contentSha(),
+                        "#" + event.pullRequestNumber(),
+                        previousHead != null,
+                        now));
+            }
             if (moved && previousHead != null) {
                 // Anchors are classified here, while both heads are still in hand: SpecForge keeps
                 // only the current head, so after this there is nothing left to compare an older

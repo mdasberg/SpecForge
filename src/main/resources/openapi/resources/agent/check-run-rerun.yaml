@@ -1,0 +1,27 @@
+post:
+  operationId: rerunCheck
+  tags: [ Checks ]
+  summary: Rerun one check on the review's current head.
+  description: >
+    A model-backed check can reach a different result on identical content, which is why a rerun is
+    always an explicit act with its own run rather than a silent refresh of the previous one.
+  parameters:
+    - name: checkRunId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '202':
+      description: The review's checks, with the new run queued.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/CheckRunList.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+    '409':
+      $ref: ../../responses/Conflict.yaml

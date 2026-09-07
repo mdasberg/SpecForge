@@ -76,7 +76,14 @@ class ApprovalMapper {
     }
 
     private static ChecksSummary checks(final CheckState checks) {
-        return new ChecksSummary(checks.configured(), checks.failed(), checks.failedCheckNames());
+        return new ChecksSummary(
+                checks.configured(),
+                checks.failed(),
+                checks.failedCheckNames(),
+                checks.totalCount(),
+                checks.passedCount(),
+                checks.failedCount(),
+                checks.pendingCount());
     }
 
     private static ApprovalGateState gateState(final ApprovalGate.Result gate) {

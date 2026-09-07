@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ApprovalStatus, RequiredReviewer, VerdictType } from '../api/approval';
 import { Avatar } from './Avatar';
 import { Badge } from './Badge';
+import { ChecksSummaryLine } from './ChecksPanel';
 import { formatRelativeTime } from '../lib/format';
 
 const REVIEWER_BADGE: Record<RequiredReviewer['state'], { variant: 'draft' | 'approved' | 'changes'; label: string }> = {
@@ -113,12 +114,19 @@ export function ApprovalPanel({
       </div>
 
       <div className="rp-block">
-        <div className="rp-t">Automated checks</div>
-        {!checks.configured ? (
-          <div className="faint" style={{ fontSize: 11.5 }}>Not configured for this project yet.</div>
-        ) : (
-          <div className="muted" style={{ fontSize: 11.5 }}>
-            {checks.failed ? `Failing: ${checks.failedCheckNames.join(', ')}` : 'All checks passed.'}
+        <div className="rp-t">
+          Automated checks<div className="spacer" />
+          {checks.configured && <span className="tag">{checks.passedCount}/{checks.totalCount}</span>}
+        </div>
+        {/* The same counts the Checks tab shows, from the same payload — the panel and the tab
+            cannot disagree about how many checks there are or how many are failing. */}
+        <div className={checks.configured ? 'muted' : 'faint'} style={{ fontSize: 11.5 }}>
+          <ChecksSummaryLine summary={checks} />
+        </div>
+        {checks.failed && (
+          <div className="gate" style={{ marginTop: 6 }}>
+            <span style={{ color: 'var(--red)' }}>✕</span>
+            <div>Blocking: {checks.failedCheckNames.join(', ')} — see the Checks tab.</div>
           </div>
         )}
       </div>

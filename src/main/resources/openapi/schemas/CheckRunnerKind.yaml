@@ -1,0 +1,6 @@
+type: string
+description: >
+  How a check reaches its verdict. Deterministic checks parse the specification; model-backed ones
+  ask a language model about the changed sections. Both report the same run shape, so the review
+  screen never has to care which produced a finding.
+enum: [DETERMINISTIC, MODEL]

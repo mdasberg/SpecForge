@@ -1,0 +1,47 @@
+type: object
+description: >
+  One agent-authored observation, anchored to a section of the review head the way a human's thread
+  is. It always names the agent that wrote it and the run that produced it — including the model
+  identity where a model did — because "which model said this, on which content" is the first
+  question asked when a finding is wrong.
+required: [id, checkRunId, checkKey, sectionKey, severity, title, body, author, createdAt]
+properties:
+  id:
+    type: string
+    format: uuid
+  checkRunId:
+    type: string
+    format: uuid
+  checkKey:
+    type: string
+    example: acceptance-criteria
+  sectionKey:
+    type: string
+    description: The anchor key of the section this finding is about.
+    example: requirements-1
+  range:
+    $ref: ./TextRange.yaml
+  severity:
+    $ref: ./FindingSeverity.yaml
+  title:
+    type: string
+  body:
+    type: string
+  proposedText:
+    type: string
+    nullable: true
+    description: >
+      What the agent suggests the section should say. Accepting it opens a thread carrying this
+      text; it is never written to the repository, which SpecForge only ever reads.
+  author:
+    $ref: ./ActorRef.yaml
+  modelIdentity:
+    type: string
+    nullable: true
+    description: The model that produced this finding, for a model-backed run.
+    example: claude-sonnet-5
+  disposition:
+    $ref: ./FindingDisposition.yaml
+  createdAt:
+    type: string
+    format: date-time

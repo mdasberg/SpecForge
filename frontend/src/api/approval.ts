@@ -30,11 +30,8 @@ export interface ApprovalRuleState {
   reason: string;
 }
 
-export interface ChecksSummary {
-  configured: boolean;
-  failed: boolean;
-  failedCheckNames: string[];
-}
+/** Re-exported from `agent.ts`: one schema, one type, so the panel and the Checks tab share it. */
+export type { ChecksSummary } from './agent';
 
 export interface ApprovalGateState {
   passed: boolean;
@@ -62,7 +59,7 @@ export interface ApprovalStatus {
   reviewers: RequiredReviewer[];
   rule: ApprovalRuleState;
   unresolvedBlockingThreads: number;
-  checks: ChecksSummary;
+  checks: import('./agent').ChecksSummary;
   gate: ApprovalGateState;
   verdicts: Verdict[];
   composer: ComposerState;

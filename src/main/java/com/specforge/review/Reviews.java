@@ -11,4 +11,11 @@ public interface Reviews {
 
     /** The review's identity and lifecycle state, for a capability that gates on it being open. */
     Optional<ReviewRef> ref(UUID reviewId);
+
+    /**
+     * Both sides of the review and the sections between them that differ, for a capability that has
+     * to check the change itself — an API-compatibility check reads the base, a model-backed one
+     * reads only what moved.
+     */
+    Optional<ReviewComparison> comparison(UUID reviewId);
 }

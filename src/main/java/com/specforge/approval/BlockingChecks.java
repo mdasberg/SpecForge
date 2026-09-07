@@ -3,11 +3,12 @@ package com.specforge.approval;
 import java.util.UUID;
 
 /**
- * The blocking automated-check state for a review's current head, owned here rather than by
- * {@code automated-review} because that capability does not exist yet — {@code add-automated-review}
- * ships its own implementation of this port later, replacing {@link com.specforge.approval.service.NoBlockingChecks}
- * as the bean the gate reads. Until then every review reports {@link CheckState#NOT_CONFIGURED}, which
- * the gate treats as non-blocking.
+ * The automated-check state for a review's current head, declared here and implemented by
+ * {@code automated-review}.
+ *
+ * <p>The port points this way round on purpose: the gate decides what stops an approval, so it
+ * states what it needs to know and the capability that runs the checks answers. A check runner
+ * therefore cannot widen its own influence over the gate — it can only fill in this answer.
  */
 public interface BlockingChecks {
 

@@ -1,0 +1,7 @@
+type: object
+description: Opens a thread on a finding's anchor without disposing of the finding.
+required: [body]
+properties:
+  body:
+    type: string
+    minLength: 1

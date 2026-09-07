@@ -1,0 +1,52 @@
+get:
+  operationId: listChecks
+  tags: [ Checks ]
+  summary: Every check run against the review's current head, with its findings.
+  description: >
+    Runs against a superseded head are excluded here and remain readable through the run they were
+    replaced by being marked stale — the tab shows what is true of the head under review.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The review's checks.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/CheckRunList.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+post:
+  operationId: rerunChecks
+  tags: [ Checks ]
+  summary: Rerun every enabled check on the review's current head.
+  description: >
+    The previous runs are marked stale rather than deleted, so their findings and dispositions stay
+    inspectable. Runs still queued for a superseded head are cancelled instead of executed.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '202':
+      description: The freshly queued runs.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/CheckRunList.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+    '409':
+      $ref: ../../responses/Conflict.yaml

@@ -1,0 +1,5 @@
+type: string
+description: >
+  Where one check run stands. A run that was queued for a head the review has since moved past is
+  never executed: it finishes as `SKIPPED` with a summary saying so, and is marked stale.
+enum: [QUEUED, RUNNING, PASSED, FAILED, SKIPPED]
