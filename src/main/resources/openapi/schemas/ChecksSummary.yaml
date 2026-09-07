@@ -1,14 +1,33 @@
 type: object
 description: >
-  Blocking automated-check state, read from the automated-review capability. Reports as not
-  configured until that capability ships, which the gate treats as non-blocking.
-required: [configured, failed, failedCheckNames]
+  One review's automated-check state, read from the automated-review capability. `failed` and
+  `failedCheckNames` cover blocking checks only — those are the gate's input — while the counts
+  cover every run against the current head, so the approval panel's summary line and the Checks tab
+  can never disagree. A project with no enabled check reports as not configured, which the gate
+  treats as non-blocking.
+required: [configured, failed, failedCheckNames, totalCount, passedCount, failedCount, pendingCount]
 properties:
   configured:
     type: boolean
   failed:
     type: boolean
+    description: Whether a blocking check has failed. Always false while not configured.
   failedCheckNames:
     type: array
+    description: The failed blocking checks, named for the gate's refusal reason.
     items:
       type: string
+  totalCount:
+    type: integer
+    format: int32
+  passedCount:
+    type: integer
+    format: int32
+  failedCount:
+    type: integer
+    format: int32
+    description: Every failure against the current head, advisory ones included.
+  pendingCount:
+    type: integer
+    format: int32
+    description: Runs still queued or running.

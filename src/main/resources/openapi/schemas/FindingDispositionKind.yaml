@@ -1,0 +1,5 @@
+type: string
+description: >
+  What a human decided about a finding. Discussing one is deliberately not a disposition: a thread
+  opens and the finding stays undisposed.
+enum: [ACCEPTED, DISMISSED]

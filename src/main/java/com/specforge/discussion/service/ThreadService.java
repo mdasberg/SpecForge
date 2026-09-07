@@ -10,6 +10,7 @@ import com.specforge.discussion.entity.ThreadEntity;
 import com.specforge.discussion.repository.CommentRepository;
 import com.specforge.discussion.repository.NotificationRepository;
 import com.specforge.discussion.repository.ThreadRepository;
+import com.specforge.platform.ActorKind;
 import com.specforge.platform.Caller;
 import com.specforge.platform.MemberRef;
 import com.specforge.platform.Members;
@@ -193,6 +194,7 @@ public class ThreadService {
     @Transactional
     public Thread resolve(final UUID threadId, final Caller caller) {
         final ThreadEntity thread = require(threadId);
+        requireHuman(caller);
         if (thread.resolved()) {
             throw Problems.conflict("Thread %s is already resolved.".formatted(threadId));
         }
@@ -205,6 +207,7 @@ public class ThreadService {
     @Transactional
     public Thread reopen(final UUID threadId, final Caller caller) {
         final ThreadEntity thread = require(threadId);
+        requireHuman(caller);
         if (!thread.resolved()) {
             throw Problems.conflict("Thread %s is not resolved.".formatted(threadId));
         }
@@ -299,5 +302,16 @@ public class ThreadService {
 
     private ThreadEntity require(final UUID threadId) {
         return threads.findById(threadId).orElseThrow(() -> Problems.notFound("No thread %s.".formatted(threadId)));
+    }
+
+    /**
+     * Resolving a conversation is settling it, and an approval waits on it being settled — so it is
+     * a human's act for the same reason approving is. An agent that could resolve the thread its own
+     * finding provoked would be clearing the gate it was supposed to be an input to.
+     */
+    private static void requireHuman(final Caller caller) {
+        if (caller.actorKind() != ActorKind.HUMAN) {
+            throw Problems.conflict("An agent identity may not resolve or reopen a discussion.");
+        }
     }
 }

@@ -7,8 +7,19 @@ import { listThreads, openThread, replyToThread, reopenThread, resolveThread } f
 import type { ThreadList } from '../api/discussion';
 import { castVerdict, getApprovalStatus } from '../api/approval';
 import type { ApprovalStatus, VerdictType } from '../api/approval';
+import {
+  acceptFinding,
+  discussFinding,
+  dismissFinding,
+  listChecks,
+  rerunCheck,
+  rerunChecks,
+  undoFindingDisposition,
+} from '../api/agent';
+import type { CheckRunList } from '../api/agent';
 import { ApiError } from '../auth/api';
 import { ApprovalPanel } from '../components/ApprovalPanel';
+import { ChecksPanel } from '../components/ChecksPanel';
 import { DiffJumpList, DiffModeToggle, DiffSummaryLine, DiffView } from '../components/DiffView';
 import { useDiffMode } from '../lib/useDiffMode';
 import { EmptyState } from '../components/EmptyState';
@@ -18,7 +29,7 @@ import { StatusBadge } from '../components/StatusBadge';
 import { ThreadCard } from '../components/ThreadCard';
 import { formatRelativeTime } from '../lib/format';
 
-type Tab = 'document' | 'changes' | 'discussions' | 'approval';
+type Tab = 'document' | 'changes' | 'discussions' | 'checks' | 'approval';
 
 /**
  * One review. The shell is deliberately built around tabs even though only two of them exist: the
@@ -33,6 +44,7 @@ export function Review() {
   const tab: Tab =
     tabParam === 'changes' ? 'changes'
     : tabParam === 'discussions' ? 'discussions'
+    : tabParam === 'checks' ? 'checks'
     : tabParam === 'approval' ? 'approval'
     : 'document';
 
@@ -40,6 +52,7 @@ export function Review() {
   const [diff, setDiff] = useState<SpecDiff | null>(null);
   const [threads, setThreads] = useState<ThreadList | null>(null);
   const [approval, setApproval] = useState<ApprovalStatus | null>(null);
+  const [checks, setChecks] = useState<CheckRunList | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useDiffMode();
@@ -127,6 +140,27 @@ export function Review() {
     };
   }, [reviewId, tab, approval, auth.user]);
 
+  // Same reasoning as the diff and the approval panel: fetched when someone opens the tab. Checks
+  // keep running after the page loaded, so this refetches on every visit rather than caching once.
+  useEffect(() => {
+    if (!reviewId || tab !== 'checks') return;
+    let cancelled = false;
+    async function run() {
+      try {
+        const result = await listChecks(reviewId as string, auth.user);
+        if (!cancelled) setChecks(result);
+      } catch (e) {
+        if (cancelled) return;
+        if (e instanceof ApiError) setError(e.problem.detail ?? e.problem.title ?? 'Could not load the checks.');
+        else throw e;
+      }
+    }
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [reviewId, tab, auth.user]);
+
   const anchors = useMemo(() => (review ? review.sections.map((section) => section.anchorKey) : []), [review]);
 
   function selectTab(next: Tab) {
@@ -195,6 +229,14 @@ export function Review() {
             <span className="count">{threads.unresolvedBlockingCount + threads.unresolvedNonBlockingCount}</span>
           )}
         </button>
+        <button type="button" className={`tab${tab === 'checks' ? ' on' : ''}`} onClick={() => selectTab('checks')}>
+          Checks
+          {checks && checks.summary.configured && (
+            <span className="count">
+              {checks.summary.passedCount}/{checks.summary.totalCount}
+            </span>
+          )}
+        </button>
         <button type="button" className={`tab${tab === 'approval' ? ' on' : ''}`} onClick={() => selectTab('approval')}>
           Approval
           {approval && <span className="count">{approval.rule.approvedCount}/{approval.rule.requiredCount}</span>}
@@ -218,6 +260,36 @@ export function Review() {
               );
               setApproval(result);
               setReview(await getReview(reviewId as string, auth.user));
+            }}
+          />
+        )
+      ) : tab === 'checks' ? (
+        !checks ? (
+          <div className="card card-pad">{error ?? 'Loading checks…'}</div>
+        ) : (
+          <ChecksPanel
+            checks={checks}
+            onRerunAll={async () => setChecks(await rerunChecks(reviewId as string, auth.user))}
+            onRerun={async (checkRunId) => setChecks(await rerunCheck(checkRunId, auth.user))}
+            onAccept={async (findingId) => {
+              await acceptFinding(findingId, auth.user);
+              // Accepting opened a thread, so the Discussions tab and the approval gate both moved.
+              setChecks(await listChecks(reviewId as string, auth.user));
+              await refreshThreads();
+              setApproval(null);
+            }}
+            onDismiss={async (findingId) => {
+              await dismissFinding(findingId, auth.user);
+              setChecks(await listChecks(reviewId as string, auth.user));
+            }}
+            onDiscuss={async (findingId, body) => {
+              await discussFinding(findingId, body, auth.user);
+              setChecks(await listChecks(reviewId as string, auth.user));
+              await refreshThreads();
+            }}
+            onUndo={async (findingId) => {
+              await undoFindingDisposition(findingId, auth.user);
+              setChecks(await listChecks(reviewId as string, auth.user));
             }}
           />
         )

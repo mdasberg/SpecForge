@@ -1,0 +1,28 @@
+delete:
+  operationId: undoFindingDisposition
+  tags: [ Checks ]
+  summary: Undo an accept or a dismiss while the review is open.
+  description: >
+    The undo is recorded alongside the disposition it reverses; a thread an accept opened is left
+    where it is, because a conversation a reviewer may already have joined is not SpecForge's to
+    delete.
+  parameters:
+    - name: findingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The finding, active again.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Finding.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+    '409':
+      $ref: ../../responses/Conflict.yaml

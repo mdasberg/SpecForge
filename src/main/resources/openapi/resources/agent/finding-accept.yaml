@@ -1,0 +1,29 @@
+post:
+  operationId: acceptFinding
+  tags: [ Checks ]
+  summary: Accept a finding, opening a thread that carries its proposed text.
+  description: >
+    Accepting records the disposition and opens an anchored thread attributed to the accepting
+    reviewer, quoting the agent's suggestion. It changes no specification content, in SpecForge or
+    in the repository — SpecForge is read-only on the repository, so an "apply" would be a lie. An
+    agent identity may not dispose of a finding.
+  parameters:
+    - name: findingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The finding, with its disposition and the thread it opened.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Finding.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+    '409':
+      $ref: ../../responses/Conflict.yaml

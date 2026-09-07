@@ -1,0 +1,19 @@
+type: object
+description: >
+  A finding's current disposition. Accepting or dismissing is recorded with its actor and time and
+  can be undone while the review is open; the undo is recorded too, so the history reads as what
+  actually happened rather than as if nothing had.
+required: [kind, actor, decidedAt]
+properties:
+  kind:
+    $ref: ./FindingDispositionKind.yaml
+  actor:
+    $ref: ./ActorRef.yaml
+  decidedAt:
+    type: string
+    format: date-time
+  threadId:
+    type: string
+    format: uuid
+    nullable: true
+    description: The thread accepting the suggestion opened, carrying its proposed text.

@@ -1062,4 +1062,183 @@
                              constraintName="uq_review_verdict_head"/>
     </changeSet>
 
+
+    <changeSet id="agent-0001-checks" author="specforge">
+        <comment>
+            Check definitions per project, check runs per review head, agent findings and the
+            append-only dispositions on them, plus the two seeded agent identities that author
+            findings.
+        </comment>
+
+        <createTable tableName="check_definition">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_check_definition" nullable="false"/>
+            </column>
+            <column name="project_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="check_key" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="blocking" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="runner_kind" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <!-- What this particular check needs configuring, one entry per line: the architecture
+                 rules to test, or the glossary's preferred terms. It sits on the definition rather
+                 than on the project because it is the check's own configuration, and a check with
+                 nothing configured reports skipped rather than passed. -->
+            <column name="configuration" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="check_definition"
+                             columnNames="project_id, check_key"
+                             constraintName="uq_check_definition_key"/>
+
+        <createTable tableName="check_run">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_check_run" nullable="false"/>
+            </column>
+            <column name="review_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="check_definition_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="head_content_sha" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="head_label" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="summary" type="TEXT"/>
+            <column name="model_identity" type="VARCHAR(128)"/>
+            <column name="stale" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration_ms" type="BIGINT"/>
+            <column name="queued_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="started_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="finished_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="check_run" indexName="idx_check_run_review">
+            <column name="review_id"/>
+            <column name="stale"/>
+            <column name="queued_at"/>
+        </createIndex>
+
+        <createTable tableName="finding">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_finding" nullable="false"/>
+            </column>
+            <column name="check_run_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="review_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="section_key" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="range_start" type="INT"/>
+            <column name="range_end" type="INT"/>
+            <column name="severity" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="proposed_text" type="TEXT"/>
+            <column name="author_subject_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="finding" indexName="idx_finding_run">
+            <column name="check_run_id"/>
+        </createIndex>
+
+        <createIndex tableName="finding" indexName="idx_finding_review">
+            <column name="review_id"/>
+        </createIndex>
+
+        <createTable tableName="finding_disposition">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_finding_disposition" nullable="false"/>
+            </column>
+            <column name="finding_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kind" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actor_subject_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="thread_id" type="UUID"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="finding_disposition" indexName="idx_finding_disposition_finding">
+            <column name="finding_id"/>
+            <column name="created_at"/>
+        </createIndex>
+
+        <insert tableName="app_user">
+            <column name="subject_id" value="a9e15ac6-0000-4000-8000-000000000001"/>
+            <column name="display_name" value="OpenSpec Validator"/>
+            <column name="handle" value="service-account-specforge-check-structure"/>
+            <column name="actor_kind" value="AGENT"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+
+        <insert tableName="app_user">
+            <column name="subject_id" value="a9e15ac6-0000-4000-8000-000000000002"/>
+            <column name="display_name" value="Spec Reviewer"/>
+            <column name="handle" value="service-account-specforge-check-reviewer"/>
+            <column name="actor_kind" value="AGENT"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -1,0 +1,6 @@
+type: string
+description: >
+  How serious the authoring agent considers the finding. Severity never decides whether a check
+  blocks an approval — that is the check definition's `blocking` flag, which the project sets, so an
+  agent cannot escalate its own output into a block.
+enum: [INFO, WARNING, ERROR]

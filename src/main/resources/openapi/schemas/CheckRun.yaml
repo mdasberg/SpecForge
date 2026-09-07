@@ -1,0 +1,54 @@
+type: object
+description: >
+  One check's run against one review head, with the findings it produced. A superseded run is kept
+  and marked stale rather than deleted, so a result stays inspectable after a rerun.
+required: [id, checkKey, displayName, blocking, runnerKind, state, headLabel, stale, findings, queuedAt]
+properties:
+  id:
+    type: string
+    format: uuid
+  checkKey:
+    type: string
+    example: openspec-structure
+  displayName:
+    type: string
+    example: OpenSpec structure
+  blocking:
+    type: boolean
+    description: Read live from the project's check definition, so changing it applies to open reviews.
+  runnerKind:
+    $ref: ./CheckRunnerKind.yaml
+  state:
+    $ref: ./CheckRunState.yaml
+  headLabel:
+    type: string
+    description: The version this run was dispatched against, e.g. `v2` or `#12`.
+    example: '#12'
+  stale:
+    type: boolean
+    description: Superseded by a later run, either a rerun or a new head.
+  summary:
+    type: string
+    nullable: true
+  modelIdentity:
+    type: string
+    nullable: true
+  durationMs:
+    type: integer
+    format: int64
+    nullable: true
+  queuedAt:
+    type: string
+    format: date-time
+  startedAt:
+    type: string
+    format: date-time
+    nullable: true
+  finishedAt:
+    type: string
+    format: date-time
+    nullable: true
+  findings:
+    type: array
+    items:
+      $ref: ./Finding.yaml

@@ -1,0 +1,28 @@
+post:
+  operationId: dismissFinding
+  tags: [ Checks ]
+  summary: Dismiss a finding, recording who dismissed it and when.
+  description: >
+    No justification is asked for: requiring one trains reviewers to type "n/a". The dismissal is
+    recorded and reversible while the review is open, which is where the accountability actually
+    lives. An agent identity may not dispose of a finding.
+  parameters:
+    - name: findingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The dismissed finding.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Finding.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+    '409':
+      $ref: ../../responses/Conflict.yaml

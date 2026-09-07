@@ -31,6 +31,12 @@ specforge:
     # which is the safe default: an unverified delivery is an unauthenticated write trigger.
     webhook-secret: ${SPECFORGE_GITHUB_WEBHOOK_SECRET:}
     api-base-url: ${SPECFORGE_GITHUB_API_URL:https://api.github.com}
+  agent:
+    # The model behind the model-backed checks. Absent in development: without a key those checks
+    # report skipped rather than passed, because a check nobody ran has found nothing and says so.
+    api-key: ${SPECFORGE_AGENT_API_KEY:}
+    model: ${SPECFORGE_AGENT_MODEL:claude-sonnet-5}
+    api-base-url: ${SPECFORGE_AGENT_API_URL:https://api.anthropic.com}
 
 server:
   port: 8080

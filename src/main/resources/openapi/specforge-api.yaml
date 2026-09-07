@@ -48,6 +48,10 @@ tags:
     description: >
       Required reviewers, verdicts, the project's approval rule and the gate that reaches Approved —
       and the rule that agents never approve.
+  - name: Checks
+    description: >
+      Automated and model-backed checks on a review's head, the findings they produce, and the
+      accept, dismiss and discuss handling. Agents comment and fail checks; they never approve.
 
 paths:
   /api/me:
@@ -110,6 +114,18 @@ paths:
     $ref: ./resources/approval/required-reviewers.yaml
   /api/reviews/{reviewId}/required-reviewers/{requiredReviewerId}:
     $ref: ./resources/approval/required-reviewer.yaml
+  /api/reviews/{reviewId}/checks:
+    $ref: ./resources/agent/checks.yaml
+  /api/checks/{checkRunId}/rerun:
+    $ref: ./resources/agent/check-run-rerun.yaml
+  /api/findings/{findingId}/accept:
+    $ref: ./resources/agent/finding-accept.yaml
+  /api/findings/{findingId}/dismiss:
+    $ref: ./resources/agent/finding-dismiss.yaml
+  /api/findings/{findingId}/discussions:
+    $ref: ./resources/agent/finding-discuss.yaml
+  /api/findings/{findingId}/disposition:
+    $ref: ./resources/agent/finding-disposition.yaml
   /api/webhooks/github:
     $ref: ./resources/repository/github-webhook.yaml
 
