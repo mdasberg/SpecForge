@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { paletteClass } from '../lib/avatarPalette';
 
 export type ActorKind = 'HUMAN' | 'AGENT';
 
@@ -24,9 +25,7 @@ function initials(name: string): string {
  */
 export function Avatar({ name, large = false, actorKind = 'HUMAN' }: AvatarProps) {
   const classes = ['av'];
-  if (actorKind === 'AGENT') {
-    classes.push('av-bot');
-  }
+  classes.push(actorKind === 'AGENT' ? 'av-bot' : paletteClass(name));
   if (large) {
     classes.push('av-lg');
   }
