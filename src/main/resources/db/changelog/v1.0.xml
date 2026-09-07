@@ -796,4 +796,181 @@
                        constraintName="pk_spec_diff"/>
     </changeSet>
 
+    <changeSet id="platform-0002-user-handle" author="specforge">
+        <comment>
+            The @-mention handle, added after app_user shipped. Nullable: a row mirrored before this
+            column existed has none yet, and backfills itself on that identity's next authenticated
+            request rather than needing a data migration.
+        </comment>
+
+        <addColumn tableName="app_user">
+            <column name="handle" type="VARCHAR(64)"/>
+        </addColumn>
+
+        <createIndex tableName="app_user" indexName="uq_app_user_handle" unique="true">
+            <column name="handle"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="discussion-0001-threads" author="specforge">
+        <comment>
+            A thread's review and document are plain UUIDs, not foreign keys — review and catalog
+            own those rows. opener_actor_kind is denormalised onto the thread so blocking/non-blocking
+            counts never join out to the identity mirror; anchor_content_sha and anchor_version_label
+            are the version the thread was written against and never change once set, only
+            anchor_state does, as the review's head carries the anchor forward.
+        </comment>
+
+        <createTable tableName="thread">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_thread" nullable="false"/>
+            </column>
+            <column name="review_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="document_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="section_key" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="range_start" type="INT"/>
+            <column name="range_end" type="INT"/>
+            <column name="quoted_text" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="anchor_content_sha" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="anchor_version_label" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="anchor_state" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="opened_by" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="opener_actor_kind" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resolved" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resolved_by" type="VARCHAR(64)"/>
+            <column name="resolved_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="reopened_by" type="VARCHAR(64)"/>
+            <column name="reopened_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="thread" indexName="idx_thread_review">
+            <column name="review_id"/>
+            <column name="resolved"/>
+        </createIndex>
+
+        <createTable tableName="comment">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_comment" nullable="false"/>
+            </column>
+            <column name="thread_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actor_kind" type="VARCHAR(16)">
+                <!-- Stamped at write time rather than joined from app_user on every read, so the
+                     API can never fail to carry it. -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="edited_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="comment"
+                                 baseColumnNames="thread_id"
+                                 constraintName="fk_comment_thread"
+                                 referencedTableName="thread"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createIndex tableName="comment" indexName="idx_comment_thread">
+            <column name="thread_id"/>
+            <column name="created_at"/>
+        </createIndex>
+
+        <createTable tableName="mention">
+            <column name="comment_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="mention" columnNames="comment_id, subject_id" constraintName="pk_mention"/>
+
+        <addForeignKeyConstraint baseTableName="mention"
+                                 baseColumnNames="comment_id"
+                                 constraintName="fk_mention_comment"
+                                 referencedTableName="comment"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createTable tableName="notification">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_notification" nullable="false"/>
+            </column>
+            <column name="recipient_subject_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(24)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="review_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="thread_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actor_subject_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="read_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="notification"
+                                 baseColumnNames="comment_id"
+                                 constraintName="fk_notification_comment"
+                                 referencedTableName="comment"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createIndex tableName="notification" indexName="idx_notification_recipient">
+            <column name="recipient_subject_id"/>
+            <column name="created_at"/>
+        </createIndex>
+
+        <createIndex tableName="notification" indexName="idx_notification_recipient_unread">
+            <column name="recipient_subject_id"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

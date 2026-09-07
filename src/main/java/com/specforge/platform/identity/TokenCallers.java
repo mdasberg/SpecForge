@@ -18,6 +18,6 @@ class TokenCallers implements Callers {
             throw new IllegalStateException("No authenticated caller on an authenticated route.");
         }
         final TokenIdentity identity = TokenIdentity.of(token.getToken());
-        return new Caller(identity.subjectId(), identity.displayName());
+        return new Caller(identity.subjectId(), identity.displayName(), identity.actorKind());
     }
 }

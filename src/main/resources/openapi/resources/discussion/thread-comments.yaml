@@ -1,0 +1,30 @@
+post:
+  operationId: replyToThread
+  tags: [ Discussions ]
+  summary: Post a reply to a thread.
+  parameters:
+    - name: threadId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/CommentRequest.yaml
+  responses:
+    '200':
+      description: The thread, with the reply appended.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Thread.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

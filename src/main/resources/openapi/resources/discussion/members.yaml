@@ -1,0 +1,22 @@
+get:
+  operationId: searchMembers
+  tags: [ Discussions ]
+  summary: Members whose handle or display name starts with `query`, for @-mention autocomplete.
+  parameters:
+    - name: query
+      in: query
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    '200':
+      description: The matching members, at most 20.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/MemberList.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml

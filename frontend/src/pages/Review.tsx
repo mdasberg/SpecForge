@@ -3,14 +3,19 @@ import { Link, useParams, useSearchParams } from 'react-router';
 import { useAuth } from 'react-oidc-context';
 import { getReview, getReviewDiff } from '../api/review';
 import type { Review as ReviewDetail, SpecDiff } from '../api/review';
+import { listThreads, openThread, replyToThread, reopenThread, resolveThread } from '../api/discussion';
+import type { ThreadList } from '../api/discussion';
 import { ApiError } from '../auth/api';
 import { DiffJumpList, DiffModeToggle, DiffSummaryLine, DiffView } from '../components/DiffView';
 import { useDiffMode } from '../lib/useDiffMode';
+import { EmptyState } from '../components/EmptyState';
+import { NewThreadForm } from '../components/NewThreadForm';
 import { SpecMarkdown } from '../components/SpecMarkdown';
 import { StatusBadge } from '../components/StatusBadge';
+import { ThreadCard } from '../components/ThreadCard';
 import { formatRelativeTime } from '../lib/format';
 
-type Tab = 'document' | 'changes';
+type Tab = 'document' | 'changes' | 'discussions';
 
 /**
  * One review. The shell is deliberately built around tabs even though only two of them exist: the
@@ -21,13 +26,33 @@ export function Review() {
   const { reviewId } = useParams<{ reviewId: string }>();
   const auth = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const tab: Tab = searchParams.get('tab') === 'changes' ? 'changes' : 'document';
+  const tabParam = searchParams.get('tab');
+  const tab: Tab = tabParam === 'changes' ? 'changes' : tabParam === 'discussions' ? 'discussions' : 'document';
 
   const [review, setReview] = useState<ReviewDetail | null>(null);
   const [diff, setDiff] = useState<SpecDiff | null>(null);
+  const [threads, setThreads] = useState<ThreadList | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useDiffMode();
+
+  async function refreshThreads() {
+    if (!reviewId) return;
+    setThreads(await listThreads(reviewId, auth.user));
+  }
+
+  useEffect(() => {
+    if (!reviewId) return;
+    let cancelled = false;
+    listThreads(reviewId, auth.user)
+      .then((result) => {
+        if (!cancelled) setThreads(result);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [reviewId, auth.user]);
 
   useEffect(() => {
     if (!reviewId) return;
@@ -135,10 +160,51 @@ export function Review() {
           Changes
           {diff && <span className="count">{diff.summary.changedLines}</span>}
         </button>
+        <button type="button" className={`tab${tab === 'discussions' ? ' on' : ''}`} onClick={() => selectTab('discussions')}>
+          Discussions
+          {threads && (threads.unresolvedBlockingCount + threads.unresolvedNonBlockingCount > 0) && (
+            <span className="count">{threads.unresolvedBlockingCount + threads.unresolvedNonBlockingCount}</span>
+          )}
+        </button>
       </div>
 
       {tab === 'document' ? (
         <SpecMarkdown content={review.content} anchors={anchors} />
+      ) : tab === 'discussions' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <NewThreadForm
+            sections={review.sections}
+            content={review.content}
+            onSubmit={async (request) => {
+              await openThread(reviewId as string, request, auth.user);
+              await refreshThreads();
+            }}
+          />
+          {threads && threads.items.length === 0 && (
+            <EmptyState title="No discussions yet">
+              Select a section above, or quote an exact phrase, to start one.
+            </EmptyState>
+          )}
+          {threads?.items.map((thread) => (
+            <ThreadCard
+              key={thread.id}
+              thread={thread}
+              busy={false}
+              onReply={async (body) => {
+                await replyToThread(thread.id, body, auth.user);
+                await refreshThreads();
+              }}
+              onResolve={async () => {
+                await resolveThread(thread.id, auth.user);
+                await refreshThreads();
+              }}
+              onReopen={async () => {
+                await reopenThread(thread.id, auth.user);
+                await refreshThreads();
+              }}
+            />
+          ))}
+        </div>
       ) : !diff ? (
         <div className="card card-pad">{error ?? 'Loading changes…'}</div>
       ) : (

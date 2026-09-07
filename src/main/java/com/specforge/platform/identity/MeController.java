@@ -35,7 +35,8 @@ class MeController implements IdentityApi {
         final Jwt jwt = ((JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getToken();
         final User user = mirror.mirror(TokenIdentity.of(jwt));
         return new Identity(user.subjectId(), user.displayName(), actorKind(user), roles(user))
-                .avatarUrl(user.avatarUrl());
+                .avatarUrl(user.avatarUrl())
+                .handle(user.handle());
     }
 
     /**

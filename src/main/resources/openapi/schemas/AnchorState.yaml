@@ -1,0 +1,9 @@
+type: string
+description: >
+  What became of a thread's anchor as the review's head moved on from the version the thread was
+  written against. A thread is never fuzzily reattached to different text — it says which of these
+  it is instead.
+enum:
+  - CURRENT
+  - STALE
+  - ORPHANED

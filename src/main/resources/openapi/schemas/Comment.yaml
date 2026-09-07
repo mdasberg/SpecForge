@@ -1,0 +1,27 @@
+type: object
+description: One post in a thread. The first comment opens it; every one after that is a reply.
+required: [id, threadId, author, body, mentions, createdAt]
+properties:
+  id:
+    type: string
+    format: uuid
+  threadId:
+    type: string
+    format: uuid
+  author:
+    $ref: ./ActorRef.yaml
+  body:
+    type: string
+    description: Markdown, rendered with the same renderer as specification text.
+  mentions:
+    type: array
+    description: Handles mentioned in this comment that resolved to a real project member.
+    items:
+      type: string
+  createdAt:
+    type: string
+    format: date-time
+  editedAt:
+    type: string
+    format: date-time
+    nullable: true

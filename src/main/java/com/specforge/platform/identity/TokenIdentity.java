@@ -1,5 +1,6 @@
 package com.specforge.platform.identity;
 
+import com.specforge.platform.ActorKind;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +10,13 @@ import org.springframework.security.oauth2.jwt.Jwt;
 /**
  * What a Keycloak access token says about who is calling. Reading the claims lives here so the
  * role converter and the identity mirror cannot disagree about them.
+ *
+ * <p>{@code handle} is {@code preferred_username} verbatim: it is already the no-space, unique
+ * name Keycloak enforces per realm, which is exactly what an {@code @}-mention needs and nothing
+ * this class has to invent.
  */
-public record TokenIdentity(String subjectId, String displayName, String avatarUrl, ActorKind actorKind,
-        Set<Role> roles) {
+public record TokenIdentity(String subjectId, String displayName, String handle, String avatarUrl,
+        ActorKind actorKind, Set<Role> roles) {
 
     /**
      * Keycloak names a client's service-account user {@code service-account-<clientId>}. That
@@ -27,7 +32,7 @@ public record TokenIdentity(String subjectId, String displayName, String avatarU
         final ActorKind actorKind = username != null && username.startsWith(SERVICE_ACCOUNT_PREFIX)
                 ? ActorKind.AGENT
                 : ActorKind.HUMAN;
-        return new TokenIdentity(jwt.getSubject(), displayName, jwt.getClaimAsString("picture"), actorKind,
+        return new TokenIdentity(jwt.getSubject(), displayName, username, jwt.getClaimAsString("picture"), actorKind,
                 realmRoles(jwt));
     }
 

@@ -1,0 +1,71 @@
+type: object
+description: >
+  A comment thread anchored to a section, or to a selected phrase within it, of the review head it
+  was opened against.
+required:
+  - id
+  - reviewId
+  - sectionKey
+  - quotedText
+  - anchorVersionLabel
+  - anchorState
+  - opener
+  - blocking
+  - resolved
+  - comments
+  - createdAt
+  - updatedAt
+properties:
+  id:
+    type: string
+    format: uuid
+  reviewId:
+    type: string
+    format: uuid
+  sectionKey:
+    type: string
+  range:
+    $ref: ./TextRange.yaml
+  quotedText:
+    type: string
+    description: >
+      The selected phrase for a text-range anchor, or the section heading for a whole-section one.
+      Shown verbatim once the thread renders as stale or orphaned, since the live text no longer is it.
+  anchorVersionLabel:
+    type: string
+    description: The version this thread was written against, e.g. `v2` or `#12`.
+    example: v2
+  anchorState:
+    $ref: ./AnchorState.yaml
+  opener:
+    $ref: ./ActorRef.yaml
+  blocking:
+    type: boolean
+    description: >
+      Whether this thread is one an approval waits on. Derived from the opener's actor kind: agents
+      never approve, so only a thread a reviewer opened can block one.
+  resolved:
+    type: boolean
+  resolvedBy:
+    $ref: ./ActorRef.yaml
+  resolvedAt:
+    type: string
+    format: date-time
+    nullable: true
+  reopenedBy:
+    $ref: ./ActorRef.yaml
+  reopenedAt:
+    type: string
+    format: date-time
+    nullable: true
+  comments:
+    type: array
+    description: Ordered oldest first; the first comment is what opened the thread.
+    items:
+      $ref: ./Comment.yaml
+  createdAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time

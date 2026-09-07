@@ -1,0 +1,15 @@
+type: object
+description: >
+  Opens a thread and posts its first comment in one call. `quotedText` is required alongside a
+  `range` — it must match the head content at that range exactly — and is ignored without one, since
+  the server takes the section heading as the quoted original for a whole-section anchor.
+required: [sectionKey, body]
+properties:
+  sectionKey:
+    type: string
+  range:
+    $ref: ./TextRange.yaml
+  quotedText:
+    type: string
+  body:
+    type: string

@@ -1,0 +1,5 @@
+type: string
+description: What triggered a notification.
+enum:
+  - MENTION
+  - REPLY

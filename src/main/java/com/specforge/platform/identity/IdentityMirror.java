@@ -26,7 +26,8 @@ public class IdentityMirror {
         final Instant now = clock.instant();
         return users.findById(identity.subjectId())
                 .map(existing -> {
-                    if (existing.refreshFrom(identity.displayName(), identity.avatarUrl(), identity.actorKind(), identity.roles(), now)) {
+                    if (existing.refreshFrom(identity.displayName(), identity.handle(), identity.avatarUrl(),
+                            identity.actorKind(), identity.roles(), now)) {
                         users.save(existing);
                     }
                     return existing;
@@ -34,6 +35,7 @@ public class IdentityMirror {
                 .orElseGet(() -> users.save(new User(
                         identity.subjectId(),
                         identity.displayName(),
+                        identity.handle(),
                         identity.avatarUrl(),
                         identity.actorKind(),
                         identity.roles(),

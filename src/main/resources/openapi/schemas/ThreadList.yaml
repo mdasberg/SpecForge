@@ -1,0 +1,16 @@
+type: object
+description: Every thread on a review, unresolved first.
+required: [items, unresolvedBlockingCount, unresolvedNonBlockingCount]
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Thread.yaml
+  unresolvedBlockingCount:
+    type: integer
+    format: int32
+    description: Unresolved threads a reviewer opened — what the approval gate waits on.
+  unresolvedNonBlockingCount:
+    type: integer
+    format: int32
+    description: Unresolved threads an agent opened. Never blocks an approval.

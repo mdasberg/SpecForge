@@ -1,0 +1,11 @@
+type: object
+description: The caller's notifications, newest first.
+required: [items, unreadCount]
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./Notification.yaml
+  unreadCount:
+    type: integer
+    format: int32
