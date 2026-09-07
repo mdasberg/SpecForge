@@ -1,0 +1,13 @@
+type: object
+description: >
+  Whether the review may reach Approved: the rule satisfied, no unresolved blocking thread, no
+  failed blocking check. There is no override past this gate.
+required: [passed, reasons]
+properties:
+  passed:
+    type: boolean
+  reasons:
+    type: array
+    description: Every failing condition, named — empty once the gate passes.
+    items:
+      type: string

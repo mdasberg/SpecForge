@@ -1,0 +1,27 @@
+type: object
+description: The approval panel for one review — reviewers, the rule, the gate, and the verdict log.
+required: [reviewId, reviewers, rule, unresolvedBlockingThreads, checks, gate, verdicts, composer]
+properties:
+  reviewId:
+    type: string
+    format: uuid
+  reviewers:
+    type: array
+    items:
+      $ref: ./RequiredReviewer.yaml
+  rule:
+    $ref: ./ApprovalRuleState.yaml
+  unresolvedBlockingThreads:
+    type: integer
+    format: int32
+  checks:
+    $ref: ./ChecksSummary.yaml
+  gate:
+    $ref: ./ApprovalGateState.yaml
+  verdicts:
+    type: array
+    description: Every cast verdict against the current head, newest first.
+    items:
+      $ref: ./Verdict.yaml
+  composer:
+    $ref: ./ComposerState.yaml

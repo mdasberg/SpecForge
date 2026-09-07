@@ -31,6 +31,12 @@ public interface SpecCatalog {
      */
     void proposeChange(UUID documentId);
 
+    /** The approval gate passed: the document is Approved. Refused if that move is not legal. */
+    void approve(UUID documentId);
+
+    /** A required reviewer requested changes: the document is Changes Requested. */
+    void requestChanges(UUID documentId);
+
     /**
      * One imported version's body. A null {@code ordinal} asks for the current version, which is
      * what a review's base is when a change is proposed.

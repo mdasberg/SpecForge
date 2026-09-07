@@ -1,0 +1,35 @@
+put:
+  operationId: updateProjectApprovalRule
+  tags: [ Repository ]
+  summary: Edit a project's approval rule.
+  description: >
+    Administrator only, and audited: the new rule takes effect the next time any of the project's
+    open reviews is read or voted on, because the approval capability evaluates the rule live
+    rather than from a snapshot taken when a review opened.
+  parameters:
+    - name: projectName
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/ApprovalRule.yaml
+  responses:
+    '200':
+      description: The rule now in effect.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ApprovalRule.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '403':
+      $ref: ../../responses/Forbidden.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

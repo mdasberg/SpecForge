@@ -114,10 +114,25 @@ public class SpecCatalogService implements SpecCatalog {
     @Override
     @Transactional
     public void proposeChange(final UUID documentId) {
-        final SpecDocument document = documents
+        SpecLifecycle.transition(require(documentId), SpecStatus.IN_REVIEW, clock.instant());
+    }
+
+    @Override
+    @Transactional
+    public void approve(final UUID documentId) {
+        SpecLifecycle.transition(require(documentId), SpecStatus.APPROVED, clock.instant());
+    }
+
+    @Override
+    @Transactional
+    public void requestChanges(final UUID documentId) {
+        SpecLifecycle.transition(require(documentId), SpecStatus.CHANGES_REQUESTED, clock.instant());
+    }
+
+    private SpecDocument require(final UUID documentId) {
+        return documents
                 .findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("No specification %s.".formatted(documentId)));
-        SpecLifecycle.transition(document, SpecStatus.IN_REVIEW, clock.instant());
     }
 
     @Override

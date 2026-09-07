@@ -1,0 +1,5 @@
+type: string
+description: >
+  What a cast verdict says. A comment never approves and never blocks: it is only ever a required
+  reviewer's approve or request-changes that claims a seat.
+enum: [APPROVE, REQUEST_CHANGES, COMMENT]

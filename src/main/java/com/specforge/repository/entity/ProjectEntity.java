@@ -84,6 +84,13 @@ public class ProjectEntity {
         this.updatedAt = now;
     }
 
+    /** Edits only the approval rule, leaving the wizard's other settings untouched. */
+    public void updateApprovalRule(final int minApprovals, final Set<String> requiredRoles, final Instant now) {
+        this.minApprovals = minApprovals;
+        this.requiredRoles = new LinkedHashSet<>(requiredRoles);
+        this.updatedAt = now;
+    }
+
     public void update(
             final String team,
             final String tracker,

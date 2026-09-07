@@ -1,0 +1,14 @@
+type: object
+description: >
+  Blocking automated-check state, read from the automated-review capability. Reports as not
+  configured until that capability ships, which the gate treats as non-blocking.
+required: [configured, failed, failedCheckNames]
+properties:
+  configured:
+    type: boolean
+  failed:
+    type: boolean
+  failedCheckNames:
+    type: array
+    items:
+      type: string

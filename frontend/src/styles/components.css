@@ -207,3 +207,21 @@
   display: flex; align-items: center; gap: 8px; padding: 8px 10px;
   border-top: 1px solid var(--line-2); color: var(--fg-3); font-size: 12px;
 }
+
+/* ---------- review panel (approval) ---------- */
+.rp-block { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.rp-block:last-child { border-bottom: none; }
+.rp-t {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--fg-3); margin-bottom: 9px; display: flex; align-items: center; gap: 7px;
+}
+.rv { display: flex; align-items: center; gap: 9px; padding: 5px 0; }
+.rv-n { font-size: 12px; font-weight: 500; }
+.rv-r { font-size: 11px; color: var(--fg-3); }
+.gate {
+  display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 6px;
+  background: var(--panel-2); border: 1px solid var(--line); font-size: 11.5px; color: var(--fg-2);
+}
+.check { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 12px; }
+.check .nm { color: var(--fg); }
+.check .ds { color: var(--fg-3); font-size: 11px; }

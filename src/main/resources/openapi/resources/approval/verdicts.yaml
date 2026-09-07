@@ -1,0 +1,38 @@
+post:
+  operationId: castVerdict
+  tags: [ Approval ]
+  summary: Cast approve, request changes or comment against the review's current head.
+  description: >
+    An agent identity casting approve or request changes is refused with a conflict — agents may
+    only comment. A verdict cast against a head that is no longer current is refused with a
+    conflict naming that the head advanced. A verdict that cannot claim a required-reviewer seat
+    (every compatible one already claimed by someone else) is still recorded, just optionally: it
+    is visible in the verdict log but does not count toward the rule.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/VerdictRequest.yaml
+  responses:
+    '200':
+      description: The approval status, after the verdict was recorded.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ApprovalStatus.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+    '409':
+      $ref: ../../responses/Conflict.yaml

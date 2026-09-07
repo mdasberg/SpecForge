@@ -973,4 +973,93 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="approval-0001-review-reviewer" author="specforge">
+        <comment>
+            review_id is a plain UUID, not a foreign key — review owns that row. A RULE-origin seat
+            starts unclaimed (subject_id null) and is reconciled against the project's rule on every
+            read; a MANUAL one names a person from the moment an administrator adds it and is never
+            touched by that reconcile. removed_at is a soft delete, so a claimed seat's history
+            survives removing the person from the requirement.
+        </comment>
+
+        <createTable tableName="review_reviewer">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_review_reviewer" nullable="false"/>
+            </column>
+            <column name="review_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="origin" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="required_role" type="VARCHAR(32)"/>
+            <column name="subject_id" type="VARCHAR(64)"/>
+            <column name="state" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="added_by" type="VARCHAR(64)"/>
+            <column name="added_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="removed_by" type="VARCHAR(64)"/>
+            <column name="removed_at" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+
+        <createIndex tableName="review_reviewer" indexName="idx_review_reviewer_review">
+            <column name="review_id"/>
+            <column name="removed_at"/>
+        </createIndex>
+
+        <!-- One live seat per subject per review: a claimed seat is exactly what the caller's own
+             row lookup during a verdict cast relies on being unique. -->
+        <sql splitStatements="true" endDelimiter=";">
+            CREATE UNIQUE INDEX uq_review_reviewer_subject ON review_reviewer (review_id, subject_id)
+            WHERE removed_at IS NULL AND subject_id IS NOT NULL;
+        </sql>
+
+        <createTable tableName="review_verdict">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_review_verdict" nullable="false"/>
+            </column>
+            <column name="review_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actor_kind" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="verdict_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body" type="TEXT"/>
+            <column name="head_content_sha" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="head_label" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="review_verdict" indexName="idx_review_verdict_review">
+            <column name="review_id"/>
+            <column name="created_at"/>
+        </createIndex>
+
+        <!-- Recasting against the same head replaces the existing verdict rather than adding a second one. -->
+        <addUniqueConstraint tableName="review_verdict"
+                             columnNames="review_id, subject_id, head_content_sha"
+                             constraintName="uq_review_verdict_head"/>
+    </changeSet>
+
 </databaseChangeLog>

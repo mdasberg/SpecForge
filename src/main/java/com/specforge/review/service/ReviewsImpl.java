@@ -1,8 +1,10 @@
 package com.specforge.review.service;
 
 import com.specforge.review.ReviewHead;
+import com.specforge.review.ReviewRef;
 import com.specforge.review.Reviews;
 import com.specforge.review.entity.ReviewEntity;
+import com.specforge.review.entity.ReviewState;
 import com.specforge.review.repository.ReviewRepository;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +22,12 @@ class ReviewsImpl implements Reviews {
     @Override
     public Optional<ReviewHead> head(final UUID reviewId) {
         return reviews.findById(reviewId).map(ReviewsImpl::head);
+    }
+
+    @Override
+    public Optional<ReviewRef> ref(final UUID reviewId) {
+        return reviews.findById(reviewId).map(review -> new ReviewRef(
+                review.id(), review.documentId(), review.state() == ReviewState.OPEN, review.proposalId()));
     }
 
     /** The same label {@link ReviewMapper#headSide} renders — a pull-request head has no ordinal. */

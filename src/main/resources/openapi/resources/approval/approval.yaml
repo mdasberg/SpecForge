@@ -1,0 +1,26 @@
+get:
+  operationId: getApprovalStatus
+  tags: [ Approval ]
+  summary: The approval panel for a review.
+  description: >
+    Reconciles the review's required-reviewer seats against the project's current rule before
+    reading them, so an edited rule is reflected here immediately rather than only on reviews
+    opened after the edit.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The approval status.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ApprovalStatus.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

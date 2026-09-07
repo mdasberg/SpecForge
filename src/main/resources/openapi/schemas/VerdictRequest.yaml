@@ -1,0 +1,15 @@
+type: object
+description: >
+  A verdict cast against the review's current head. atHeadSha is the head the caller believes is
+  current — read from the review's own headSide.contentSha — and is refused once it no longer is,
+  telling the reviewer the head advanced rather than silently recording an approval of stale content.
+required: [verdictType, atHeadSha]
+properties:
+  verdictType:
+    $ref: ./VerdictType.yaml
+  body:
+    type: string
+    nullable: true
+  atHeadSha:
+    type: string
+    example: 3f8a9c2b7e1d4f6a8b0c2d4e6f8a0b1c
