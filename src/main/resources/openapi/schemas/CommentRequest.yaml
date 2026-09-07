@@ -1,0 +1,6 @@
+type: object
+description: A reply to an existing thread.
+required: [body]
+properties:
+  body:
+    type: string

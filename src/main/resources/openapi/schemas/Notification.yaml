@@ -1,0 +1,27 @@
+type: object
+description: One in-app notification — a mention, or a reply on a thread the caller participates in.
+required: [id, type, reviewId, threadId, commentId, actor, createdAt]
+properties:
+  id:
+    type: string
+    format: uuid
+  type:
+    $ref: ./NotificationType.yaml
+  reviewId:
+    type: string
+    format: uuid
+  threadId:
+    type: string
+    format: uuid
+  commentId:
+    type: string
+    format: uuid
+  actor:
+    $ref: ./ActorRef.yaml
+  readAt:
+    type: string
+    format: date-time
+    nullable: true
+  createdAt:
+    type: string
+    format: date-time

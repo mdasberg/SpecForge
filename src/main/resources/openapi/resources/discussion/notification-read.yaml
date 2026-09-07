@@ -1,0 +1,22 @@
+post:
+  operationId: markNotificationRead
+  tags: [ Discussions ]
+  summary: Mark one of the caller's own notifications read.
+  parameters:
+    - name: notificationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The notification.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Notification.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

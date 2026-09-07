@@ -1,0 +1,22 @@
+type: object
+description: >
+  Enough of a mirrored identity to show who did something and link to them — a comment's author, a
+  thread's opener or resolver, a notification's actor, or a member matched by an @-mention search.
+required: [subjectId, displayName, actorKind]
+properties:
+  subjectId:
+    type: string
+    example: 31f66889-ed02-490c-bf54-7f4897645c6e
+  displayName:
+    type: string
+    example: Architect User
+  handle:
+    type: string
+    nullable: true
+    description: The @-mention handle. Absent for an identity that has never been mirrored from a token.
+    example: architect
+  avatarUrl:
+    type: string
+    nullable: true
+  actorKind:
+    $ref: ./ActorKind.yaml

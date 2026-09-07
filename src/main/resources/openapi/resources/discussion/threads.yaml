@@ -1,0 +1,58 @@
+get:
+  operationId: listThreads
+  tags: [ Discussions ]
+  summary: Every thread on a review, unresolved first.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The review's threads.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ThreadList.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+post:
+  operationId: openThread
+  tags: [ Discussions ]
+  summary: Open a thread anchored to a section, or a selection within it, and post its first comment.
+  description: >
+    Anchors against the review's current head: the content sha and the version label it renders
+    against are read from the review, not taken from the caller, so a thread's "written against"
+    claim cannot be forged and matches what a later head-advance event carries it against.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/ThreadRequest.yaml
+  responses:
+    '201':
+      description: The thread was opened.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/Thread.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml
+    '422':
+      $ref: ../../responses/UnprocessableEntity.yaml

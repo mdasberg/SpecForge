@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router';
 import { useAuth } from 'react-oidc-context';
+import { NotificationBell } from '../components/NotificationBell';
 import { useTheme } from '../theme/useTheme';
 
 const SCREENS = [
@@ -35,6 +36,7 @@ export function TopBar() {
       </button>
       {auth.isAuthenticated && (
         <>
+          <NotificationBell />
           <span style={{ color: 'var(--fg-2)' }}>{auth.user?.profile.name ?? auth.user?.profile.preferred_username}</span>
           <button type="button" className="iconbtn" style={{ width: 'auto', padding: '0 10px' }} onClick={() => void auth.signoutRedirect()}>
             Sign out

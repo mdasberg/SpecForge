@@ -1,0 +1,12 @@
+type: object
+description: >
+  A half-open character range `[startOffset, endOffset)` into the review head's normalised content,
+  narrowing a thread's anchor from the whole section to a selected phrase within it.
+required: [startOffset, endOffset]
+properties:
+  startOffset:
+    type: integer
+    format: int32
+  endOffset:
+    type: integer
+    format: int32

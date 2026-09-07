@@ -11,6 +11,13 @@ properties:
   displayName:
     type: string
     example: Architect User
+  handle:
+    type: string
+    nullable: true
+    description: >
+      The Keycloak username, used as the @-mention handle. Absent for a row mirrored before this
+      field existed, until that identity's next authenticated request.
+    example: architect
   avatarUrl:
     type: string
     nullable: true

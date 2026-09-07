@@ -1,0 +1,8 @@
+type: object
+description: Members whose handle or display name matches a mention query.
+required: [items]
+properties:
+  items:
+    type: array
+    items:
+      $ref: ./ActorRef.yaml

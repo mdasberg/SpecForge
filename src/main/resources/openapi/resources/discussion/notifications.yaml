@@ -1,0 +1,13 @@
+get:
+  operationId: listNotifications
+  tags: [ Discussions ]
+  summary: The caller's own notifications, newest first.
+  responses:
+    '200':
+      description: The caller's notifications.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/NotificationList.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml

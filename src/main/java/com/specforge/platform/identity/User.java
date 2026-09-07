@@ -1,5 +1,6 @@
 package com.specforge.platform.identity;
 
+import com.specforge.platform.ActorKind;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -33,6 +34,13 @@ public class User {
     @Column(name = "display_name", nullable = false, length = 255)
     private String displayName;
 
+    /**
+     * Keycloak's {@code preferred_username}, nullable because a row created before this column
+     * existed has none yet — it backfills itself the next time that identity is mirrored.
+     */
+    @Column(name = "handle", length = 64)
+    private String handle;
+
     @Column(name = "avatar_url", length = 1024)
     private String avatarUrl;
 
@@ -56,10 +64,11 @@ public class User {
         // for JPA
     }
 
-    User(final String subjectId, final String displayName, final String avatarUrl, final ActorKind actorKind,
-            final Set<Role> roles, final Instant now) {
+    User(final String subjectId, final String displayName, final String handle, final String avatarUrl,
+            final ActorKind actorKind, final Set<Role> roles, final Instant now) {
         this.subjectId = subjectId;
         this.displayName = displayName;
+        this.handle = handle;
         this.avatarUrl = avatarUrl;
         this.actorKind = actorKind;
         this.roles = EnumSet.copyOf(roles);
@@ -71,15 +80,17 @@ public class User {
      * Applies what the current token says. Returns whether anything actually changed, so a request
      * that presents the same claims as the last one does not write.
      */
-    boolean refreshFrom(final String displayName, final String avatarUrl, final ActorKind actorKind,
-            final Set<Role> roles, final Instant now) {
+    boolean refreshFrom(final String displayName, final String handle, final String avatarUrl,
+            final ActorKind actorKind, final Set<Role> roles, final Instant now) {
         if (this.displayName.equals(displayName)
+                && java.util.Objects.equals(this.handle, handle)
                 && java.util.Objects.equals(this.avatarUrl, avatarUrl)
                 && this.actorKind == actorKind
                 && this.roles.equals(roles)) {
             return false;
         }
         this.displayName = displayName;
+        this.handle = handle;
         this.avatarUrl = avatarUrl;
         this.actorKind = actorKind;
         this.roles = EnumSet.copyOf(roles);
@@ -93,6 +104,10 @@ public class User {
 
     public String displayName() {
         return displayName;
+    }
+
+    public String handle() {
+        return handle;
     }
 
     public String avatarUrl() {
