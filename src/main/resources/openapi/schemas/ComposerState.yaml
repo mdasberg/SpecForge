@@ -1,0 +1,13 @@
+type: object
+description: What the current caller may do from the verdict composer, and why not when they may not.
+required: [canApprove, canRequestChanges, canComment]
+properties:
+  canApprove:
+    type: boolean
+  canRequestChanges:
+    type: boolean
+  canComment:
+    type: boolean
+  disabledReason:
+    type: string
+    nullable: true

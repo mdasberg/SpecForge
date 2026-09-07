@@ -1,0 +1,21 @@
+type: object
+description: One cast verdict against one head. Recasting against the same head replaces it in place.
+required: [id, author, verdictType, headLabel, castAt]
+properties:
+  id:
+    type: string
+    format: uuid
+  author:
+    $ref: ./ActorRef.yaml
+  verdictType:
+    $ref: ./VerdictType.yaml
+  body:
+    type: string
+    nullable: true
+  headLabel:
+    type: string
+    description: The version this verdict was cast against, e.g. `v2` or `#12`.
+    example: v2
+  castAt:
+    type: string
+    format: date-time

@@ -1,0 +1,17 @@
+type: object
+description: >
+  The project's approval rule evaluated against this review's current seats, with a reason present
+  whether or not it is satisfied — one source for the state and its explanation.
+required: [satisfied, approvedCount, requiredCount, reason]
+properties:
+  satisfied:
+    type: boolean
+  approvedCount:
+    type: integer
+    format: int32
+  requiredCount:
+    type: integer
+    format: int32
+  reason:
+    type: string
+    example: 1 of 2 required approvals; needs one from an architect.

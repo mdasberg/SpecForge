@@ -2,6 +2,7 @@ package com.specforge.platform.identity;
 
 import com.specforge.platform.Caller;
 import com.specforge.platform.Callers;
+import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -18,6 +19,7 @@ class TokenCallers implements Callers {
             throw new IllegalStateException("No authenticated caller on an authenticated route.");
         }
         final TokenIdentity identity = TokenIdentity.of(token.getToken());
-        return new Caller(identity.subjectId(), identity.displayName(), identity.actorKind());
+        final var roles = identity.roles().stream().map(Enum::name).collect(Collectors.toUnmodifiableSet());
+        return new Caller(identity.subjectId(), identity.displayName(), identity.actorKind(), roles);
     }
 }

@@ -1,0 +1,7 @@
+type: object
+description: An administrator naming a specific person as required on this one review.
+required: [subjectId]
+properties:
+  subjectId:
+    type: string
+    example: 31f66889-ed02-490c-bf54-7f4897645c6e

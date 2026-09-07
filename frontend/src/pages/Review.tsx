@@ -5,7 +5,10 @@ import { getReview, getReviewDiff } from '../api/review';
 import type { Review as ReviewDetail, SpecDiff } from '../api/review';
 import { listThreads, openThread, replyToThread, reopenThread, resolveThread } from '../api/discussion';
 import type { ThreadList } from '../api/discussion';
+import { castVerdict, getApprovalStatus } from '../api/approval';
+import type { ApprovalStatus, VerdictType } from '../api/approval';
 import { ApiError } from '../auth/api';
+import { ApprovalPanel } from '../components/ApprovalPanel';
 import { DiffJumpList, DiffModeToggle, DiffSummaryLine, DiffView } from '../components/DiffView';
 import { useDiffMode } from '../lib/useDiffMode';
 import { EmptyState } from '../components/EmptyState';
@@ -15,7 +18,7 @@ import { StatusBadge } from '../components/StatusBadge';
 import { ThreadCard } from '../components/ThreadCard';
 import { formatRelativeTime } from '../lib/format';
 
-type Tab = 'document' | 'changes' | 'discussions';
+type Tab = 'document' | 'changes' | 'discussions' | 'approval';
 
 /**
  * One review. The shell is deliberately built around tabs even though only two of them exist: the
@@ -27,11 +30,16 @@ export function Review() {
   const auth = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
-  const tab: Tab = tabParam === 'changes' ? 'changes' : tabParam === 'discussions' ? 'discussions' : 'document';
+  const tab: Tab =
+    tabParam === 'changes' ? 'changes'
+    : tabParam === 'discussions' ? 'discussions'
+    : tabParam === 'approval' ? 'approval'
+    : 'document';
 
   const [review, setReview] = useState<ReviewDetail | null>(null);
   const [diff, setDiff] = useState<SpecDiff | null>(null);
   const [threads, setThreads] = useState<ThreadList | null>(null);
+  const [approval, setApproval] = useState<ApprovalStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useDiffMode();
@@ -97,6 +105,27 @@ export function Review() {
       cancelled = true;
     };
   }, [reviewId, tab, diff, auth.user]);
+
+  // Same reasoning as the diff: the approval panel reconciles the review's seats against the
+  // project's live rule on every fetch, so it is worth fetching only when someone looks at it.
+  useEffect(() => {
+    if (!reviewId || tab !== 'approval' || approval) return;
+    let cancelled = false;
+    async function run() {
+      try {
+        const result = await getApprovalStatus(reviewId as string, auth.user);
+        if (!cancelled) setApproval(result);
+      } catch (e) {
+        if (cancelled) return;
+        if (e instanceof ApiError) setError(e.problem.detail ?? e.problem.title ?? 'Could not load the approval status.');
+        else throw e;
+      }
+    }
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [reviewId, tab, approval, auth.user]);
 
   const anchors = useMemo(() => (review ? review.sections.map((section) => section.anchorKey) : []), [review]);
 
@@ -166,10 +195,32 @@ export function Review() {
             <span className="count">{threads.unresolvedBlockingCount + threads.unresolvedNonBlockingCount}</span>
           )}
         </button>
+        <button type="button" className={`tab${tab === 'approval' ? ' on' : ''}`} onClick={() => selectTab('approval')}>
+          Approval
+          {approval && <span className="count">{approval.rule.approvedCount}/{approval.rule.requiredCount}</span>}
+        </button>
       </div>
 
       {tab === 'document' ? (
         <SpecMarkdown content={review.content} anchors={anchors} />
+      ) : tab === 'approval' ? (
+        !approval ? (
+          <div className="card card-pad">{error ?? 'Loading approval status…'}</div>
+        ) : (
+          <ApprovalPanel
+            status={approval}
+            headLabel={review.head.label}
+            onCastVerdict={async (verdictType: VerdictType, body: string) => {
+              const result = await castVerdict(
+                reviewId as string,
+                { verdictType, body: body || undefined, atHeadSha: review.head.contentSha },
+                auth.user,
+              );
+              setApproval(result);
+              setReview(await getReview(reviewId as string, auth.user));
+            }}
+          />
+        )
       ) : tab === 'discussions' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <NewThreadForm

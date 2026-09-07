@@ -1,6 +1,7 @@
 package com.specforge.discussion.repository;
 
 import com.specforge.discussion.entity.ThreadEntity;
+import com.specforge.platform.ActorKind;
 import com.specforge.review.AnchorState;
 import java.util.List;
 import java.util.UUID;
@@ -12,4 +13,6 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, UUID> {
 
     /** Every thread still worth re-checking on a head advance; an orphaned one never un-orphans. */
     List<ThreadEntity> findByReviewIdAndAnchorStateNot(UUID reviewId, AnchorState anchorState);
+
+    int countByReviewIdAndResolvedFalseAndOpenerActorKind(UUID reviewId, ActorKind openerActorKind);
 }

@@ -1,0 +1,27 @@
+type: object
+description: >
+  One seat the approval rule requires filled. A RULE seat starts unclaimed (no reviewer yet) and is
+  claimed by the first compatible verdict; a MANUAL seat names a specific person from the moment an
+  administrator adds them.
+required: [id, origin, state]
+properties:
+  id:
+    type: string
+    format: uuid
+  origin:
+    type: string
+    enum: [RULE, MANUAL]
+  requiredRole:
+    type: string
+    nullable: true
+    description: Set only while a RULE seat is unclaimed; irrelevant once a reviewer has claimed it.
+  reviewer:
+    $ref: ./ActorRef.yaml
+  state:
+    type: string
+    enum: [PENDING, APPROVED, CHANGES_REQUESTED]
+  addedBy:
+    $ref: ./ActorRef.yaml
+  addedAt:
+    type: string
+    format: date-time

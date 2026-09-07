@@ -1,6 +1,7 @@
 package com.specforge.repository.api;
 
 import com.specforge.platform.api.Problems;
+import com.specforge.platform.api.dto.ApprovalRule;
 import com.specforge.platform.api.dto.Connection;
 import com.specforge.platform.api.dto.ConnectionList;
 import com.specforge.platform.api.dto.ConnectionRequest;
@@ -107,5 +108,11 @@ class RepositoryController implements RepositoryApi {
     @Override
     public void updateSpecContent(final UUID specId, final SpecContentUpdate update) {
         specContent.refuseEdit(specId);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApprovalRule updateProjectApprovalRule(final String projectName, final ApprovalRule rule) {
+        return connections.updateApprovalRule(projectName, rule);
     }
 }

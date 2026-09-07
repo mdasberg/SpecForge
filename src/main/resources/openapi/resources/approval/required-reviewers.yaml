@@ -1,0 +1,33 @@
+post:
+  operationId: addRequiredReviewer
+  tags: [ Approval ]
+  summary: Add a specific person as required on this one review.
+  description: Administrator only, and audited. On top of whatever the project's rule already requires.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/AddRequiredReviewerRequest.yaml
+  responses:
+    '200':
+      description: The approval status, with the seat added.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ApprovalStatus.yaml
+    '400':
+      $ref: ../../responses/BadRequest.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '403':
+      $ref: ../../responses/Forbidden.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

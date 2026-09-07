@@ -44,6 +44,10 @@ tags:
     description: >
       Anchored comment threads on a review, replies, @-mentions, resolution and the notifications they
       raise.
+  - name: Approval
+    description: >
+      Required reviewers, verdicts, the project's approval rule and the gate that reaches Approved —
+      and the rule that agents never approve.
 
 paths:
   /api/me:
@@ -72,6 +76,8 @@ paths:
     $ref: ./resources/review/spec-diff.yaml
   /api/projects:
     $ref: ./resources/catalog/projects.yaml
+  /api/projects/{projectName}/approval-rule:
+    $ref: ./resources/repository/project-approval-rule.yaml
   /api/specs/{specId}/content:
     $ref: ./resources/repository/spec-content.yaml
   /api/reviews:
@@ -96,6 +102,14 @@ paths:
     $ref: ./resources/discussion/notification-read.yaml
   /api/members:
     $ref: ./resources/discussion/members.yaml
+  /api/reviews/{reviewId}/approval:
+    $ref: ./resources/approval/approval.yaml
+  /api/reviews/{reviewId}/verdicts:
+    $ref: ./resources/approval/verdicts.yaml
+  /api/reviews/{reviewId}/required-reviewers:
+    $ref: ./resources/approval/required-reviewers.yaml
+  /api/reviews/{reviewId}/required-reviewers/{requiredReviewerId}:
+    $ref: ./resources/approval/required-reviewer.yaml
   /api/webhooks/github:
     $ref: ./resources/repository/github-webhook.yaml
 

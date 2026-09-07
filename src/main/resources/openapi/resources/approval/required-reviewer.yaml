@@ -1,0 +1,33 @@
+delete:
+  operationId: removeRequiredReviewer
+  tags: [ Approval ]
+  summary: Remove a required-reviewer seat, e.g. one naming someone who has left the team.
+  description: >
+    Administrator only, and audited. A soft delete: the verdict the seat's occupant may have cast
+    stays in the review's verdict log regardless.
+  parameters:
+    - name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: requiredReviewerId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: The approval status, with the seat removed.
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/ApprovalStatus.yaml
+    '401':
+      $ref: ../../responses/Unauthorized.yaml
+    '403':
+      $ref: ../../responses/Forbidden.yaml
+    '404':
+      $ref: ../../responses/NotFound.yaml

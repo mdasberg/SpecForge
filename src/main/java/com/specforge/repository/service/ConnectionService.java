@@ -1,6 +1,7 @@
 package com.specforge.repository.service;
 
 import com.specforge.platform.api.Problems;
+import com.specforge.platform.api.dto.ApprovalRule;
 import com.specforge.platform.api.dto.Connection;
 import com.specforge.platform.api.dto.ConnectionList;
 import com.specforge.platform.api.dto.ConnectionRequest;
@@ -19,6 +20,7 @@ import com.specforge.repository.repository.RepositoryConnectionRepository;
 import com.specforge.repository.repository.RepositoryScanRepository;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -89,6 +91,16 @@ public class ConnectionService {
         return connections
                 .findById(connectionId)
                 .orElseThrow(() -> Problems.notFound("No repository connection %s.".formatted(connectionId)));
+    }
+
+    /** Edits a project's approval rule after the wizard, taking effect the next time it is read. */
+    public ApprovalRule updateApprovalRule(final String projectName, final ApprovalRule rule) {
+        final ProjectEntity project = projects
+                .findByName(projectName)
+                .orElseThrow(() -> Problems.notFound("No project %s.".formatted(projectName)));
+        project.updateApprovalRule(
+                rule.getMinApprovals(), new LinkedHashSet<>(rule.getRequiredRoles()), clock.instant());
+        return new ApprovalRule(project.minApprovals(), new ArrayList<>(project.requiredRoles()));
     }
 
     ProjectEntity project(final RepositoryConnectionEntity connection) {
