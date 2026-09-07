@@ -12,8 +12,9 @@
 # One step is not instant: the scan started by request 3 runs asynchronously, so request 3b is
 # re-sent until it settles. Request 4 deliberately does not depend on it — see the note there.
 #
-# Step 1e registers the installation the connection flow needs. Steps 2 to 5 are that flow,
-# which has no UI yet. Steps 6 onward are the catalogue.
+# Step 1e registers the installation the connection flow needs. Steps 2 to 5 are that flow, which
+# has no UI yet, and 5c opens a review the same way — by posting the delivery GitHub would have
+# sent, so neither needs a tunnel. Steps 6 onward are the catalogue.
 #
 # https://github.com/mdasberg/requirements is private and holds 40 specifications at
 # `openspecs/specs/<domain>/<capability>/spec.md`. Two things about that layout matter:
@@ -289,6 +290,82 @@ Authorization: Bearer {{token}}
 # Independent of the sync mode. Useful after pushing to the branch when sync is ON_PULL_REQUEST.
 POST {{host}}/api/repository-connections/{{connectionId}}/imports
 Authorization: Bearer {{token}}
+
+### 5c. Open a review without a tunnel
+# A review is only ever created by a `pull_request` delivery — nothing in the API opens one — so an
+# instance GitHub cannot reach shows "No reviews yet" forever no matter how many specifications it
+# imported. This posts the delivery, signed the same way request 1e signs the installation one.
+#
+# The pull request has to genuinely exist on GitHub. Only the routing comes from this payload:
+# `ProposalService` asks the App which files the pull request touched and reads each one at
+# `head.sha`, so an invented number or sha finds no files and records nothing — silently, since a
+# pull request touching no specification is the ordinary case.
+#
+# Four things must line up, or the delivery is accepted (202) and does nothing:
+#   1. `prNumber` is open on {{repositoryFullName}} and touches a path matching {{pathGlob}}.
+#   2. `headSha` is that pull request's current head commit.
+#   3. Its base branch is {{branch}} — the connection is looked up by repository AND base branch.
+#   4. The connection's syncMode is ON_PULL_REQUEST and it is not DEGRADED.
+#
+# `prNumber` and `headSha` live in `http-client.private.env.json` beside the webhook secret, since
+# they are yours and change constantly. `gh pr view <n> --json number,headRefOid` prints both.
+#
+# Actions are handled as GitHub sends them: `opened`, `reopened`, `synchronize` and
+# `ready_for_review` all record the head — send `synchronize` after pushing to the branch to move
+# the review's head and watch the approvals reset and the checks re-run. `closed` closes the review.
+< {%
+    const secret = request.environment.get("webhookSecret");
+    const pr = request.environment.get("prNumber");
+    if (!secret || !/^\d+$/.test(pr ?? "")) {
+        throw new Error("`webhookSecret` and `prNumber` come from http/http-client.private.env.json. "
+            + "`prNumber` must be the bare number of an open pull request, and `headSha` its head "
+            + "commit — `gh pr view <n> --json number,headRefOid` prints both.");
+    }
+    if (!/^[0-9a-f]{40}$/.test(request.environment.get("headSha") ?? "")) {
+        throw new Error("`headSha` must be the pull request's full 40-character head commit sha. "
+            + "The files are read at that sha, so a wrong one imports nothing.");
+    }
+    request.variables.set("author", request.environment.get("repositoryFullName").split("/")[0]);
+    request.variables.set("signature", crypto.hmac.sha256()
+        .withTextSecret(secret)
+        .updateWithText(request.body.tryGetSubstituted())
+        .digest()
+        .toHex());
+%}
+POST {{host}}/api/webhooks/github
+X-GitHub-Event: pull_request
+X-GitHub-Delivery: {{$uuid}}
+X-Hub-Signature-256: sha256={{signature}}
+Content-Type: application/json
+
+{"action":"opened","number":{{prNumber}},"repository":{"full_name":"{{repositoryFullName}}"},"pull_request":{"number":{{prNumber}},"title":"Proposed specification change","base":{"ref":"{{branch}}"},"head":{"sha":"{{headSha}}"},"user":{"login":"{{author}}"}}}
+
+> {%
+    client.test("the delivery was accepted", () => {
+        client.assert(response.status === 202,
+            "401 means the signature did not verify: `webhookSecret` is not the "
+            + "SPECFORGE_GITHUB_WEBHOOK_SECRET the running instance was given.");
+    });
+%}
+
+### 5d. The reviews it opened
+# One review per specification the pull request touches — four changed specs are four reviews,
+# because a reviewer approves a specification and one review spanning four could not say "approved"
+# honestly about any of them.
+#
+# Empty after a 202 at 5c means the delivery routed nowhere: no file matched {{pathGlob}}, the base
+# branch was not {{branch}}, the connection is not ON_PULL_REQUEST, or the specification has not
+# been imported yet — a proposal against a path with no base version has nothing to diff and is
+# skipped until the next import creates one.
+GET {{host}}/api/reviews?state=OPEN
+Authorization: Bearer {{token}}
+
+> {%
+    const first = response.body.items[0];
+    if (first) {
+        client.global.set("reviewId", first.id);
+    }
+%}
 
 ### 6. Browse the catalogue
 # Grouped by project unless `groupBy` says otherwise. The group counts are computed over the whole
