@@ -123,6 +123,30 @@ npx smee-client --url https://smee.io/<your-channel> --path /api/webhooks/github
 Use that `smee.io` URL as the app's webhook URL. Install the app on the repository
 (**Only select repositories**), and the delivery that follows registers the installation.
 
+**Without a tunnel**, the two deliveries that matter can be posted by hand — `http/specforge.http`
+signs them with the same secret the running instance verifies against. Request **1e** posts the
+`installation` delivery, and request **5c** posts a `pull_request` one, which is the only way a
+review is ever opened: no endpoint creates one, so an unreachable instance shows "No reviews yet"
+however many specifications it has imported.
+
+Request 5c needs a pull request that genuinely exists — only the routing comes from the payload,
+and SpecForge asks the App which files the pull request touched and reads them at its head commit.
+Put its number and head sha beside the webhook secret in `http/http-client.private.env.json`, which
+is gitignored:
+
+```json
+{
+  "dev": {
+    "webhookSecret": "<the app's webhook secret>",
+    "installationExternalId": "<from github.com/settings/installations → Configure>",
+    "prNumber": "<an open pull request touching a spec>",
+    "headSha": "<its 40-character head commit sha>"
+  }
+}
+```
+
+`gh pr view <n> --json number,headRefOid` prints the last two.
+
 ### Run with the app configured
 
 ```
